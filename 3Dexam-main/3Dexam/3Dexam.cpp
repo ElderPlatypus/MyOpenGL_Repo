@@ -7,8 +7,7 @@
 
 int main()
 {
-    Application* app = new Application("Test Run", 1920,1080);
-    app->Run_App();
+    Application::GetAPP()->Run_App();
 }
 
 ///Template Given befor hand

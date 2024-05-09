@@ -7,9 +7,6 @@
 //Other includes
 #include "glm/mat4x3.hpp"
 
-
-
-
 class Application
 {
 private:
@@ -26,12 +23,15 @@ public:
 	Application(std::string name, int width, int height) : mWidth(width), mHeight(height), mName(name) {}
 	~Application(); //Destroy window memory loaction after done running 
 
+	static Application* GetAPP();
+
 	///Initializers
 	void GLFW_Init();
 	void Window_Init(); //Initialize window
 
 	///RenderLoop
 	void Run_App(); 
+	void Original_Run_App();
 
 	///Window Callbacks
 	void RegisterWindowCallbacks();
