@@ -33,9 +33,6 @@
     <ClCompile Include="SceneFolder\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SceneFolder\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SceneFolder\Actor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -71,7 +68,10 @@
     <ClInclude Include="SceneFolder\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SceneFolder\Mesh.h">
+    <ClInclude Include="SceneFolder\Actor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility\pathDefinition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SceneFolder\Vertex.h">
@@ -80,16 +80,13 @@
     <ClInclude Include="Definitions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SceneFolder\Actor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CameraFolder\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\pathDefinition.h">
+    <ClInclude Include="Utility\Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utility\Transform.h">
+    <ClInclude Include="Dependency\includes\stb\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -99,9 +96,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Shaders\container.jpg">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Shaders\wall.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

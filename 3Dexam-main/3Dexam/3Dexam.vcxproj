@@ -135,7 +135,6 @@
     <ClCompile Include="CameraFolder\Camera.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="SceneFolder\Actor.cpp" />
-    <ClCompile Include="SceneFolder\Mesh.cpp" />
     <ClCompile Include="SceneFolder\Scene.cpp" />
     <ClCompile Include="Shaders\Shader.cpp" />
     <ClCompile Include="Shaders\ShaderFileLoader.cpp" />
@@ -143,19 +142,19 @@
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="CameraFolder\Camera.h" />
+    <ClInclude Include="Dependency\includes\stb\stb_image.h" />
     <ClInclude Include="includes\assimp\Bitmap.h" />
     <ClInclude Include="includes\GLFW\glfw3.h" />
     <ClInclude Include="includes\GLFW\glfw3native.h" />
     <ClInclude Include="includes\glm\mat4x3.hpp" />
     <ClInclude Include="includes\KHR\khrplatform.h" />
+    <ClInclude Include="Utility\pathDefinition.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="SceneFolder\Actor.h" />
-    <ClInclude Include="SceneFolder\Mesh.h" />
     <ClInclude Include="SceneFolder\Scene.h" />
     <ClInclude Include="SceneFolder\Vertex.h" />
     <ClInclude Include="Shaders\Shader.h" />
     <ClInclude Include="Shaders\ShaderFileLoader.h" />
-    <ClInclude Include="Utility\pathDefinition.h" />
     <ClInclude Include="Utility\Transform.h" />
   </ItemGroup>
   <ItemGroup>
@@ -164,7 +163,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Shaders\container.jpg" />
-    <Image Include="Shaders\wall.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
