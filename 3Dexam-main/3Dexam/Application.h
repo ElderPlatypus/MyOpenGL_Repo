@@ -9,13 +9,6 @@
 
 class Application
 {
-private:
-	int mWidth{800};
-	int mHeight{600};
-	std::string mName;
-
-
-
 public:
 	struct GLFWwindow* mWindow{ nullptr };
 
@@ -40,8 +33,6 @@ public:
 	void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 	void CursorPosCallback(GLFWwindow* window, double xPos, double yPos);
 
-
-
 	///Setters
 	void SetHeight(int height);
 	void SetWidth(int width);
@@ -50,6 +41,13 @@ public:
 	std::map<int, bool> mKeyState;
 	void ExitApplication(float dt);
 
-
 	Application() = default;  
+
+	int mWidth{ 1920 };
+	int mHeight{ 1080 };
+
+
+
+
+	std::string mName;
 };

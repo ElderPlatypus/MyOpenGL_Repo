@@ -3,8 +3,21 @@
 //Includes
 #include "Shaders/ShaderFileLoader.h"
 #include "Shaders/Shader.h"
-#include "SceneFolder/Mesh.h"
-#include "stb/stb_image.h"
+
+//GLad/GLM etc
+#define STB_IMAGE_IMPLEMENTATION
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <stb/stb_image.h>
+#include "glm/glm.hpp"
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
+//Midelertidig
+#include "SceneFolder/Actor.h"
+#include "CameraFolder/Camera.h"
+#include "Utility/Transform.h"
+#include "SceneFolder/Scene.h"
 
 std::string vs = ShaderLoader::LoadShaderFromFile("Shaders/Triangle.vs");
 std::string fs = ShaderLoader::LoadShaderFromFile("Shaders/Triangle.fs");
@@ -58,9 +71,7 @@ void Application::Window_Init()
         assert("Failed to Load GladLoad!");
     }
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_ALWAYS);
-
+    glEnable(GL_DEPTH_TEST); 
 }
 
 void Application::Run_App()
@@ -70,23 +81,47 @@ void Application::Run_App()
     Window_Init();
     RegisterWindowCallbacks();
   
-    Shader ourShader("Shaders/Triangle.vs", "Shaders/Triangle.fs"); // you can name your shader files however you like
+    // you can name your shader files however you like
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    float Triangle2D[] = {
-        // positions         // colors
-         0.5f, -0.5f, 0.0f,  0.5f, 0.0f, 0.0f, 1.0f,1.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f,1.0f, // bottom left
-         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f,1.0f // top 
-    };
+    Scene* scene1 = new Scene("Scene1");
+    scene1->LoadContent();
 
-    Mesh* tr = Mesh::Create2DTriangle();
 
-    tr->configureMesh();
+    ///Test
+    unsigned int texture1; 
+    // texture 1
+    // ---------
+    glGenTextures(1, &texture1); 
+    glBindTexture(GL_TEXTURE_2D, texture1); 
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    // load image, create texture and generate mipmaps
+    int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
+    unsigned char* data = stbi_load("Shaders/wall.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data); 
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl; 
+    } 
+    stbi_image_free(data); 
+    scene1->mShader->use(); 
+    scene1->mShader->setInt("texture1",0);
 
     ///Creating the deltaTime variable
     float lastFrame = static_cast<float>(glfwGetTime());
+  
     // render loop
     // -----------
     while (!glfwWindowShouldClose(mWindow)) 
@@ -98,26 +133,29 @@ void Application::Run_App()
 
         // input
         // -----
-
         ExitApplication(deltaTime);   
-
+        float timer = (float)glfwGetTime();
+      
+       
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
-        // render the triangle
-        ourShader.use();
-     
-        tr->drawMesh(&ourShader);
-  
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
 
+        // render the Actores
+        scene1->mShader->use();
+       
+        scene1->RenderScene(deltaTime);  
+        
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(mWindow);
         glfwPollEvents();
     }
-    tr->~Mesh();
+    scene1->UnloadContent();
   
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
