@@ -1,12 +1,14 @@
 #include "Actor.h"
 
 //Includes
+#include <string>
 
 ///Acor constructor/destructor
-Actor::Actor(std::vector<Vertex>& vertices,std::vector<Index>& indices)
+Actor::Actor(const std::string& name, std::vector<Vertex>& vertices,std::vector<Index>& indices)
 {
     mVertices = vertices;
     mIndices = indices;
+    mName = name;
     configureMesh();
 }
 
@@ -33,7 +35,7 @@ Actor* Actor::Create2DTriangle()
         0,1,2
     };
 
-   return new Actor(vertices, indices);
+   return new Actor("2DTriangle", vertices, indices);
 }
 
 
@@ -89,7 +91,7 @@ Actor* Actor::CreatePyramid()
         13,14,15
     };
     
-    return new Actor(vertices, indices);
+    return new Actor("pyramid",vertices, indices);
 }
 
 Actor* Actor::CreateCube()
@@ -142,7 +144,7 @@ Actor* Actor::CreateCube()
         20, 21, 22, 20, 22, 23
     };
 
-    return new Actor(vertices, indices);
+    return new Actor("cube", vertices, indices);
 }
 
 Actor* Actor::CreateInterpolationCurve3Points(const double& startVal, const double& endingVal, const double& resolution)
@@ -193,7 +195,7 @@ Actor* Actor::CreateInterpolationCurve3Points(const double& startVal, const doub
         Indices.emplace_back(i);
     }
 
-    return new Actor(Vertices, Indices);
+    return new Actor("InterpolationCurve",Vertices, Indices);
 }
 
 Actor* Actor::CreatePlane(const double& xMin, const double& zMin, const double& xMax, const double& zMax, const double& resolution)
@@ -227,8 +229,6 @@ Actor* Actor::CreatePlane(const double& xMin, const double& zMin, const double& 
 
             y = glm::cos(4 * (x + resolution)) * glm::cos(2 * (z + resolution)) + pi; //Top Rigth
             vertices.emplace_back(x + resolution, y, z + resolution);
-
-
         }
     }
 
@@ -240,7 +240,7 @@ Actor* Actor::CreatePlane(const double& xMin, const double& zMin, const double& 
 
     }
 
-    return new Actor(vertices, inidces);
+    return new Actor("pane", vertices, inidces);
 }
 
 
@@ -266,14 +266,18 @@ void Actor::configureMesh()
 }
 
 ///Drawing the mesh
-void Actor::drawActor(const Shader* shader) const
+void Actor::drawActor(const Shader* shader, bool DrawLineTrueFalse) const
 {
     glBindVertexArray(mVAO);
-    if (shader)
+    if (shader && DrawLineTrueFalse == false)
     {
         glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); 
     }
-    else
+    else if (shader && DrawLineTrueFalse == true)
+    {
+        glDrawElements(GL_LINE_STRIP, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0);
+    }
+    else 
     {
         assert(shader && "No shader found");
     }
@@ -282,13 +286,8 @@ void Actor::drawActor(const Shader* shader) const
 
 
 
-void Actor::Render(Actor* Actor, float dt,const Shader* shader, Transform transform)
-{
-    transform.SetTransformMatrix(Actor->GetLocalTransformMatrix());
 
-    shader->setMat4("transform", transform.GetTransformMatrix()); 
-    drawActor(shader); 
-}
+
 
 
 

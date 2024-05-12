@@ -39,6 +39,9 @@
     <ClCompile Include="CameraFolder\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Utility\InputInterface.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shaders\ShaderFileLoader.h">
@@ -96,6 +99,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Shaders\container.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Shaders\wall.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

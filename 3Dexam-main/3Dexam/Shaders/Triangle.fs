@@ -9,8 +9,10 @@ in vec3 Normal;
 in vec2 TexCoord;
 
 uniform sampler2D texture1;
+uniform vec3 viewPos;
   
 void main()
 {
     FragColor = texture(texture1, TexCoord);    
+    vec3 viewDir = normalize(viewPos-FragPos);
 }

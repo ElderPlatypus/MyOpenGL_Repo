@@ -17,7 +17,6 @@
 #include "SceneFolder/Actor.h"
 #include "CameraFolder/Camera.h"
 #include "Utility/Transform.h"
-#include "SceneFolder/Scene.h"
 
 std::string vs = ShaderLoader::LoadShaderFromFile("Shaders/Triangle.vs");
 std::string fs = ShaderLoader::LoadShaderFromFile("Shaders/Triangle.fs");
@@ -81,13 +80,15 @@ void Application::Run_App()
     Window_Init();
     RegisterWindowCallbacks();
   
-    // you can name your shader files however you like
+
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     Scene* scene1 = new Scene("Scene1");
-    scene1->LoadContent();
+    scene1->LoadContent();    
 
+    ///Fillig the unordered map
+    uSceneMap["scene1"] = scene1;
 
     ///Test
     unsigned int texture1; 
@@ -218,7 +219,7 @@ void Application::Original_Run_App()
         // -----
 
         ExitApplication(deltaTime);
-
+        UpdateActiveController(deltaTime, "scene1");
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -300,10 +301,20 @@ void Application::RegisterWindowCallbacks()
 void Application::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    for (auto scene = uSceneMap.begin(); scene != uSceneMap.end(); scene++)
+    {
+        if (scene->second) 
+        {
+            scene->second->mSceneCamera->SetAspectRatio(static_cast<float>(width) / static_cast<float>(height));  
+        }
+    }
+       
+    
 }
 
 void Application::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+   
     if (action == GLFW_PRESS || action == GLFW_REPEAT) 
     {
         mKeyState[key] = true;
@@ -311,6 +322,14 @@ void Application::KeyCallback(GLFWwindow* window, int key, int scancode, int act
     else if (action == GLFW_RELEASE)
     {
         mKeyState[key] = false; 
+    }
+
+    for (auto scene = uSceneMap.begin(); scene != uSceneMap.end(); scene++)
+    {
+        if (scene->second)  
+        {
+            UpdateActiveController(0, scene->first); 
+        }
     }
 }
 
@@ -344,6 +363,38 @@ void Application::ExitApplication(float dt)
     }
 }
 
+void Application::UpdateActiveController(float dt, std::string sceneName) 
+{
+    glm::vec3 acceleration = glm::vec3(0.f);
 
+    for (auto scene = uSceneMap.begin(); scene != uSceneMap.end(); scene++) 
+    {
+        if (scene->first == sceneName)
+        {
+            //Forward and Backwards
+            if (mKeyState[GLFW_KEY_W]) acceleration.z += scene->second->mSceneCamera->GetAccelerationSpeed();
+            if (mKeyState[GLFW_KEY_S]) acceleration.z -= scene->second->mSceneCamera->GetAccelerationSpeed();
+
+            //Left and right
+            if (mKeyState[GLFW_KEY_D]) acceleration.x += scene->second->mSceneCamera->GetAccelerationSpeed();
+            if (mKeyState[GLFW_KEY_A]) acceleration.x -= scene->second->mSceneCamera->GetAccelerationSpeed();
+
+            //Up and Down
+            if (mKeyState[GLFW_KEY_SPACE]) acceleration.y += scene->second->mSceneCamera->GetAccelerationSpeed(); 
+            if (mKeyState[GLFW_KEY_LEFT_ALT]) acceleration.y -= scene->second->mSceneCamera->GetAccelerationSpeed(); 
+
+            //Increase of Speed
+            if (mKeyState[GLFW_KEY_LEFT_SHIFT]) scene->second->mSceneCamera->SetAccelerationSpeed(200.f); 
+            else if (!mKeyState[GLFW_KEY_LEFT_SHIFT]) scene->second->mSceneCamera->SetAccelerationSpeed(50.f); 
+
+            scene->second->mSceneCamera->SetAcceleration(acceleration); 
+            std::cout << "Key pressed" << std::endl; 
+        }
+        else
+        {
+            assert(scene->second && "Wrong Scene Name");  
+        }
+    }
+}
 
 

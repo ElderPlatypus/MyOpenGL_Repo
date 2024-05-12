@@ -138,6 +138,7 @@
     <ClCompile Include="SceneFolder\Scene.cpp" />
     <ClCompile Include="Shaders\Shader.cpp" />
     <ClCompile Include="Shaders\ShaderFileLoader.cpp" />
+    <ClCompile Include="Utility\InputInterface.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -163,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Shaders\container.jpg" />
+    <Image Include="Shaders\wall.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
