@@ -15,8 +15,8 @@ uniform mat4 projection; //Gives perspective to the scene
 
 void main()
 {
-    gl_Position = projection * view * model * vec4(aPos,1.0);
+    gl_Position = projection * view * model * vec4(aPos,1.0); //calculate gl_position
     FragPos = vec3(model*vec4(aPos,1.0)); // set FragPos to the input color we got from the vertex data
-    TexCoord = vec2(aTexCoord.x, aTexCoord.y);  
-    Normal = normalize(mat3(transpose(inverse(model))) * aNormal);
+    TexCoord = vec2(aTexCoord.x, aTexCoord.y);  //Setting texCoords
+    Normal = normalize(mat3(transpose(inverse(model))) * aNormal);  //Calculating the normals
 }       

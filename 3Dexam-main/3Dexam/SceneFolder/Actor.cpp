@@ -4,11 +4,13 @@
 #include <string>
 
 ///Acor constructor/destructor
-Actor::Actor(const std::string& name, std::vector<Vertex>& vertices,std::vector<Index>& indices)
+Actor::Actor(const std::string& name, std::vector<Vertex>& vertices,std::vector<Index>& indices, const bool& useTex, const bool& drawLine)
 {
     mVertices = vertices;
     mIndices = indices;
     mName = name;
+    mUseTex = useTex;
+    mDrawLine = drawLine;
     configureMesh();
 }
 
@@ -35,7 +37,7 @@ Actor* Actor::Create2DTriangle()
         0,1,2
     };
 
-   return new Actor("2DTriangle", vertices, indices);
+   return new Actor("2DTriangle", vertices, indices, false, false);
 }
 
 
@@ -91,7 +93,7 @@ Actor* Actor::CreatePyramid()
         13,14,15
     };
     
-    return new Actor("pyramid",vertices, indices);
+    return new Actor("pyramid",vertices, indices, true);
 }
 
 Actor* Actor::CreateCube()
@@ -144,7 +146,7 @@ Actor* Actor::CreateCube()
         20, 21, 22, 20, 22, 23
     };
 
-    return new Actor("cube", vertices, indices);
+    return new Actor("cube", vertices, indices, true, false);
 }
 
 Actor* Actor::CreateInterpolationCurve3Points(const double& startVal, const double& endingVal, const double& resolution)
@@ -195,40 +197,39 @@ Actor* Actor::CreateInterpolationCurve3Points(const double& startVal, const doub
         Indices.emplace_back(i);
     }
 
-    return new Actor("InterpolationCurve",Vertices, Indices);
+    return new Actor("InterpolationCurve",Vertices, Indices, false, true);
 }
 
-Actor* Actor::CreatePlane(const double& xMin, const double& zMin, const double& xMax, const double& zMax, const double& resolution)
+Actor* Actor::CreatePlaneXZ(const double& xMin, const double& zMin, const double& xMax, const double& zMax, const double& resolution)
 {
     std::vector<Vertex> vertices;
     std::vector<Index> inidces;
     double y;
-    double pi = 2 * glm::acos(0.0f);
 
     for (auto x = zMin; x < zMax; x += resolution)
     {
         for (auto z = zMin; z < zMax; z += resolution)
         {
             ///Lower Triangle
-            y = glm::cos(4 * x) * glm::cos(2 * z) + pi; //Bottom Left 
-            vertices.emplace_back(x, y, z);
+            y = glm::cos(x) * glm::cos(z); //Bottom Left 
+            vertices.emplace_back(x, y, z, 1.f,1.f,1.f, x,z);
 
-            y = glm::cos(4 * (x + resolution)) * glm::cos(2 * z) + pi; //Bottom Right 
-            vertices.emplace_back(x + resolution, y, z);
+            y = glm::cos(x + resolution) * glm::cos(z); //Bottom Right 
+            vertices.emplace_back(x + resolution, y, z, 1.f, 1.f, 1.f, x, z);
 
-            y = glm::cos(4 * x) * glm::cos(2 * (z + resolution)) + pi; //Top Left 
+            y = glm::cos(x) * glm::cos(z + resolution); //Top Left 
             vertices.emplace_back(x, y, z + resolution);
 
 
             ///Upper Triangle
-            y = glm::cos(4 * x) * glm::cos(2 * (z + resolution)) + pi; //Top Left 
-            vertices.emplace_back(x, y, z + resolution);
+            y = glm::cos(x) * glm::cos(z + resolution); //Top Left 
+            vertices.emplace_back(x, y, z + resolution, 1.f, 1.f, 1.f, x, z); 
 
-            y = glm::cos(4 * (x + resolution)) * glm::cos(2 * z) + pi; //Bottom Right
-            vertices.emplace_back(x + resolution, y, z);
+            y = glm::cos(x + resolution) * glm::cos(z); //Bottom Right
+            vertices.emplace_back(x + resolution, y, z, 1.f, 1.f, 1.f, x, z);
 
-            y = glm::cos(4 * (x + resolution)) * glm::cos(2 * (z + resolution)) + pi; //Top Rigth
-            vertices.emplace_back(x + resolution, y, z + resolution);
+            y = glm::cos(x + resolution) * glm::cos(z + resolution); //Top Rigth
+            vertices.emplace_back(x + resolution, y, z + resolution, 1.f, 1.f, 1.f, x, z);
         }
     }
 
@@ -240,10 +241,53 @@ Actor* Actor::CreatePlane(const double& xMin, const double& zMin, const double& 
 
     }
 
-    return new Actor("pane", vertices, inidces);
+    return new Actor("plane", vertices, inidces, true, false);
 }
 
 
+Actor* Actor::CreatePlaneXY(const double& xMin, const double& yMin, const double& xMax, const double& yMax, const double& resolution)
+{
+    std::vector<Vertex> vertices;
+    std::vector<Index> inidces;
+    double z;
+
+    for (auto x = yMin; x < yMax; x += resolution) 
+    {
+        for (auto y = yMin; y < yMax; y += resolution) 
+        {
+            ///Lower Triangle
+            z = glm::cos(x) * glm::cos(y); //Bottom Left 
+            vertices.emplace_back(x, y, z, 1.f, 1.f, 1.f, x, y); 
+
+            z = glm::cos(x + resolution) * glm::cos(y); //Bottom Right  
+            vertices.emplace_back(x + resolution, y, z, 1.f, 1.f, 1.f, x, y); 
+
+            z = glm::cos(x) * glm::cos(y + resolution); //Top Left 
+            vertices.emplace_back(x, y + resolution, z); 
+
+
+            ///Upper Triangle
+            z = glm::cos(x) * glm::cos(y + resolution); //Top Left 
+            vertices.emplace_back(x, y+resolution, z, 1.f, 1.f, 1.f, x, y); 
+
+            z = glm::cos(x + resolution) * glm::cos(y); //Bottom Right
+            vertices.emplace_back(x + resolution, y, z, 1.f, 1.f, 1.f, x, y); 
+
+            z = glm::cos(x + resolution) * glm::cos(y + resolution); //Top Rigth
+            vertices.emplace_back(x + resolution, y +resolution, z, 1.f, 1.f, 1.f, x, y); 
+        }
+    }
+
+    for (int i = 0; i < vertices.size(); i += 3)
+    {
+        inidces.emplace_back(i);
+        inidces.emplace_back(i + 1);
+        inidces.emplace_back(i + 2);
+
+    }
+
+    return new Actor("planeXY", vertices, inidces, false, false);
+}
 
 
 ///Configuring the mesh
@@ -266,14 +310,14 @@ void Actor::configureMesh()
 }
 
 ///Drawing the mesh
-void Actor::drawActor(const Shader* shader, bool DrawLineTrueFalse) const
+void Actor::drawActor(const Shader* shader) const
 {
     glBindVertexArray(mVAO);
-    if (shader && DrawLineTrueFalse == false)
+    if (shader && mDrawLine == false) 
     {
         glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); 
     }
-    else if (shader && DrawLineTrueFalse == true)
+    else if (shader && mDrawLine == true) 
     {
         glDrawElements(GL_LINE_STRIP, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0);
     }

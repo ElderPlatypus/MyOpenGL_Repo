@@ -5,24 +5,22 @@
 #include "Shaders/Shader.h"
 
 //GLad/GLM etc
-#define STB_IMAGE_IMPLEMENTATION
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <stb/stb_image.h>
+
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-//Midelertidig
-#include "SceneFolder/Actor.h"
-#include "CameraFolder/Camera.h"
-#include "Utility/Transform.h"
 
 std::string vs = ShaderLoader::LoadShaderFromFile("Shaders/Triangle.vs");
 std::string fs = ShaderLoader::LoadShaderFromFile("Shaders/Triangle.fs");
 
 Application::~Application()
 {
+    delete mScene;
+    mScene = nullptr;
     glfwDestroyWindow(mWindow);
 }
 
@@ -80,46 +78,17 @@ void Application::Run_App()
     Window_Init();
     RegisterWindowCallbacks();
   
-
-
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     Scene* scene1 = new Scene("Scene1");
-    scene1->LoadContent();    
+    /*scene1->LoadContent(); */   
 
     ///Fillig the unordered map
-    uSceneMap["scene1"] = scene1;
+    mScene = scene1;
+    mScene->LoadContent();
 
-    ///Test
-    unsigned int texture1; 
-    // texture 1
-    // ---------
-    glGenTextures(1, &texture1); 
-    glBindTexture(GL_TEXTURE_2D, texture1); 
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
-    // load image, create texture and generate mipmaps
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-    unsigned char* data = stbi_load("Shaders/wall.jpg", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data); 
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl; 
-    } 
-    stbi_image_free(data); 
-    scene1->mShader->use(); 
-    scene1->mShader->setInt("texture1",0);
-
+    
+    
     ///Creating the deltaTime variable
     float lastFrame = static_cast<float>(glfwGetTime());
   
@@ -127,124 +96,39 @@ void Application::Run_App()
     // -----------
     while (!glfwWindowShouldClose(mWindow)) 
     {
-        ///DeltaTime Controller
+        //DeltaTime Controller
         float currentFrame = static_cast<float>(glfwGetTime());
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
+ 
         // input
         // -----
         ExitApplication(deltaTime);   
         float timer = (float)glfwGetTime();
-      
-       
+
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
-
         // render the Actores
-        scene1->mShader->use();
+        mScene->RenderScene(deltaTime);  
+        
        
-        scene1->RenderScene(deltaTime);  
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(mWindow);
         glfwPollEvents();
     }
-    scene1->UnloadContent();
+    mScene->UnloadContent();
   
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
 }
 
-void Application::Original_Run_App()
-{
-    ///Creating the Window for display and registering callbacks
-    GLFW_Init();
-    Window_Init();
-    RegisterWindowCallbacks();
 
-    Shader orgShader("Shaders/Triangle.vs", "Shaders/Triangle.fs"); // you can name your shader files however you like
-
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    float Triangle2D[] = {
-        // positions         // colors
-         0.5f, -0.5f, 0.0f,  0.5f, 0.0f, 0.0f, 1.0f,1.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f,1.0f, // bottom left
-         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f, 1.0f,1.0f // top 
-    };
-
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
-    
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Triangle2D), Triangle2D, GL_STATIC_DRAW); 
-    
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    //texture attributes
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float))); 
-    glEnableVertexAttribArray(2); 
-   /* 
-     You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-     VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.*/
-     glBindVertexArray(0);
-    
-    ///Creating the deltaTime variable
-    float lastFrame = static_cast<float>(glfwGetTime());
-    // render loop
-    // -----------
-    while (!glfwWindowShouldClose(mWindow))
-    {
-        ///DeltaTime Controller
-        float currentFrame = static_cast<float>(glfwGetTime());
-        float deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-
-        // input
-        // -----
-
-        ExitApplication(deltaTime);
-        UpdateActiveController(deltaTime, "scene1");
-        // render
-        // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // render the triangle
-        orgShader.use(); 
-
-        glBindVertexArray(VAO); 
-        glDrawArrays(GL_TRIANGLES, 0, 3);  
-
-        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-        // -------------------------------------------------------------------------------
-        glfwSwapBuffers(mWindow);
-        glfwPollEvents();
-    }
-    // optional: de-allocate all resources once they've outlived their purpose:
-    // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, &VAO); 
-    glDeleteBuffers(1, &VBO); 
-
-    // glfw: terminate, clearing all previously allocated GLFW resources.
-    // ------------------------------------------------------------------
-    glfwTerminate();
-}
 
 ///Callback Controlls
 void Application::RegisterWindowCallbacks()
@@ -301,15 +185,9 @@ void Application::RegisterWindowCallbacks()
 void Application::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
-    for (auto scene = uSceneMap.begin(); scene != uSceneMap.end(); scene++)
-    {
-        if (scene->second) 
-        {
-            scene->second->mSceneCamera->SetAspectRatio(static_cast<float>(width) / static_cast<float>(height));  
-        }
-    }
-       
-    
+
+    mScene->mSceneCamera->SetAspectRatio(static_cast<float>(width) / static_cast<float>(height));
+     
 }
 
 void Application::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -324,13 +202,7 @@ void Application::KeyCallback(GLFWwindow* window, int key, int scancode, int act
         mKeyState[key] = false; 
     }
 
-    for (auto scene = uSceneMap.begin(); scene != uSceneMap.end(); scene++)
-    {
-        if (scene->second)  
-        {
-            UpdateActiveController(0, scene->first); 
-        }
-    }
+    UpdateActiveController(0); 
 }
 
 void Application::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -339,6 +211,7 @@ void Application::MouseButtonCallback(GLFWwindow* window, int button, int action
 
 void Application::CursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 {
+   
 }
 
 ///Setters
@@ -363,38 +236,32 @@ void Application::ExitApplication(float dt)
     }
 }
 
-void Application::UpdateActiveController(float dt, std::string sceneName) 
+
+
+///Test
+void Application::UpdateActiveController(float dt)
 {
-    glm::vec3 acceleration = glm::vec3(0.f);
+    //Forward and Backwards
+    if (mKeyState[GLFW_KEY_W]) mScene->mSceneCamera->CameraMovement(forward,dt), std::cout << "W pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_S]) mScene->mSceneCamera->CameraMovement(backwards, dt), std::cout << "S pressed\n" << std::endl;
 
-    for (auto scene = uSceneMap.begin(); scene != uSceneMap.end(); scene++) 
-    {
-        if (scene->first == sceneName)
-        {
-            //Forward and Backwards
-            if (mKeyState[GLFW_KEY_W]) acceleration.z += scene->second->mSceneCamera->GetAccelerationSpeed();
-            if (mKeyState[GLFW_KEY_S]) acceleration.z -= scene->second->mSceneCamera->GetAccelerationSpeed();
+    //Left and right
+    if (mKeyState[GLFW_KEY_D]) mScene->mSceneCamera->CameraMovement(right, dt), std::cout << "D pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_A]) mScene->mSceneCamera->CameraMovement(left, dt), std::cout << "A pressed\n" << std::endl;
 
-            //Left and right
-            if (mKeyState[GLFW_KEY_D]) acceleration.x += scene->second->mSceneCamera->GetAccelerationSpeed();
-            if (mKeyState[GLFW_KEY_A]) acceleration.x -= scene->second->mSceneCamera->GetAccelerationSpeed();
+    //Up and Down
+    if (mKeyState[GLFW_KEY_SPACE]) mScene->mSceneCamera->CameraMovement(up, dt), std::cout << "Space pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_LEFT_ALT]) mScene->mSceneCamera->CameraMovement(down, dt), std::cout << "Alt pressed\n" << std::endl;
 
-            //Up and Down
-            if (mKeyState[GLFW_KEY_SPACE]) acceleration.y += scene->second->mSceneCamera->GetAccelerationSpeed(); 
-            if (mKeyState[GLFW_KEY_LEFT_ALT]) acceleration.y -= scene->second->mSceneCamera->GetAccelerationSpeed(); 
+    //Increase of Speed
+    if (mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->mSceneCamera->CameraMovement(speed, dt), std::cout << "Shift pressed\n" << std::endl;
+    else if (!mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->mSceneCamera->CameraMovement(speed, dt);
 
-            //Increase of Speed
-            if (mKeyState[GLFW_KEY_LEFT_SHIFT]) scene->second->mSceneCamera->SetAccelerationSpeed(200.f); 
-            else if (!mKeyState[GLFW_KEY_LEFT_SHIFT]) scene->second->mSceneCamera->SetAccelerationSpeed(50.f); 
+    /*glm::vec3 getPos = mScene->mSceneCamera->mTransform.GetPosition();
+    std::cout << "getcameraPos:" << getPos.x << " " << getPos.y << " " << getPos.z << std::endl;*/
 
-            scene->second->mSceneCamera->SetAcceleration(acceleration); 
-            std::cout << "Key pressed" << std::endl; 
-        }
-        else
-        {
-            assert(scene->second && "Wrong Scene Name");  
-        }
-    }
 }
+
+
 
 

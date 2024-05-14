@@ -39,7 +39,7 @@
     <ClCompile Include="CameraFolder\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\InputInterface.h">
+    <ClCompile Include="Shaders\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -90,6 +90,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Dependency\includes\stb\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shaders\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

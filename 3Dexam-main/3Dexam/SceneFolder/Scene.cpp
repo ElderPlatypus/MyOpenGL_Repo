@@ -1,7 +1,5 @@
 #include "Scene.h"
-#include "glm/glm.hpp"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+#include <random>
 
 
 Scene::Scene(std::string name)
@@ -9,24 +7,42 @@ Scene::Scene(std::string name)
 	mName = name;
 }
 
+///Loaders & Unloaders
 void Scene::LoadActors()
 {
 	//Load Actors into U-Map
 	//uActorMap["pyramid"] = Actor::CreatePyramid();
-	//uActorMap["curve"] = Actor::CreateInterpolationCurve3Points(0, 13, 0.2f);
+	//uActorMap["curve"] = Actor::CreateInterpolationCurve3Points(0, 13, 0.2f); 
+	//uActorMap["planeXY"] = Actor::CreatePlaneXY(-5, 0, 5, 5, 0.05f); 
+	/*uActorMap["planeXZ"] = Actor::CreatePlaneXZ(-5, 0, 5, 5, 0.05f); */
 
 	uActorMap["cube"] = Actor::CreateCube();
-	//uActorMap["plane"] = Actor::CreatePlane(0, 2, 0, 5, 0.1f);
+	uActorMap["cube2"] = Actor::CreateCube();
 
-	mSceneCamera = new Camera("SceneCamera", uActorMap["cube"]);
+
+	//Create camera object
+	
+     mSceneCamera = new Camera("SceneCamera"); 
+	
 }
 
 void Scene::LoadContent()
 {
 	LoadActors();
-	mShader = new Shader("Shaders/Triangle.vs", "Shaders/Triangle.fs");
-	
 	SpaceManipulation();
+
+	mShader = new Shader("Shaders/Triangle.vs", "Shaders/Triangle.fs");
+	mTexture = new Texture("Shaders/wall.jpg",mShader);   
+	
+	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++)
+	{
+		actor->second->SetShader(mShader);  
+	}
+	for (auto object : spawnVector)
+	{
+		object->SetShader(mShader); 
+	}
+
 }
 
 void Scene::UnloadContent()
@@ -39,8 +55,11 @@ void Scene::UnloadContent()
 	delete uActorMap["pyramid"];
 	uActorMap["pyramid"] = nullptr;
 
-	delete uActorMap["plane"];
-	uActorMap["plane"] = nullptr;
+	delete uActorMap["planeXZ"];
+	uActorMap["planeXZ"] = nullptr;
+
+	delete uActorMap["planeXY"];
+	uActorMap["planeXY"] = nullptr;
 
 	delete uActorMap["curve"];
 	uActorMap["curve"] = nullptr;
@@ -48,75 +67,122 @@ void Scene::UnloadContent()
 	delete uActorMap["cube"];
 	uActorMap["cube"] = nullptr;
 
+	delete uActorMap["cube2"];
+	uActorMap["cube2"] = nullptr;
+
+	delete uActorMap["curve"];
+	uActorMap["curve"] = nullptr;
+
 	delete mSceneCamera;
 	mSceneCamera = nullptr;
+
+	delete mShader;
+	mShader = nullptr;
+
+	mTexture->~Texture(); 
+	delete mTexture; 
+	mTexture = nullptr; 
+
+	for (auto it : spawnVector)
+	{
+		delete it;
+		it = nullptr;
+	}
 }
 
+void Scene::Spawner()
+{
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<float> radius(-3.f,3.f); 
+
+	for (int amount = 0; amount < 10; amount++)
+	{
+	 glm::vec3 spawnPos{ 0.f,0.f,-5.f };
+	 Actor* spawnedActor{ nullptr }; 
+	 spawnedActor = Actor::CreateCube();
+	 spawnedActor->SetLocalPosition(spawnPos); 
+	 spawnVector.emplace_back(spawnedActor);
+	}
+
+	
+}
+
+///Updater
 void Scene::UpdateScene(float dt)
 {
 	mSceneCamera->UpdateCamera(dt); 
 }
 
-void Scene::RenderScene(float dt, Transform globalTransform) 
+///Rednerer
+void Scene::RenderScene(float dt, Transform globaltransform)
 { 
+	mTransform = globaltransform;
+
+	Spawner();
 	LoadContent();
 	BindCamera();
-	UpdateScene(dt);
+	UpdateScene(dt);  
 
-	//Other uniforms
-	glm::mat4 viewMat4 = glm::mat4(1.0);
-	//viewMat4 = glm::lookAt(glm::vec3(0.f), glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.1f, 0.f));
-	//viewMat4 = glm::lookAt(mSceneCamera->GetLocalPosition(), mSceneCamera->GetLocalPosition() + mSceneCamera->GetForwardVector(), glm::vec3(0.f, 1.f, 0.f));
-
-
-	glm::mat4 pojectionMat4 = glm::mat4(1.0);
-	pojectionMat4 = glm::perspective(glm::radians(45.f), (float)1920 / 1080, 0.1f, 100.f); 
-	
-	glm::mat4 perspectiveMat4 = glm::mat4(1.0); 
-	perspectiveMat4 = glm::translate(perspectiveMat4, uActorMap["cube"]->GetLocalPosition());  
-	perspectiveMat4 = glm::scale(perspectiveMat4, uActorMap["cube"]->GetLocalScale());  
-
-	glm::mat4 rotationMatrix = glm::mat4_cast(uActorMap["cube"]->GetLocalRotation()); 
-	perspectiveMat4 = perspectiveMat4 * rotationMatrix; 
-
-	
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 	for (auto actor = uActorMap.begin(); actor!= uActorMap.end(); actor++) 
 	{
+		globaltransform.SetTransformMatrix(globaltransform.GetTransformMatrix() * actor->second->GetLocalTransformMatrix());
+		mSceneCamera->UpdateCamera(dt);
 
-		mShader->setMat4("model", perspectiveMat4);   
 
-		mShader->setMat4("projection", pojectionMat4); 
-		actor->second->drawActor(mShader,false);  
-		globalTransform.SetTransformMatrix(globalTransform.GetTransformMatrix() * actor->second->GetLocalTransformMatrix()); 
+		mShader->setMat4("model", actor->second->GetLocalTransformMatrix());   
+		actor->second->UseTexture(actor->second->GetTexBool());    
+		actor->second->drawActor(mShader); 
+
+		for (auto it : spawnVector) 
+		{
+			it->UseTexture(it->GetTexBool()); 
+			it->drawActor(mShader);
+		}
 	}
 
+	
 }
 
+///Tranformations
 void Scene::SpaceManipulation()
 {
-	/*uActorMap["pyramid"]->SetLocalPosition(glm::vec3(0.5f, 0.f, 5.f));
-	uActorMap["pyramid"]->SetLocalRotation(glm::vec3(0.f, float(glfwGetTime()), 0.f));*/
-	uActorMap["cube"]->SetLocalPosition(glm::vec3(0.f, 0.0f, -8.f)); 
+	/////Pyramid
+	//uActorMap["pyramid"]->SetLocalPosition(glm::vec3(0.0f, 0.5f, -4.f));
+	//uActorMap["pyramid"]->SetLocalRotation(glm::vec3(0.f, float(glfwGetTime()), 0.f)); 
 
+	///PlaneXZ
+	//uActorMap["planeXZ"]->SetLocalPosition(glm::vec3(-2.f, -1.f,-10.f));
+	//uActorMap["planeXZ"]->SetLocalRotation(glm::vec3(0.f, 0.f, 0.f));
+
+	/////PlaneXY
+	//uActorMap["planeXY"]->SetLocalPosition(uActorMap["planeXZ"]->GetLocalPosition() + glm::vec3(-10.f,0.f,0.f));
+	//uActorMap["planeXY"]->SetLocalRotation(glm::vec3(0.f, 0.f,0.f));
+
+
+	///Cube
+	uActorMap["cube"]->SetLocalPosition(glm::vec3(-2.f, 0.0f, -8.f)); 
 	uActorMap["cube"]->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime()));
-	
 
-	/*std::cout << "camera local pos: " << mSceneCamera->GetLocalRotation().x << mSceneCamera->GetLocalRotation().y << mSceneCamera->GetLocalRotation().z << std::endl;
-	std::cout << " \n";
-	std::cout << "cube local rot: " << uActorMap["cube"]->GetLocalRotation().x << " " <<  uActorMap["cube"]->GetLocalRotation().y << " " << uActorMap["cube"]->GetLocalRotation().z << std::endl;
-	std::cout << " \n";
-	std::cout << "cube local pos: " << uActorMap["cube"]->GetLocalPosition().x << " " << uActorMap["cube"]->GetLocalPosition().y << " " << uActorMap["cube"]->GetLocalPosition().z << std::endl;*/
+	uActorMap["cube2"]->SetLocalPosition(glm::vec3(2.f, 0.0f, -8.f));
+	uActorMap["cube2"]->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime()));
+
+	
+	/////Curve
+	//uActorMap["curve"]->SetLocalPosition(glm::vec3(-2.f, -1.0f, -8.f));
+
 
 } 
 
+///Shader Binder
 void Scene::BindCamera()
 {
-	mShader->setMat4("view", mSceneCamera->GetViewMatrix());
+	mShader->setMat4("view", mSceneCamera->GetViewMatrix()); 
 	mShader->setMat4("projection", mSceneCamera->GetProjectionMatrix());
-	mShader->setVec3("viewPos", mSceneCamera->GetLocalPosition());  
-	//mShader->setMat4("model", mSceneCamera->GetLocalTransformMatrix());
+	mShader->setVec3("viewPos", mSceneCamera->GetLocalPosition());   
 }
-
 
 

@@ -47,11 +47,31 @@ public:
 
     ///Setters
     void SetRotation(const glm::quat& rot){ mOrientation = rot;} //Set rotation in form of glm::quat(angle,x,y,z)
-
     void SetPosition(const glm::vec3& pos){mPosition = pos;} //Set position glm::vec3(x,y,z)
-
     void SetScale(const glm::vec3& scl){mScale = scl;} //Set scale glm::vec3(x,y,z)
  
+    void SetRotation(const glm::vec3& forwardDirection, const glm::vec3& upDirection = glm::vec3(0.0f, 1.0f, 0.0f))
+    {
+        glm::vec3 normalizedForward = glm::normalize(forwardDirection);
+        glm::vec3 defaultForward(0.0f, 0.0f, -1.0f);
+        glm::quat newRotation = glm::rotation(defaultForward, normalizedForward);
+        mOrientation = newRotation;
+    }
+
+    void SetRotationFromPitch(float pitchDegrees)
+    {
+        float pitchRadians = glm::radians(pitchDegrees);
+        glm::quat pitchRotation = glm::angleAxis(pitchRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+        mOrientation = pitchRotation;
+    }
+
+    void SetRotationFromYaw(float yawDegrees)
+    {
+        float yawRadians = glm::radians(yawDegrees);
+        glm::quat yawRotation = glm::angleAxis(yawRadians, glm::vec3(0.0f, 1.0f, 0.0f));
+        mOrientation = yawRotation;
+    }
+
     void SetTransformMatrix(const glm::mat4 matrix) //Set matrix transformation: transforms a matrix consiting of all neccessary components
     {
         glm::vec3 scale; 
@@ -72,17 +92,17 @@ public:
     }
 
     ///Getters
-    //Matrix Components
+    //---------------------------------Matrix Components------------------------------------------------
     const glm::vec3& GetScale() const { return mScale; } //Returns scale as correct datatype
     const glm::quat& GetOrientation() const { return mOrientation; } //Returns orientation as correct datatype
     const glm::vec3& GetPosition() const { return mPosition; } //Returns position as correct datatype
 
-    //Vector Components
+    //---------------------------------Vector Components------------------------------------------------
     glm::vec3 GetRightVector() const { return glm::rotate(mOrientation, glm::vec3(1.f, 0.f, 0.f));} // Returns right vector: invert axis to get oposite direction
     glm::vec3 GetForwardVector() const { return glm::rotate(mOrientation, glm::vec3(0.f, 0.f, -1.f)); } //Returns forward vector inverted to match view directio: invert axis to get oposite direction
     glm::vec3 GetUpVector() const { return glm::rotate(mOrientation, glm::vec3(0.f, 1.f, 0.f)); } //Returns Up vector: invert axis to get oposite direction
 
-    //Pitch and Yaw
+    //---------------------------------Pitch & Yaw------------------------------------------------
     //Euler angles will be used and are vectors fixed to a rigid object and uses rotations in form of: yaw(x), pitch(y) and roll(z)
     float GetPitch() //Return current pitch in degrees
     {
@@ -104,7 +124,7 @@ public:
         glm::mat4 orientingMatrix = glm::toMat4(mOrientation);  //Converts the quaternions to 4x4 matrix
         glm::mat4 translateMatrix = glm::translate(glm::mat4(1.0f), mPosition); //Translates a "4x4 matrix created from 3-scalars" 
 
-        return translateMatrix * orientingMatrix * scalingMatrix;
+        return translateMatrix * orientingMatrix * scalingMatrix; 
     }
 
 

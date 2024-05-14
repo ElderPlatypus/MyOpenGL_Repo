@@ -12,6 +12,7 @@
 #include "../SceneFolder/Actor.h"
 #include "../Application.h"
 #include "../CameraFolder/Camera.h"
+#include "../Shaders/Texture.h"
 
 class Scene 
 {
@@ -22,18 +23,23 @@ class Scene
 public:
 	Shader* mShader{ nullptr };
 	Camera* mSceneCamera{ nullptr };
+	Texture* mTexture{ nullptr }; 
 	Scene(std::string name);
+
+	std::vector<Actor*> spawnVector;
 
 	//Loaders
 	void LoadActors();
 	void LoadContent(); //Load all content in scene
 	void UnloadContent();
+	void Spawner();
 
 	//Updaters
 	void UpdateScene(float dt);
 
 	//Renderer
-	void RenderScene(float dt, Transform globalTransform = Transform{});
+	void RenderScene(float dt, Transform globalTransform = {});
+	Transform mTransform;
 
 	//Actor space manipulation
 	void SpaceManipulation();
@@ -41,16 +47,9 @@ public:
 	//Camera Binding
 	void BindCamera();
 
-	//Callbacks
-	//void FramebufferSizeCallback(class Application* app, int width, int height);
-	//void KeyCallback(class Application* app, int key, int scancode, int action, int mods);
-	//void MouseButtonCallback(class Application* app, int button, int action, int mods);
-	//void CursorPosCallback(class Application* app, double xPos, double yPos);
+	Scene() = default;
 
 	
-	//std::shared_ptr<Camera> mCameraController; 
-
-	Scene() = default;
 	
 };
 

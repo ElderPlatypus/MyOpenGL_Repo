@@ -6,9 +6,7 @@
 #include <unordered_map>
 
 //Other includes
-#include "glm/mat4x3.hpp"
 #include "SceneFolder/Scene.h"
-
 class Application
 {
 public:
@@ -27,7 +25,6 @@ public:
 
 	///RenderLoop
 	void Run_App(); 
-	void Original_Run_App();
 
 	///Window Callbacks
 	void RegisterWindowCallbacks();
@@ -42,7 +39,8 @@ public:
 
 	///Window KeyController
 	std::map<int, bool> mKeyState; 
-	std::unordered_map<std::string, class Scene* > uSceneMap;
+
+	class Scene* mScene{ nullptr };
 
 	void ExitApplication(float dt);
 
@@ -50,7 +48,7 @@ public:
 	int mHeight{ 1080 };
 
 	///Callbacks for camera
-	void UpdateActiveController(float dt, std::string);
+	void UpdateActiveController(float dt);
 
 	std::string mName;
 };

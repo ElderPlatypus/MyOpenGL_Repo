@@ -16,6 +16,14 @@ public:
         mTextCoords = glm::vec2(1.f);
     }
 
+    Vertex(float x, float y, float z, float nX, float nY, float nZ, float u, float v) 
+    {
+        mPos = glm::vec3(x, y, z);
+        mNormals = glm::vec3(nX,nY,nZ);
+        mTextCoords = glm::vec2(u,v); 
+    }
+
+
     Vertex(const glm::vec3& position, const glm::vec3& normals, const glm::vec2 textCoords)
     {
         mPos = position;

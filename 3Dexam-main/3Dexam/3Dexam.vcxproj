@@ -138,7 +138,7 @@
     <ClCompile Include="SceneFolder\Scene.cpp" />
     <ClCompile Include="Shaders\Shader.cpp" />
     <ClCompile Include="Shaders\ShaderFileLoader.cpp" />
-    <ClCompile Include="Utility\InputInterface.h" />
+    <ClCompile Include="Shaders\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -149,6 +149,7 @@
     <ClInclude Include="includes\GLFW\glfw3native.h" />
     <ClInclude Include="includes\glm\mat4x3.hpp" />
     <ClInclude Include="includes\KHR\khrplatform.h" />
+    <ClInclude Include="Shaders\Texture.h" />
     <ClInclude Include="Utility\pathDefinition.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="SceneFolder\Actor.h" />
