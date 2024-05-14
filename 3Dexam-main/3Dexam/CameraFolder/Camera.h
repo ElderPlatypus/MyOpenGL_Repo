@@ -25,12 +25,13 @@ public:
 		const std::string& name,
 		glm::vec3 position = glm::vec3(0.f, 0.f, 0.f),
 		glm::quat rotation = glm::quat(glm::identity<glm::quat>()),
-		float aspectRatio = 1280.f / 720.f, 
-		float nearPlane = 0.1f, 
-		float farPlane = 100.f, 
+		float aspectRatio = 1280.f / 720.f,
+		float nearPlane = 0.1f,
+		float farPlane = 100.f,
 		float FOV = 45.f,
-		float maxMovementSpeed = 40.f, 
-		float accelerationSpeed = 60.f 
+		float maxMovementSpeed = 40.f,
+		float accelerationSpeed = 50.f,
+		float dampeningFactor = 5.f
 		 );
 
 	///Setters & Adders
@@ -44,8 +45,8 @@ public:
 	///Updaters
 	void UpdateCamera(float dt) ;
 	//______________Updates all speed function_____________
-	//void UpdateSpeed(float dt);
 	void UpdateVelocity(float dt);
+	void UpdateDampening(float dt);
 	void UpdatePosition(float dt);
 	//______________Updates all martixes_____________
 	void UpdateProjectionMatrix();
@@ -89,6 +90,7 @@ public:
 	///Movement members
 	glm::vec3 mVelocity{ 0.f,0.f,0.f };
 	glm::vec3 mAcceleration{ 0.f,0.f,0.f };
+	float mDampeningFactor;
 	float mMaxMovementSpeed;
 	float mAccelerationSpeed;
 

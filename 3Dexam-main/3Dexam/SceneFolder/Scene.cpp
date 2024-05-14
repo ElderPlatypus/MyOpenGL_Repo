@@ -29,7 +29,7 @@ void Scene::LoadActors()
 void Scene::LoadContent()
 {
 	LoadActors();
-	SpaceManipulation();
+	Spawner(); 
 
 	mShader = new Shader("Shaders/Triangle.vs", "Shaders/Triangle.fs");
 	mTexture = new Texture("Shaders/wall.jpg",mShader);   
@@ -114,10 +114,7 @@ void Scene::UpdateScene(float dt)
 ///Rednerer
 void Scene::RenderScene(float dt, Transform globaltransform)
 { 
-	mTransform = globaltransform;
-
-	Spawner();
-	LoadContent();
+	SpaceManipulation(); 
 	BindCamera();
 	UpdateScene(dt);  
 
@@ -126,9 +123,6 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 
 	for (auto actor = uActorMap.begin(); actor!= uActorMap.end(); actor++) 
 	{
-		globaltransform.SetTransformMatrix(globaltransform.GetTransformMatrix() * actor->second->GetLocalTransformMatrix());
-
-
 		mShader->setMat4("model", actor->second->GetLocalTransformMatrix());   
 		actor->second->UseTexture(actor->second->GetTexBool());    
 		actor->second->drawActor(mShader); 

@@ -11,13 +11,14 @@ Camera::Camera(const std::string& name,
 	float farPlane,
 	float FOV,
 	float maxMovementSpeed,
-	float accelerationSpeed)
+	float accelerationSpeed,
+    float dampeningFactor)
 {
 	    mName = name;
 		mMaxMovementSpeed = maxMovementSpeed;
 		mAccelerationSpeed = accelerationSpeed;
-
-		mAspectRatio = aspectRatio;
+		mDampeningFactor = dampeningFactor;
+		mAspectRatio = aspectRatio; 
 		mNearPlane = nearPlane;
 		mFarplane = farPlane;
 		mFOV = FOV;
@@ -38,13 +39,13 @@ void Camera::UpdateCamera(float dt)
 {
 	UpdateVelocity(dt);
 	UpdatePosition(dt);
+	UpdateDampening(dt);
 }
 
 void Camera::UpdateVelocity(float dt)
 {
 	//Updating the velocity 
-	glm::vec3 test{ 0.f,0.f,1.f };
-	mVelocity += test + dt; 
+	mVelocity += mAcceleration * dt; 
 
 	//If the velocity exceeds the maximum speed, it is normalized: (unity vector) with
 	//size of 1 and the multiplied with the max speed until criteria is not true.
@@ -61,6 +62,17 @@ void Camera::UpdateVelocity(float dt)
  	mAcceleration = glm::vec3(0.f);
 }
 
+void Camera::UpdateDampening(float dt)
+{
+	float dampingFactor = glm::length(mVelocity) > 0 ? mDampeningFactor : 0.0f;
+
+	mVelocity -= mVelocity * dampingFactor * dt;
+
+	if (glm::length(mVelocity) < 0.001f)
+	{
+		mVelocity = glm::vec3(0.0f);
+	}
+}
 void Camera::UpdatePosition(float dt)
 {
 	
@@ -120,7 +132,7 @@ void Camera::CameraMovement(Direction direction, float dt)
 {
 
 	//Forward and Backwards
-	if (direction == forward) mAcceleration.z += mAccelerationSpeed;  
+	if (direction == forward) mAcceleration.z += GetAccelerationSpeed();
 	if (direction == backwards) mAcceleration.z -= GetAccelerationSpeed();
 
 	//Left and right

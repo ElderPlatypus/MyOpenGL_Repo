@@ -81,12 +81,12 @@ void Application::Run_App()
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     Scene* scene1 = new Scene("Scene1");
-    /*scene1->LoadContent(); */   
+    scene1->LoadContent();    
 
     ///Fillig the unordered map
     mScene = scene1;
     mScene->LoadContent();
-
+ 
     
     
     ///Creating the deltaTime variable
@@ -100,7 +100,7 @@ void Application::Run_App()
         float currentFrame = static_cast<float>(glfwGetTime());
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-       
+        UpdateActiveController(deltaTime);
         // input
         // -----
         ExitApplication(deltaTime);   
