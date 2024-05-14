@@ -100,7 +100,7 @@ void Application::Run_App()
         float currentFrame = static_cast<float>(glfwGetTime());
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
- 
+       
         // input
         // -----
         ExitApplication(deltaTime);   

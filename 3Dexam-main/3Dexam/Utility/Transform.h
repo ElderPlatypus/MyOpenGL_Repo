@@ -20,7 +20,7 @@ class Transform
 
 public:
     Transform()
-        : mPosition(glm::vec3(0.0f)), mScale(glm::vec3(1.0f)), mOrientation(glm::quat(glm::identity<glm::quat>())) {}
+        : mPosition(glm::vec3(0.0f)), mScale(glm::vec3(1.0f)), mOrientation(glm::quat(1,0,0,0)) {}
 
    
     ///Adders

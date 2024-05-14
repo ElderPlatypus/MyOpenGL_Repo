@@ -38,17 +38,13 @@ void Camera::UpdateCamera(float dt)
 {
 	UpdateVelocity(dt);
 	UpdatePosition(dt);
-	CameraMovement(forward,dt);  
-	CameraMovement(backwards, dt);
-	CameraMovement(left, dt);
-	CameraMovement(right, dt); 
-
 }
 
 void Camera::UpdateVelocity(float dt)
 {
 	//Updating the velocity 
-	mVelocity.z = 100.f; 
+	glm::vec3 test{ 0.f,0.f,1.f };
+	mVelocity += test + dt; 
 
 	//If the velocity exceeds the maximum speed, it is normalized: (unity vector) with
 	//size of 1 and the multiplied with the max speed until criteria is not true.
@@ -62,7 +58,7 @@ void Camera::UpdateVelocity(float dt)
 			<< std::endl;*/
 	}
 	
-	mAcceleration = glm::vec3(0.f);
+ 	mAcceleration = glm::vec3(0.f);
 }
 
 void Camera::UpdatePosition(float dt)
@@ -74,11 +70,11 @@ void Camera::UpdatePosition(float dt)
 	 
 	//Updating the position as a 
 	SetLocalPosition(GetLocalPosition() + mVelocity.x * dt * right + mVelocity.y * dt * up + mVelocity.z * dt * front);
-	//std::cout << "Check acceleration pos: " <<
-	//	GetLocalPosition().x << " "
-	//	<< GetLocalPosition().y << " "
-	//	<< GetLocalPosition().z << " "
-	//	<< std::endl;
+	/*std::cout << "Check acceleration pos: " 
+		<< GetLocalPosition().x << " " 
+		<< GetLocalPosition().y << " " 
+		<< GetLocalPosition().z << " " 
+		<< std::endl; */
 
 }
 
@@ -96,13 +92,17 @@ glm::vec3 Camera::GetForwardVector() const
 glm::vec3 Camera::GetUpVector() const
 {
 	//Return Up vector
-	return glm::rotate(GetLocalRotation(), glm::vec3(0.f, 1.f, 0.f));
+	glm::vec3 front = GetForwardVector();
+	glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0.f, 1.f, 0.f)));
+	return glm::cross(right, front);
+	//return glm::rotate(GetLocalRotation(), glm::vec3(0.f, 1.f, 0.f));
 }
 
 glm::mat4 Camera::GetViewMatrix() const
 {
 	//Returns the viewMatrix
-	return glm::lookAt(GetLocalPosition(), GetLocalPosition() + GetForwardVector(), glm::vec3(0.f, 1.f, 0.f)); 
+	auto pos = GetLocalPosition();
+	return glm::lookAt(pos, pos + GetForwardVector(), GetUpVector());
 }
 
 const glm::mat4& Camera::GetProjectionMatrix() const
@@ -137,11 +137,11 @@ void Camera::CameraMovement(Direction direction, float dt)
 
 	SetAcceleration(mAcceleration);   
 
-	//std::cout << "Actor pos:" << scene-> << " " << getCameraAcceleration.y << " " << getCameraAcceleration.z << std::endl;
-	//std::cout << "Check acceleration pos: " << mAcceleration.x << " " 
-	//	<< mAcceleration.y << " "
-	//	<< mAcceleration.z << " " 
-	//	<< std::endl;
+	//std::cout << "Actor pos:" << GetLocalPosition().x << " " << GetLocalPosition().y << " " << GetLocalPosition().z << std::endl;
+	/*std::cout << "Check acceleration pos: " << mAcceleration.x << " " 
+		<< mAcceleration.y << " "
+		<< mAcceleration.z << " " 
+		<< std::endl;*/
 }
 
 

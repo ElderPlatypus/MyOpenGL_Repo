@@ -38,10 +38,7 @@ void Scene::LoadContent()
 	{
 		actor->second->SetShader(mShader);  
 	}
-	for (auto object : spawnVector)
-	{
-		object->SetShader(mShader); 
-	}
+	
 
 }
 
@@ -130,18 +127,11 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 	for (auto actor = uActorMap.begin(); actor!= uActorMap.end(); actor++) 
 	{
 		globaltransform.SetTransformMatrix(globaltransform.GetTransformMatrix() * actor->second->GetLocalTransformMatrix());
-		mSceneCamera->UpdateCamera(dt);
 
 
 		mShader->setMat4("model", actor->second->GetLocalTransformMatrix());   
 		actor->second->UseTexture(actor->second->GetTexBool());    
 		actor->second->drawActor(mShader); 
-
-		for (auto it : spawnVector) 
-		{
-			it->UseTexture(it->GetTexBool()); 
-			it->drawActor(mShader);
-		}
 	}
 
 	
