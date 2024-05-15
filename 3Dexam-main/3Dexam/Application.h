@@ -39,6 +39,8 @@ public:
 
 	///Window KeyController
 	std::map<int, bool> mKeyState; 
+	std::map<int, bool> mButtonState;
+
 
 	class Scene* mScene{ nullptr };
 
@@ -48,7 +50,10 @@ public:
 	int mHeight{ 1080 };
 
 	///Callbacks for camera
-	void UpdateActiveController(float dt);
+	void UpdateCameraController(float dt);
+
+
+
 
 	std::string mName;
 };

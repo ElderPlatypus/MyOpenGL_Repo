@@ -106,15 +106,13 @@ glm::vec3 Camera::GetUpVector() const
 	//Return Up vector
 	glm::vec3 front = GetForwardVector();
 	glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0.f, 1.f, 0.f)));
-	return glm::cross(right, front);
-	//return glm::rotate(GetLocalRotation(), glm::vec3(0.f, 1.f, 0.f));
+	return glm::rotate(GetLocalRotation(), glm::vec3(0.f, 1.f, 0.f));
 }
 
 glm::mat4 Camera::GetViewMatrix() const
 {
 	//Returns the viewMatrix
-	auto pos = GetLocalPosition();
-	return glm::lookAt(pos, pos + GetForwardVector(), GetUpVector());
+	return glm::lookAt(GetLocalPosition(), GetLocalPosition() + GetForwardVector(), GetUpVector()); 
 }
 
 const glm::mat4& Camera::GetProjectionMatrix() const
@@ -130,31 +128,65 @@ glm::mat4 Camera::GetFrustumMatrix() const
 ///Camera movement
 void Camera::CameraMovement(Direction direction, float dt)
 {
-
 	//Forward and Backwards
-	if (direction == forward) mAcceleration.z += GetAccelerationSpeed();
-	if (direction == backwards) mAcceleration.z -= GetAccelerationSpeed();
+	if (direction == Forward) mAcceleration.z += GetAccelerationSpeed();  
+	if (direction == Backwards) mAcceleration.z -= GetAccelerationSpeed();
 
 	//Left and right
-	if (direction == right) mAcceleration.x += GetAccelerationSpeed(); 
-	if (direction == left) mAcceleration.x -= GetAccelerationSpeed(); 
+	if (direction == Right) mAcceleration.x += GetAccelerationSpeed(); 
+	if (direction == Left) mAcceleration.x -= GetAccelerationSpeed(); 
 
 	//Up and Down
-	if (direction == up) mAcceleration.y += GetAccelerationSpeed();
-	if (direction == down) mAcceleration.y -= GetAccelerationSpeed(); 
+	if (direction == Up) mAcceleration.y += GetAccelerationSpeed();
+	if (direction == Down) mAcceleration.y -= GetAccelerationSpeed(); 
 
 	//Increase of Speed
-	if (direction == speed) SetAccelerationSpeed(200.f);
-	else if (direction != speed) SetAccelerationSpeed(50.f);
+	if (direction == IncreaseSpeed) SetAccelerationSpeed(100.f);  
+	else SetAccelerationSpeed(50.f);  
 
 	SetAcceleration(mAcceleration);   
 
-	//std::cout << "Actor pos:" << GetLocalPosition().x << " " << GetLocalPosition().y << " " << GetLocalPosition().z << std::endl;
-	/*std::cout << "Check acceleration pos: " << mAcceleration.x << " " 
+	/*std::cout << "Check acceleration: "
+		<< mAcceleration.x << " " 
 		<< mAcceleration.y << " "
 		<< mAcceleration.z << " " 
-		<< std::endl;*/
+		<< std::endl; */
 }
+
+void Camera::CameraMouseButton(double xPos, double yPos)
+{
+	//Saves the x and y pos for lather when rotating camera
+	mRightMouseButtonPressed = true;
+	mLastX = static_cast<float>(xPos);
+	mLastY = static_cast<float>(yPos);
+}
+
+void Camera::CameraMouseMovement(double xPos, double yPos) 
+{
+	if (!mRightMouseButtonPressed) return;
+
+	float xOffset = mLastX - xPos;
+	float yOffset = mLastY - yPos;
+
+	xOffset *= mMouseSensitivity;
+	yOffset *= mMouseSensitivity; 
+
+	float yawRadians = glm::radians(xOffset);
+	float pitchRadians = glm::radians(yOffset);
+
+
+	//Creating a quaternion from angle and a normalized axis: projecting the normalized axis with the given angel whic is now the rotation domain for the quaternion.
+	//Can bed visualize as a  cone where the flat surface is the where the quaternions merges from.
+	glm::quat currentOrientation = GetLocalRotation();
+	glm::quat yawRotation = glm::angleAxis(yawRadians, glm::vec3(0.0f, 1.0f, 0.0f)); //normal axis is not 0 for y-axis --> gets yaw
+	glm::quat pitchRotation = glm::angleAxis(pitchRadians, glm::vec3(1.0f, 0.0f, 0.0f));  //normal axis is not 0 for x-axis --> gets pitch
+	glm::quat newOrientation = yawRotation * currentOrientation * pitchRotation;
+	newOrientation = glm::normalize(newOrientation); 
+	SetLocalRotation(newOrientation); 
+
+}
+
+
 
 
 

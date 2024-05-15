@@ -10,10 +10,15 @@
 
 enum Direction
 {
-	forward, backwards,
-	right, left,
-	up, down,
-	speed
+	//Directions
+	Forward, Backwards,
+	Right, Left,
+	Up, Down,
+	IncreaseSpeed,
+
+	//Mouse buttons
+	RightMouseButton,
+	MouseMotionX, MouseMotionY
 };
 
 
@@ -87,11 +92,14 @@ public:
 	float GetYaw() { return mTransform.GetYaw(); }
 	float GetPitch()  { return mTransform.GetPitch(); }
 
-	///Movement members
+	///Members
+	Transform mTransform{};
+	std::string mName;
 	glm::vec3 mVelocity{ 0.f,0.f,0.f };
 	glm::vec3 mAcceleration{ 0.f,0.f,0.f };
+	glm::mat4 mProjectionMatrix;
 	float mDampeningFactor;
-	float mMaxMovementSpeed;
+	float mMaxMovementSpeed; 
 	float mAccelerationSpeed;
 
 	float mAspectRatio;
@@ -100,12 +108,17 @@ public:
 	float mFOV;
 
 	///Mouse members
-	std::string mName;
-	glm::mat4 mProjectionMatrix;
-	Transform mTransform{};
+	float mLastX; 
+	float mLastY; 
+	bool mRightMouseButtonPressed = false;
+	float mMouseSensitivity = 0.05;
 
-	void CameraMovement(Direction direction ,float dt);
-	
+	///CamerControll
+	void CameraMovement(Direction direction,float dt);
+	void CameraMouseButton(double xPos, double yPos);
+
+	void CameraMouseMovement(double xPos, double yPos);
+
 
 };
 

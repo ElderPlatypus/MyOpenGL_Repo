@@ -100,7 +100,8 @@ void Application::Run_App()
         float currentFrame = static_cast<float>(glfwGetTime());
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        UpdateActiveController(deltaTime);
+        UpdateCameraController(deltaTime);
+
         // input
         // -----
         ExitApplication(deltaTime);   
@@ -185,14 +186,12 @@ void Application::RegisterWindowCallbacks()
 void Application::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
-
-    mScene->mSceneCamera->SetAspectRatio(static_cast<float>(width) / static_cast<float>(height));
-     
+    mScene->mSceneCamera->SetAspectRatio(static_cast<float>(width) / static_cast<float>(height)); //set Framebuffer according to aspect ratio
 }
 
 void Application::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-   
+    //Using map for stateflow on key-callbacks
     if (action == GLFW_PRESS || action == GLFW_REPEAT) 
     {
         mKeyState[key] = true;
@@ -202,16 +201,41 @@ void Application::KeyCallback(GLFWwindow* window, int key, int scancode, int act
         mKeyState[key] = false; 
     }
 
-    UpdateActiveController(0); 
+    UpdateCameraController(0);
 }
 
 void Application::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
+    //Using map for stateflow on button-callbacks
+    if (action == GLFW_PRESS)
+    {
+        mButtonState[button] = true;
+        
+    }
+    else if (action == GLFW_RELEASE)
+    {
+        mButtonState[button] = false; 
+    }
 }
+
 
 void Application::CursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 {
-   
+    //Checking if spesific button is called. Takes integer "button" anc checks in MousButtonCallback
+    if (mButtonState[GLFW_MOUSE_BUTTON_RIGHT])
+    {
+        //Disabling the visible cursor for when rotating the camera
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwGetCursorPos(window, &xPos, &yPos);  
+        mScene->mSceneCamera->CameraMouseMovement(xPos, yPos);  
+        mScene->mSceneCamera->CameraMouseButton(xPos, yPos);   
+    }
+    else
+    {
+        //Enabling the visible cursor for when not rotating the camera
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
 }
 
 ///Setters
@@ -238,29 +262,31 @@ void Application::ExitApplication(float dt)
 
 
 
-///Test
-void Application::UpdateActiveController(float dt)
+///Camera Updta Controller
+void Application::UpdateCameraController(float dt)
 {
     //Forward and Backwards
-    if (mKeyState[GLFW_KEY_W]) mScene->mSceneCamera->CameraMovement(forward,dt), std::cout << "W pressed\n" << std::endl;
-    if (mKeyState[GLFW_KEY_S]) mScene->mSceneCamera->CameraMovement(backwards, dt), std::cout << "S pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_W]) mScene->mSceneCamera->CameraMovement(Forward,dt), std::cout << "W pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_S]) mScene->mSceneCamera->CameraMovement(Backwards, dt), std::cout << "S pressed\n" << std::endl;
 
     //Left and right
-    if (mKeyState[GLFW_KEY_D]) mScene->mSceneCamera->CameraMovement(right, dt), std::cout << "D pressed\n" << std::endl;
-    if (mKeyState[GLFW_KEY_A]) mScene->mSceneCamera->CameraMovement(left, dt), std::cout << "A pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_D]) mScene->mSceneCamera->CameraMovement(Right, dt), std::cout << "D pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_A]) mScene->mSceneCamera->CameraMovement(Left, dt), std::cout << "A pressed\n" << std::endl;
 
     //Up and Down
-    if (mKeyState[GLFW_KEY_SPACE]) mScene->mSceneCamera->CameraMovement(up, dt), std::cout << "Space pressed\n" << std::endl;
-    if (mKeyState[GLFW_KEY_LEFT_ALT]) mScene->mSceneCamera->CameraMovement(down, dt), std::cout << "Alt pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_SPACE]) mScene->mSceneCamera->CameraMovement(Up, dt), std::cout << "Space pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_LEFT_ALT]) mScene->mSceneCamera->CameraMovement(Down, dt), std::cout << "Alt pressed\n" << std::endl;
 
     //Increase of Speed
-    if (mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->mSceneCamera->CameraMovement(speed, dt), std::cout << "Shift pressed\n" << std::endl;
-    else if (!mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->mSceneCamera->CameraMovement(speed, dt);
+    if (mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->mSceneCamera->CameraMovement(IncreaseSpeed, dt), std::cout << "Shift pressed\n" << std::endl;
+   
 
     /*glm::vec3 getPos = mScene->mSceneCamera->mTransform.GetPosition();
     std::cout << "getcameraPos:" << getPos.x << " " << getPos.y << " " << getPos.z << std::endl;*/
 
 }
+
+
 
 
 

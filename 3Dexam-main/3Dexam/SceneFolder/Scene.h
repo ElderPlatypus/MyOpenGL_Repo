@@ -18,6 +18,7 @@ class Scene
 {
 	std::string mName;
 	std::unordered_map<std::string,Actor*> uActorMap;
+	std::vector<Actor*> spawnVector;
 
 
 public:
@@ -26,7 +27,6 @@ public:
 	Texture* mTexture{ nullptr }; 
 	Scene(std::string name);
 
-	std::vector<Actor*> spawnVector;
 
 	//Loaders
 	void LoadActors();
@@ -50,6 +50,6 @@ public:
 	Scene() = default;
 
 	
-	
+	int mAmount = 10;
 };
 

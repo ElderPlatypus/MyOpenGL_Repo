@@ -26,10 +26,28 @@ void Scene::LoadActors()
 	
 }
 
+void Scene::Spawner()
+{
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<float> radiusXZ(-10.f, 10.f);
+	std::uniform_real_distribution<float> radiusY(-5.f, 5.f);
+
+
+	for (int amount = 0; amount < mAmount; amount++)
+	{
+		glm::vec3 spawnPos{ radiusXZ(gen),radiusY(gen),radiusXZ(gen) }; 
+		Actor* spawnedActor{ nullptr }; 
+		spawnedActor = Actor::CreateCube();
+		spawnedActor->SetLocalPosition(spawnPos);
+		spawnVector.emplace_back(spawnedActor);
+	}
+}
+
 void Scene::LoadContent()
 {
-	LoadActors();
 	Spawner(); 
+	LoadActors();
 
 	mShader = new Shader("Shaders/Triangle.vs", "Shaders/Triangle.fs");
 	mTexture = new Texture("Shaders/wall.jpg",mShader);   
@@ -38,7 +56,10 @@ void Scene::LoadContent()
 	{
 		actor->second->SetShader(mShader);  
 	}
-	
+	for (auto object : spawnVector)  
+	{
+		object->SetShader(mShader);   
+	}
 
 }
 
@@ -49,6 +70,10 @@ void Scene::UnloadContent()
 		actor->second->~Actor(); 
 	}
 
+	for (auto it : spawnVector) 
+	{
+		it->~Actor();
+	}
 	delete uActorMap["pyramid"];
 	uActorMap["pyramid"] = nullptr;
 
@@ -79,30 +104,6 @@ void Scene::UnloadContent()
 	mTexture->~Texture(); 
 	delete mTexture; 
 	mTexture = nullptr; 
-
-	for (auto it : spawnVector)
-	{
-		delete it;
-		it = nullptr;
-	}
-}
-
-void Scene::Spawner()
-{
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_real_distribution<float> radius(-3.f,3.f); 
-
-	for (int amount = 0; amount < 10; amount++)
-	{
-	 glm::vec3 spawnPos{ 0.f,0.f,-5.f };
-	 Actor* spawnedActor{ nullptr }; 
-	 spawnedActor = Actor::CreateCube();
-	 spawnedActor->SetLocalPosition(spawnPos); 
-	 spawnVector.emplace_back(spawnedActor);
-	}
-
-	
 }
 
 ///Updater
@@ -118,16 +119,20 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 	BindCamera();
 	UpdateScene(dt);  
 
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 	for (auto actor = uActorMap.begin(); actor!= uActorMap.end(); actor++) 
 	{
-		mShader->setMat4("model", actor->second->GetLocalTransformMatrix());   
+		globaltransform.SetTransformMatrix(actor->second->GetLocalTransformMatrix());
+		mShader->setMat4("model", globaltransform.GetTransformMatrix());   
 		actor->second->UseTexture(actor->second->GetTexBool());    
 		actor->second->drawActor(mShader); 
 	}
-
+	for (auto object : spawnVector) 
+	{
+		mShader->setMat4("model", object->GetLocalTransformMatrix());  
+		object->UseTexture(object->GetTexBool()); 
+		object->drawActor(mShader);
+	}
 	
 }
 
@@ -158,7 +163,10 @@ void Scene::SpaceManipulation()
 	/////Curve
 	//uActorMap["curve"]->SetLocalPosition(glm::vec3(-2.f, -1.0f, -8.f));
 
-
+	for (auto object : spawnVector)
+	{
+		object->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
+	}
 } 
 
 ///Shader Binder
