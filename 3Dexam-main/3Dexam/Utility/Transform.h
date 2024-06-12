@@ -23,13 +23,12 @@ public:
         : mPosition(glm::vec3(0.0f)), mScale(glm::vec3(1.0f)), mOrientation(glm::quat(1,0,0,0)) {}
 
    
-    ///Adders
+    ///Rotation Yaw and Pitch
     void AddRotation(const glm::quat& rot)
     {
         mOrientation = mOrientation * rot; //rotation = current rot multilpied ny new rot
         mOrientation = glm::normalize(mOrientation); //Normalizes the vector to a unit-vector with length 1
     }
-
     void AddPitch(float angle_Degrees) //Rotation along Y-axis
     {
         float angleToRadians = glm::radians(angle_Degrees);
@@ -37,7 +36,6 @@ public:
         glm::quat pitchRotation = glm::angleAxis(angleToRadians, rightVector);
         AddRotation(pitchRotation);
     }
-
     void AddYaw(float angle_Degress) //Rotation along X-axis
     {
         float angleToRadians = glm::radians(angle_Degress);
@@ -49,7 +47,6 @@ public:
     void SetRotation(const glm::quat& rot){ mOrientation = rot;} //Set rotation in form of glm::quat(angle,x,y,z)
     void SetPosition(const glm::vec3& pos){mPosition = pos;} //Set position glm::vec3(x,y,z)
     void SetScale(const glm::vec3& scl){mScale = scl;} //Set scale glm::vec3(x,y,z)
- 
     void SetRotation(const glm::vec3& forwardDirection, const glm::vec3& upDirection = glm::vec3(0.0f, 1.0f, 0.0f))
     {
         glm::vec3 normalizedForward = glm::normalize(forwardDirection);
@@ -57,21 +54,18 @@ public:
         glm::quat newRotation = glm::rotation(defaultForward, normalizedForward);
         mOrientation = newRotation;
     }
-
     void SetRotationFromPitch(float pitchDegrees)
     {
         float pitchRadians = glm::radians(pitchDegrees);
         glm::quat pitchRotation = glm::angleAxis(pitchRadians, glm::vec3(1.0f, 0.0f, 0.0f));
         mOrientation = pitchRotation;
     }
-
     void SetRotationFromYaw(float yawDegrees)
     {
         float yawRadians = glm::radians(yawDegrees);
         glm::quat yawRotation = glm::angleAxis(yawRadians, glm::vec3(0.0f, 1.0f, 0.0f));
         mOrientation = yawRotation;
     }
-
     void SetTransformMatrix(const glm::mat4 matrix) //Set matrix transformation: transforms a matrix consiting of all neccessary components
     {
         glm::vec3 scale; 

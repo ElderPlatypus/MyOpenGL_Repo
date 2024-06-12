@@ -101,10 +101,12 @@ void Application::Run_App()
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         UpdateCameraController(deltaTime);
+        UpdateActorMovement(deltaTime);  
+        UpdateCameraPlacement(deltaTime);
 
         // input
         // -----
-        ExitApplication(deltaTime);   
+        ExitApplication(deltaTime);    
         float timer = (float)glfwGetTime();
 
         // render
@@ -202,6 +204,8 @@ void Application::KeyCallback(GLFWwindow* window, int key, int scancode, int act
     }
 
     UpdateCameraController(0);
+    UpdateActorMovement(0);
+    UpdateCameraPlacement(0);
 }
 
 void Application::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -234,6 +238,7 @@ void Application::CursorPosCallback(GLFWwindow* window, double xPos, double yPos
     {
         //Enabling the visible cursor for when not rotating the camera
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        mScene->mSceneCamera->mRightMouseButtonPressed = false; 
     }
 
 }
@@ -261,7 +266,6 @@ void Application::ExitApplication(float dt)
 }
 
 
-
 ///Camera Updta Controller
 void Application::UpdateCameraController(float dt)
 {
@@ -284,6 +288,30 @@ void Application::UpdateCameraController(float dt)
     /*glm::vec3 getPos = mScene->mSceneCamera->mTransform.GetPosition();
     std::cout << "getcameraPos:" << getPos.x << " " << getPos.y << " " << getPos.z << std::endl;*/
 
+}
+ 
+void Application::UpdateActorMovement(float dt) 
+{
+    for (auto actor : mScene->uActorMap) 
+    {
+       //Movement Keys
+       if (mKeyState[GLFW_KEY_W]) actor.second->ActorMovementNoCameraAttachment(Forward, mScene->mSceneCamera,dt);    
+       if (mKeyState[GLFW_KEY_A]) actor.second->ActorMovementNoCameraAttachment(Left, mScene->mSceneCamera, dt); 
+       if (mKeyState[GLFW_KEY_S]) actor.second->ActorMovementNoCameraAttachment(Backwards, mScene->mSceneCamera, dt); 
+       if (mKeyState[GLFW_KEY_D]) actor.second->ActorMovementNoCameraAttachment(Right, mScene->mSceneCamera, dt); 
+
+       //Increase Speed
+       if (mKeyState[GLFW_KEY_LEFT_SHIFT]) actor.second->ActorMovementNoCameraAttachment(IncreaseSpeed, mScene->mSceneCamera, dt);  
+    }
+}
+
+void Application::UpdateCameraPlacement(float dt)
+{
+    for (auto actor : mScene->uActorMap)
+    {
+        if (mKeyState[GLFW_KEY_1]) actor.second->CameraPlacement(UseCameraKey1,mScene->mSceneCamera, dt); 
+        if (mKeyState[GLFW_KEY_2]) actor.second->CameraPlacement(StaticCameraKey2, mScene->mSceneCamera, dt);   
+    }
 }
 
 

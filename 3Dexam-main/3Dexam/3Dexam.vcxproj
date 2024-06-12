@@ -150,6 +150,7 @@
     <ClInclude Include="includes\glm\mat4x3.hpp" />
     <ClInclude Include="includes\KHR\khrplatform.h" />
     <ClInclude Include="Shaders\Texture.h" />
+    <ClInclude Include="Utility\Collision.h" />
     <ClInclude Include="Utility\pathDefinition.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="SceneFolder\Actor.h" />

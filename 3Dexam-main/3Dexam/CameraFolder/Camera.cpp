@@ -128,29 +128,37 @@ glm::mat4 Camera::GetFrustumMatrix() const
 ///Camera movement
 void Camera::CameraMovement(Direction direction, float dt)
 {
-	//Forward and Backwards
-	if (direction == Forward) mAcceleration.z += GetAccelerationSpeed();  
-	if (direction == Backwards) mAcceleration.z -= GetAccelerationSpeed();
+	if (mUseCameraMovement == true)
+	{
+		//Forward and Backwards
+		if (direction == Forward) mAcceleration.z += GetAccelerationSpeed(); 
+		if (direction == Backwards) mAcceleration.z -= GetAccelerationSpeed();
 
-	//Left and right
-	if (direction == Right) mAcceleration.x += GetAccelerationSpeed(); 
-	if (direction == Left) mAcceleration.x -= GetAccelerationSpeed(); 
+		//Left and right 
+		if (direction == Right) mAcceleration.x += GetAccelerationSpeed();
+		if (direction == Left) mAcceleration.x -= GetAccelerationSpeed();  
 
-	//Up and Down
-	if (direction == Up) mAcceleration.y += GetAccelerationSpeed();
-	if (direction == Down) mAcceleration.y -= GetAccelerationSpeed(); 
+		//Up and Down 
+		if (direction == Up) mAcceleration.y += GetAccelerationSpeed();
+		if (direction == Down) mAcceleration.y -= GetAccelerationSpeed(); 
 
-	//Increase of Speed
-	if (direction == IncreaseSpeed) SetAccelerationSpeed(100.f);  
-	else SetAccelerationSpeed(50.f);  
+		//Increase of Speed
+		if (mAcceleration != glm::vec3(0.f,0.f,0.f) && direction == IncreaseSpeed) SetAccelerationSpeed(100.f);   
+		else SetAccelerationSpeed(50.f); 
 
-	SetAcceleration(mAcceleration);   
+		SetAcceleration(mAcceleration);
 
-	/*std::cout << "Check acceleration: "
-		<< mAcceleration.x << " " 
-		<< mAcceleration.y << " "
-		<< mAcceleration.z << " " 
-		<< std::endl; */
+		/*std::cout << "Check acceleration: "
+			<< mAcceleration.x << " "
+			<< mAcceleration.y << " "
+			<< mAcceleration.z << " "
+			<< std::endl; */
+
+	}
+	else
+	{
+		//std::cout << "Camera Movement Not in Use" << std::endl;
+	}
 }
 
 void Camera::CameraMouseButton(double xPos, double yPos)
@@ -164,27 +172,35 @@ void Camera::CameraMouseButton(double xPos, double yPos)
 void Camera::CameraMouseMovement(double xPos, double yPos) 
 {
 	if (!mRightMouseButtonPressed) return;
+	else
+	{
 
-	float xOffset = mLastX - xPos;
-	float yOffset = mLastY - yPos;
+		std::cout << "Mouse Button Pressed \n" << std::endl; 
 
-	xOffset *= mMouseSensitivity;
-	yOffset *= mMouseSensitivity; 
+		float xOffset = mLastX - static_cast<float>(xPos); 
+		float yOffset = mLastY - static_cast<float>(yPos);
 
-	float yawRadians = glm::radians(xOffset);
-	float pitchRadians = glm::radians(yOffset);
+		xOffset *= mMouseSensitivity; 
+		yOffset *= mMouseSensitivity; 
+
+		float yawRadians = glm::radians(xOffset); 
+		float pitchRadians = glm::radians(yOffset); 
 
 
-	//Creating a quaternion from angle and a normalized axis: projecting the normalized axis with the given angel whic is now the rotation domain for the quaternion.
-	//Can bed visualize as a  cone where the flat surface is the where the quaternions merges from.
-	glm::quat currentOrientation = GetLocalRotation();
-	glm::quat yawRotation = glm::angleAxis(yawRadians, glm::vec3(0.0f, 1.0f, 0.0f)); //normal axis is not 0 for y-axis --> gets yaw
-	glm::quat pitchRotation = glm::angleAxis(pitchRadians, glm::vec3(1.0f, 0.0f, 0.0f));  //normal axis is not 0 for x-axis --> gets pitch
-	glm::quat newOrientation = yawRotation * currentOrientation * pitchRotation;
-	newOrientation = glm::normalize(newOrientation); 
-	SetLocalRotation(newOrientation); 
+		//Creating a quaternion from angle and a normalized axis: projecting the normalized axis with the given angel whic is now the rotation domain for the quaternion.
+		//Can bed visualize as a  cone where the flat surface is the where the quaternions merges from.
+		glm::quat currentOrientation = GetLocalRotation(); 
+		glm::quat yawRotation = glm::angleAxis(yawRadians, glm::vec3(0.0f, 1.0f, 0.0f)); //normal axis is not 0 for y-axis --> gets yaw
+		glm::quat pitchRotation = glm::angleAxis(pitchRadians, glm::vec3(1.0f, 0.0f, 0.0f));  //normal axis is not 0 for x-axis --> gets pitch
+		glm::quat newOrientation = yawRotation * currentOrientation * pitchRotation; 
+		newOrientation = glm::normalize(newOrientation); 
+		SetLocalRotation(newOrientation);
+	}
+
 
 }
+
+
 
 
 

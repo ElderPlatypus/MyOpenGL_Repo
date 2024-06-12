@@ -10,13 +10,11 @@
 class Application
 {
 public:
-	struct GLFWwindow* mWindow{ nullptr };
 
 	///Create and Destroy window object
 	Application() = default;  
 	Application(std::string name, int width, int height) : mWidth(width), mHeight(height), mName(name) {}
 	~Application(); //Destroy window memory loaction after done running 
-
 	static Application* GetAPP();
 
 	///Initializers
@@ -37,23 +35,22 @@ public:
 	void SetHeight(int height);
 	void SetWidth(int width);
 
-	///Window KeyController
+	///Members and variables
 	std::map<int, bool> mKeyState; 
 	std::map<int, bool> mButtonState;
-
-
+	struct GLFWwindow* mWindow{ nullptr };
 	class Scene* mScene{ nullptr };
-
-	void ExitApplication(float dt);
-
 	int mWidth{ 1920 };
 	int mHeight{ 1080 };
-
-	///Callbacks for camera
-	void UpdateCameraController(float dt);
-
-
-
-
 	std::string mName;
+
+	///Util Funtions
+	void ExitApplication(float dt);
+
+	//---------------------------------Update callback from Camera class------------------------------------------
+	void UpdateCameraController(float dt);
+	void UpdateActorMovement(float dt);
+	void UpdateCameraPlacement(float dt);
+
+
 };

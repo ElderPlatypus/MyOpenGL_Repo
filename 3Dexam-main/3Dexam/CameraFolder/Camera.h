@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+//Enum
 enum Direction
 {
 	//Directions
@@ -18,9 +19,11 @@ enum Direction
 
 	//Mouse buttons
 	RightMouseButton,
-	MouseMotionX, MouseMotionY
-};
+	MouseMotionX, MouseMotionY,
 
+	//Other buttons
+	UseCameraKey1,StaticCameraKey2
+};
 
 
 class Camera
@@ -73,7 +76,7 @@ public:
 	float GetAspectRatio() const { return mAspectRatio; }
 	
 
-    ///Transformation
+   ///Transformation
    //---------------------------------Local Setters------------------------------------------------
 	void SetTransformation(const Transform& transform) { mTransform = transform; }
 	void SetLocalPosition(const glm::vec3& position) { mTransform.SetPosition(position); }
@@ -89,8 +92,6 @@ public:
 	const glm::vec3& GetLocalScale() const { return mTransform.GetScale(); }
 	const glm::mat4 GetLocalTransformMatrix() const { return mTransform.GetTransformMatrix(); }
 	glm::vec3 GetRightVector() const { return mTransform.GetRightVector(); }
-	float GetYaw() { return mTransform.GetYaw(); }
-	float GetPitch()  { return mTransform.GetPitch(); }
 
 	///Members
 	Transform mTransform{};
@@ -111,13 +112,14 @@ public:
 	float mLastX; 
 	float mLastY; 
 	bool mRightMouseButtonPressed = false;
-	float mMouseSensitivity = 0.05;
+	float mMouseSensitivity = 0.05f;
 
 	///CamerControll
 	void CameraMovement(Direction direction,float dt);
 	void CameraMouseButton(double xPos, double yPos);
-
 	void CameraMouseMovement(double xPos, double yPos);
+	bool mUseCameraMovement = true; 
+
 
 
 };

@@ -93,7 +93,7 @@ Actor* Actor::CreatePyramid()
         13,14,15
     };
     
-    return new Actor("pyramid",vertices, indices, true);
+    return new Actor("pyramid",vertices, indices, true); 
 }
 
 Actor* Actor::CreateCube()
@@ -171,7 +171,7 @@ Actor* Actor::CreateInterpolationCurve3Points(const double& startVal, const doub
     //Iterating over Points.size and adding respective values to respective variable
     for (auto i = 0; i < Points.size(); i++)
     {
-        A[0][i] = pow(Points[i].x, 2);
+        A[0][i] = pow(Points[i].x, 2.0f);
         A[1][i] = Points[i].x;
         A[2][i] = 1.f;
 
@@ -328,7 +328,52 @@ void Actor::drawActor(const Shader* shader) const
     glBindVertexArray(0);
 }
 
+///Actor movement
+void Actor::ActorMovementNoCameraAttachment(Direction direction, Camera* camera, float dt)
+{
+  
+    if (mAttachCamera == true && camera->mUseCameraMovement == false)  
+    {
+        //Forward and Backwards
+        if (direction == Forward) 
+        {
+            SetLocalPosition(GetLocalPosition() - glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt);
+            SetLocalRotation(glm::quat(0, 0, 1, 0)); 
+        }
 
+        if (direction == Backwards)
+        {
+            SetLocalPosition(GetLocalPosition() + glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt);
+            SetLocalRotation(glm::quat(0, 0, 0, 0));
+        }
+
+        //Left and right
+        if (direction == Right) SetLocalPosition(GetLocalPosition() + glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt); 
+        if (direction == Left) SetLocalPosition(GetLocalPosition() - glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt); 
+
+        if (mMovementSpeed != 0.f && direction == IncreaseSpeed) mMovementSpeed = 10.f; 
+        else mMovementSpeed = 5.0f;
+       
+
+      /*  std::cout << "Check Local pos: "
+        << GetLocalPosition().x << " "
+        << GetLocalPosition().y << " "
+        << GetLocalPosition().z << " "
+        << std::endl; */ 
+    }
+}
+
+void Actor::CameraPlacement(Direction placement, Camera* camera, float dt)
+{
+    if (placement == UseCameraKey1 && mAttachCamera == true)
+    {
+        camera->mUseCameraMovement = true;
+    }
+    if (placement == StaticCameraKey2 && mAttachCamera == true)
+    {
+        camera->mUseCameraMovement = false;
+    }
+}
 
 
 

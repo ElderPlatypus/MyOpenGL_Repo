@@ -16,14 +16,19 @@ void Scene::LoadActors()
 	//uActorMap["planeXY"] = Actor::CreatePlaneXY(-5, 0, 5, 5, 0.05f); 
 	/*uActorMap["planeXZ"] = Actor::CreatePlaneXZ(-5, 0, 5, 5, 0.05f); */
 
-	uActorMap["cube"] = Actor::CreateCube();
-	uActorMap["cube2"] = Actor::CreateCube();
+	uActorMap["player"] = Actor::CreateCube();
+	uActorMap["player"]->SetLocalPosition(glm::vec3(-2.f, 0.0f, -8.f)); 
+	uActorMap["player"]->mAttachCamera = true;
+
+
+	//uActorMap["cube2"] = Actor::CreateCube();
 
 
 	//Create camera object
 	
      mSceneCamera = new Camera("SceneCamera"); 
-	
+	 //mSceneCamera->mUseCamerMovement = true; 
+	 
 }
 
 void Scene::Spawner()
@@ -38,7 +43,7 @@ void Scene::Spawner()
 	{
 		glm::vec3 spawnPos{ radiusXZ(gen),radiusY(gen),radiusXZ(gen) }; 
 		Actor* spawnedActor{ nullptr }; 
-		spawnedActor = Actor::CreateCube();
+		spawnedActor = Actor::CreatePyramid();
 		spawnedActor->SetLocalPosition(spawnPos);
 		spawnVector.emplace_back(spawnedActor);
 	}
@@ -86,8 +91,8 @@ void Scene::UnloadContent()
 	delete uActorMap["curve"];
 	uActorMap["curve"] = nullptr;
 
-	delete uActorMap["cube"];
-	uActorMap["cube"] = nullptr;
+	delete uActorMap["player"];
+	uActorMap["player"] = nullptr;
 
 	delete uActorMap["cube2"];
 	uActorMap["cube2"] = nullptr;
@@ -137,7 +142,7 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 }
 
 ///Tranformations
-void Scene::SpaceManipulation()
+void Scene::SpaceManipulation() //Only rotation can be manipulated before call in Render. Offset needs to be set in LoacActors.
 {
 	/////Pyramid
 	//uActorMap["pyramid"]->SetLocalPosition(glm::vec3(0.0f, 0.5f, -4.f));
@@ -153,19 +158,24 @@ void Scene::SpaceManipulation()
 
 
 	///Cube
-	uActorMap["cube"]->SetLocalPosition(glm::vec3(-2.f, 0.0f, -8.f)); 
-	uActorMap["cube"]->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime()));
+	//uActorMap["cube"]->SetLocalPosition(glm::vec3(-2.f, 0.0f, -8.f)); 
+	//uActorMap["cube"]->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime()));
 
-	uActorMap["cube2"]->SetLocalPosition(glm::vec3(2.f, 0.0f, -8.f));
-	uActorMap["cube2"]->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime()));
+	//uActorMap["cube2"]->SetLocalPosition(glm::vec3(2.f, 0.0f, -8.f));
+	//uActorMap["cube2"]->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime()));
 
 	
 	/////Curve
 	//uActorMap["curve"]->SetLocalPosition(glm::vec3(-2.f, -1.0f, -8.f));
 
-	for (auto object : spawnVector)
+	/*for (auto object : spawnVector)
 	{
 		object->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
+	}*/
+
+	for (auto object : spawnVector)
+	{
+		mCollision->AABB(uActorMap["player"], object);
 	}
 } 
 

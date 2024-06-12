@@ -13,15 +13,16 @@
 #include "../Application.h"
 #include "../CameraFolder/Camera.h"
 #include "../Shaders/Texture.h"
+#include "../Utility/Collision.h"
 
 class Scene 
 {
 	std::string mName;
-	std::unordered_map<std::string,Actor*> uActorMap;
 	std::vector<Actor*> spawnVector;
 
 
 public:
+	std::unordered_map<std::string,Actor*> uActorMap;
 	Shader* mShader{ nullptr };
 	Camera* mSceneCamera{ nullptr };
 	Texture* mTexture{ nullptr }; 
@@ -49,7 +50,10 @@ public:
 
 	Scene() = default;
 
-	
+	//Spawner controll
 	int mAmount = 10;
+
+	//Collision control
+	Collision* mCollision{ nullptr };
 };
 
