@@ -86,5 +86,6 @@ public:
     bool mAttachCamera = false;  
     float mMovementSpeed = 5.0f;
     void CameraPlacement(Direction placement, Camera* camera, float dt);
+    bool mIsMoving = false;
 };
 

@@ -334,45 +334,81 @@ void Actor::ActorMovementNoCameraAttachment(Direction direction, Camera* camera,
   
     if (mAttachCamera == true && camera->mUseCameraMovement == false)  
     {
-        //Forward and Backwards
-        if (direction == Forward) 
+        switch (direction)
         {
-            SetLocalPosition(GetLocalPosition() - glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt);
-            SetLocalRotation(glm::quat(0, 0, 1, 0)); 
-        }
+            //Forward & Backwards
+        case Forward:
+            SetLocalPosition(GetLocalPosition() - glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt); 
+            SetLocalRotation(glm::quat(0, 0, 1, 0));
+            break;
 
-        if (direction == Backwards)
-        {
+        case Backwards:
             SetLocalPosition(GetLocalPosition() + glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt);
             SetLocalRotation(glm::quat(0, 0, 0, 0));
+            break;
+
+            //Left & Right
+        case Left:
+            SetLocalPosition(GetLocalPosition() - glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt);
+            break;
+
+        case Right:
+            SetLocalPosition(GetLocalPosition() + glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt);
+            break;
+
+            //Increase Speed
+        case IncreaseSpeed:
+            mIsMoving = true;
+            break; 
         }
 
-        //Left and right
-        if (direction == Right) SetLocalPosition(GetLocalPosition() + glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt); 
-        if (direction == Left) SetLocalPosition(GetLocalPosition() - glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt); 
-
-        if (mMovementSpeed != 0.f && direction == IncreaseSpeed) mMovementSpeed = 10.f; 
-        else mMovementSpeed = 5.0f;
-       
-
-      /*  std::cout << "Check Local pos: "
+        if (mIsMoving == true)
+        {
+            mMovementSpeed = 10.0f;
+            mIsMoving = false;
+        }
+        else
+        {
+            mIsMoving = false;
+            mMovementSpeed = 5.0f;
+        }
+  
+      /*  std::cout << "Speed " <<  mMovementSpeed << std::endl;
+        std::cout << "IsMoving " << mIsMoving << std::endl; 
+        std::cout << "Check Local pos: "
         << GetLocalPosition().x << " "
         << GetLocalPosition().y << " "
         << GetLocalPosition().z << " "
-        << std::endl; */ 
+        << std::endl;  */
     }
 }
 
 void Actor::CameraPlacement(Direction placement, Camera* camera, float dt)
 {
-    if (placement == UseCameraKey1 && mAttachCamera == true)
+    switch (placement)
+    {
+    case UseCameraKey1:
+        if (mAttachCamera == true)
+        {
+            camera->mUseCameraMovement = true;
+        }
+        break;
+
+    case StaticCameraKey2:
+        if (mAttachCamera == true)
+        {
+            camera->mUseCameraMovement = false;
+
+        }
+    }
+   /* if (placement == UseCameraKey1 && mAttachCamera == true)
     {
         camera->mUseCameraMovement = true;
     }
     if (placement == StaticCameraKey2 && mAttachCamera == true)
     {
         camera->mUseCameraMovement = false;
-    }
+    }*/
 }
 
 
