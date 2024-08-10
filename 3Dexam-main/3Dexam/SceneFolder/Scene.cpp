@@ -20,6 +20,9 @@ void Scene::LoadActors()
 	uActorMap["player"]->SetLocalPosition(glm::vec3(-2.f, 0.0f, -8.f)); 
 	uActorMap["player"]->mAttachCamera = true;
 
+	uActorMap["testCube"] = Actor::CreateCube();
+	uActorMap["testCube"]->SetLocalPosition(glm::vec3(0.f, 0.0f, -16.f));
+
 
 	//uActorMap["cube2"] = Actor::CreateCube();
 
@@ -45,6 +48,7 @@ void Scene::Spawner()
 		Actor* spawnedActor{ nullptr }; 
 		spawnedActor = Actor::CreatePyramid();
 		spawnedActor->SetLocalPosition(spawnPos);
+		spawnedActor->mUseTex = true;
 		spawnVector.emplace_back(spawnedActor);
 	}
 }
@@ -100,6 +104,9 @@ void Scene::UnloadContent()
 	delete uActorMap["curve"];
 	uActorMap["curve"] = nullptr;
 
+	delete uActorMap["testCube"];
+	uActorMap["testCube"] = nullptr;
+
 	delete mSceneCamera;
 	mSceneCamera = nullptr;
 
@@ -115,6 +122,23 @@ void Scene::UnloadContent()
 void Scene::UpdateScene(float dt)
 {
 	mSceneCamera->UpdateCamera(dt); 
+
+	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++)
+	{
+		actor->second->UpdateActors(dt);
+	}
+
+	for (auto object : spawnVector)
+	{
+		object->UpdateActors(dt);
+	}
+
+	for (auto object : spawnVector)
+	{
+	  Collision::Intersect(uActorMap["player"], object);
+	}
+
+	Collision::Intersect(uActorMap["player"], uActorMap["testCube"]);
 }
 
 ///Rednerer
@@ -173,10 +197,10 @@ void Scene::SpaceManipulation() //Only rotation can be manipulated before call i
 		object->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
 	}*/
 
-	for (auto object : spawnVector)
+	/*for (auto object : spawnVector)
 	{
-		mCollision->AABB(uActorMap["player"], object);
-	}
+		mCollision->Intersect(uActorMap["player"], object);
+	}*/
 } 
 
 ///Shader Binder

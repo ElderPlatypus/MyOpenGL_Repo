@@ -48,7 +48,7 @@
               "RelativeDocumentMoniker": "3Dexam\\SceneFolder\\Actor.h",
               "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\SceneFolder\\Actor.h",
               "RelativeToolTip": "3Dexam\\SceneFolder\\Actor.h",
-              "ViewState": "AQIAAD8AAAAAAAAAAAAAAFgAAAAbAAAA",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAAACAAAAAfAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2024-08-02T14:33:45.852Z",
               "EditorCaption": ""
@@ -61,9 +61,22 @@
               "RelativeDocumentMoniker": "3Dexam\\SceneFolder\\Actor.cpp",
               "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\SceneFolder\\Actor.cpp",
               "RelativeToolTip": "3Dexam\\SceneFolder\\Actor.cpp",
-              "ViewState": "AQIAABsBAAAAAAAAAAAwwGsBAAAAAAAA",
+              "ViewState": "AQIAAFQBAAAAAAAAAAAAAHcBAAAdAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-08-02T13:58:59.244Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Collision.h",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\Utility\\Collision.h",
+              "RelativeDocumentMoniker": "3Dexam\\Utility\\Collision.h",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\Utility\\Collision.h",
+              "RelativeToolTip": "3Dexam\\Utility\\Collision.h",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABkAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-08-02T13:33:08.548Z",
               "EditorCaption": ""
             },
             {
@@ -74,7 +87,7 @@
               "RelativeDocumentMoniker": "3Dexam\\Application.cpp",
               "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\Application.cpp",
               "RelativeToolTip": "3Dexam\\Application.cpp",
-              "ViewState": "AQIAAPQAAAAAAAAAAAAowCcBAAAFAAAA",
+              "ViewState": "AQIAAOUAAAAAAAAAAAAowCcBAAAFAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-08-02T14:19:37.897Z",
               "EditorCaption": ""
@@ -87,21 +100,10 @@
               "RelativeDocumentMoniker": "3Dexam\\SceneFolder\\Scene.cpp",
               "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\SceneFolder\\Scene.cpp",
               "RelativeToolTip": "3Dexam\\SceneFolder\\Scene.cpp",
-              "ViewState": "AQIAAJAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACcAAAAYAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-08-02T13:55:47.056Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "Collision.h",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\Utility\\Collision.h",
-              "RelativeDocumentMoniker": "3Dexam\\Utility\\Collision.h",
-              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\Utility\\Collision.h",
-              "RelativeToolTip": "3Dexam\\Utility\\Collision.h",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAsAAAAEAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-08-02T13:33:08.548Z"
+              "WhenOpened": "2024-08-02T13:55:47.056Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",

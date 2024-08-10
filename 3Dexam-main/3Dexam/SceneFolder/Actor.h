@@ -87,5 +87,13 @@ public:
     float mMovementSpeed = 5.0f;
     void CameraPlacement(Direction placement, Camera* camera, float dt);
     bool mIsMoving = false;
+
+
+    ///Collision Values
+    glm::vec3 mCenter{ 0.f,0.f,0.f };
+    glm::vec3 mExtent{ 0.5f,0.5f,0.5f };
+
+    ///Update Actors
+    void UpdateActors(float dt);
 };
 

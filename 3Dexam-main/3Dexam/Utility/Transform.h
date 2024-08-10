@@ -74,7 +74,7 @@ public:
         glm::vec3 skew;
         glm::vec4 perspective;
 
-        glm::decompose(matrix, scale, orientation, translation, skew, perspective); //Decomposing the matrix to fit the trasnformation matrix
+        glm::decompose(matrix, scale, orientation, translation, skew, perspective); //Decomposing the matrix to fit the trasformation matrix
         //bool decompose(mat<4, 4, T, Q> const& ModelMatrix, vec<3, T, Q> & Scale, qua<T, Q> & Orientation, vec<3, T, Q> & Translation, vec<3, T, Q> & Skew, vec<4, T, Q> & Perspective)
         //Using LU decomposition, a faster alternative to Gauss Jordan elemination.
         // As said on https://glm.g-truc.net/0.9.6/api/a00204.html#ga0f1245817507156b337798a253577c8b it breaks down the matrix into parts: "translations, rotations adn scale components".
@@ -98,14 +98,14 @@ public:
 
     //---------------------------------Pitch & Yaw------------------------------------------------
     //Euler angles will be used and are vectors fixed to a rigid object and uses rotations in form of: yaw(x), pitch(y) and roll(z)
-    float GetPitch() //Return current pitch in degrees
+    float GetPitch() const//Return current pitch in degrees
     {
         glm::vec3 eulerAngleX = glm::eulerAngles(mOrientation); //variable which stores the euler angles of the orientation: 3-vectors
         float pitch = eulerAngleX.x; //Extracting the EulerAngle corresponding to the axis i need for Pitch
         return glm::degrees(pitch); //Returns specific EulerAngle
     }
 
-    float GetYaw() //Returns current yaw in degrees
+    float GetYaw() const //Returns current yaw in degrees
     {
         glm::vec3 eulerAngleY = glm::eulerAngles(mOrientation); //variable which stores the euler angles of the orientation: 3-vectors
         float yaw = eulerAngleY.y;  //Extracting the EulerAngle corresponding to the axis i need for Pitch

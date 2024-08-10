@@ -12,6 +12,21 @@ Actor::Actor(const std::string& name, std::vector<Vertex>& vertices,std::vector<
     mUseTex = useTex;
     mDrawLine = drawLine;
     configureMesh();
+
+
+    //Offset for Boudning Box
+    glm::vec3 minExtent{0.f,0.f,0.f};
+    glm::vec3 maxExtent{ 0.f,0.f,0.f };
+
+    for (auto &it : vertices)
+    {
+        minExtent = glm::min(minExtent, it.mPos);
+        maxExtent = glm::max(maxExtent, it.mPos);
+    }
+
+    mExtent = maxExtent - minExtent;
+
+
 }
 
 Actor::~Actor()
@@ -409,6 +424,11 @@ void Actor::CameraPlacement(Direction placement, Camera* camera, float dt)
     {
         camera->mUseCameraMovement = false;
     }*/
+}
+
+void Actor::UpdateActors(float dt)
+{
+    mCenter = GetLocalPosition();
 }
 
 
