@@ -298,7 +298,10 @@ void Application::UpdateActorMovement(float dt)
        if (mKeyState[GLFW_KEY_W]) actor.second->ActorMovementNoCameraAttachment(Forward, mScene->mSceneCamera,dt);    
        if (mKeyState[GLFW_KEY_A]) actor.second->ActorMovementNoCameraAttachment(Left, mScene->mSceneCamera, dt); 
        if (mKeyState[GLFW_KEY_S]) actor.second->ActorMovementNoCameraAttachment(Backwards, mScene->mSceneCamera, dt); 
-       if (mKeyState[GLFW_KEY_D]) actor.second->ActorMovementNoCameraAttachment(Right, mScene->mSceneCamera, dt); 
+       if (mKeyState[GLFW_KEY_D]) actor.second->ActorMovementNoCameraAttachment(Right, mScene->mSceneCamera, dt);
+       if (mKeyState[GLFW_KEY_SPACE]) actor.second->ActorMovementNoCameraAttachment(Up, mScene->mSceneCamera, dt);
+       if (mKeyState[GLFW_KEY_LEFT_ALT]) actor.second->ActorMovementNoCameraAttachment(Down, mScene->mSceneCamera, dt); 
+
 
        //Increase Speed
        if (mKeyState[GLFW_KEY_LEFT_SHIFT]) actor.second->ActorMovementNoCameraAttachment(IncreaseSpeed, mScene->mSceneCamera, dt);  

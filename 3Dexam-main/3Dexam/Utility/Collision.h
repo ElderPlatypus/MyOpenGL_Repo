@@ -12,21 +12,26 @@ public:
 	static bool Intersect(Actor* a, Actor* b) 
 	{
 
-		//Center differnce
-		glm::vec3 diff{ a->mCenter - b->mCenter };
-
-		//Sum of extent
-		glm::vec3 sumExtent{ a->mExtent + b->mExtent };
-
-		for (int i = 0; i < 3; i++)
+		if (a->mEnableCollison == true && b->mEnableCollison == true)
 		{
-			//If difference per axis is less than sum of extent then no collision is detected
-			if (abs(diff[i]) >= sumExtent[i]) return false;
+			//Center differnce
+			glm::vec3 diff{ a->mCenter - b->mCenter };
+
+			//Sum of extent
+			glm::vec3 sumExtent{ a->mExtent + b->mExtent };
+
+			for (int i = 0; i < 3; i++)
+			{
+				//If difference per axis is less than sum of extent then no collision is detected
+				if (abs(diff[i]) >= sumExtent[i]) return false;
+			}
+			std::cout << "Collison Detected" << std::endl;
+
+
+			return true;
 		}
-		std::cout << "Collison Detected" << std::endl;
-
-
-		return true;
+		else false;
+	
 	}
 
 	

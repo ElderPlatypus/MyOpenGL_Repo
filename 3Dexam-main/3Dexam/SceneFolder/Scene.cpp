@@ -10,27 +10,33 @@ Scene::Scene(std::string name)
 ///Loaders & Unloaders
 void Scene::LoadActors()
 {
-	//Load Actors into U-Map
+	///Load Actors into U-Map
 	//uActorMap["pyramid"] = Actor::CreatePyramid();
 	//uActorMap["curve"] = Actor::CreateInterpolationCurve3Points(0, 13, 0.2f); 
 	//uActorMap["planeXY"] = Actor::CreatePlaneXY(-5, 0, 5, 5, 0.05f); 
-	/*uActorMap["planeXZ"] = Actor::CreatePlaneXZ(-5, 0, 5, 5, 0.05f); */
 
+	///Plane
+	uActorMap["planeXZ"] = Actor::CreatePlaneXZ(-5, 0, 5, 5, 0.05f);  
+
+	///Player
 	uActorMap["player"] = Actor::CreateCube();
-	uActorMap["player"]->SetLocalPosition(glm::vec3(-2.f, 0.0f, -8.f)); 
+	uActorMap["player"]->mEnableCollison = true;
+	uActorMap["player"]->SetSurfaceActor(uActorMap["planeXZ"]);
+	uActorMap["player"]->SetLocalPosition(glm::vec3(-2.f, 0.0f, -8.f));  
 	uActorMap["player"]->mAttachCamera = true;
 
+	///Test cube
 	uActorMap["testCube"] = Actor::CreateCube();
+	uActorMap["testCube"]->mEnableCollison = true;
 	uActorMap["testCube"]->SetLocalPosition(glm::vec3(0.f, 0.0f, -16.f));
 
 
 	//uActorMap["cube2"] = Actor::CreateCube();
 
 
-	//Create camera object
-	
-     mSceneCamera = new Camera("SceneCamera"); 
-	 //mSceneCamera->mUseCamerMovement = true; 
+	///Create camera object
+    mSceneCamera = new Camera("SceneCamera"); 
+	//mSceneCamera->mUseCamerMovement = true; 
 	 
 }
 
@@ -41,7 +47,6 @@ void Scene::Spawner()
 	std::uniform_real_distribution<float> radiusXZ(-10.f, 10.f);
 	std::uniform_real_distribution<float> radiusY(-5.f, 5.f);
 
-
 	for (int amount = 0; amount < mAmount; amount++)
 	{
 		glm::vec3 spawnPos{ radiusXZ(gen),radiusY(gen),radiusXZ(gen) }; 
@@ -49,6 +54,7 @@ void Scene::Spawner()
 		spawnedActor = Actor::CreatePyramid();
 		spawnedActor->SetLocalPosition(spawnPos);
 		spawnedActor->mUseTex = true;
+		spawnedActor->mEnableCollison = true;
 		spawnVector.emplace_back(spawnedActor);
 	}
 }
@@ -121,24 +127,18 @@ void Scene::UnloadContent()
 ///Updater
 void Scene::UpdateScene(float dt)
 {
+	//Camera Update
 	mSceneCamera->UpdateCamera(dt); 
 
-	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++)
-	{
-		actor->second->UpdateActors(dt);
-	}
-
-	for (auto object : spawnVector)
-	{
-		object->UpdateActors(dt);
-	}
-
-	for (auto object : spawnVector)
-	{
-	  Collision::Intersect(uActorMap["player"], object);
-	}
+	//Collision Update
+	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++) { actor->second->UpdateActors(dt); }
+	for (auto object : spawnVector){ object->UpdateActors(dt); }
+	for (auto object : spawnVector){  Collision::Intersect(uActorMap["player"], object); }
 
 	Collision::Intersect(uActorMap["player"], uActorMap["testCube"]);
+
+	//Barysentric Update
+	
 }
 
 ///Rednerer
@@ -168,7 +168,7 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 ///Tranformations
 void Scene::SpaceManipulation() //Only rotation can be manipulated before call in Render. Offset needs to be set in LoacActors.
 {
-	/////Pyramid
+	///Pyramid
 	//uActorMap["pyramid"]->SetLocalPosition(glm::vec3(0.0f, 0.5f, -4.f));
 	//uActorMap["pyramid"]->SetLocalRotation(glm::vec3(0.f, float(glfwGetTime()), 0.f)); 
 
@@ -192,15 +192,12 @@ void Scene::SpaceManipulation() //Only rotation can be manipulated before call i
 	/////Curve
 	//uActorMap["curve"]->SetLocalPosition(glm::vec3(-2.f, -1.0f, -8.f));
 
-	/*for (auto object : spawnVector)
+	for (auto object : spawnVector)
 	{
 		object->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
-	}*/
+	}
 
-	/*for (auto object : spawnVector)
-	{
-		mCollision->Intersect(uActorMap["player"], object);
-	}*/
+
 } 
 
 ///Shader Binder

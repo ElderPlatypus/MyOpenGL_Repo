@@ -35,6 +35,11 @@ public:
     static Actor* CreatePlaneXZ(const double& xMin, const double& zMin, const double& xMax, const double& zMax, const double& resolution);
     static Actor* CreatePlaneXY(const double& xMin, const double& yMin, const double& xMax, const double& yMax, const double& resolution);
 
+    ///Barycentric Coordinates
+    void SetSurfaceActor(Actor* selectSurface);
+    Actor* BarycentricCoordinates(Actor* surface, float dt);
+    glm::vec3 CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,  glm::vec3 playerPos); 
+
     ///Configure and Draw
     void configureMesh(); //Binds VAO,VB & EBO to respective mesh
     void drawActor(const Shader* shader)const ; 
@@ -50,6 +55,7 @@ public:
     //---------------------------------Loacal Getters------------------------------------------
     const Transform& GetTransform() const { return mTransform; }
     const glm::vec3& GetLocalPosition() const { return mTransform.GetPosition(); }
+    glm::vec3 GetLocalPosition(bool notConst)  { return mTransform.GetPosition(false); }
     const glm::quat& GetLocalRotation() const { return mTransform.GetOrientation(); }
     const glm::vec3& GetLocalScale() const { return mTransform.GetScale(); }
     const glm::mat4 GetLocalTransformMatrix() const { return mTransform.GetTransformMatrix(); }
@@ -73,6 +79,7 @@ public:
     VBO mVBO{ 0U }; 
     EBO mEBO{ 0U };
     Transform mTransform{};
+    Actor* confirmSurface = nullptr;
 
     //---------------------------------Draw and texture------------------------------------------
     bool mUseTex = false;
@@ -89,9 +96,10 @@ public:
     bool mIsMoving = false;
 
 
-    ///Collision Values
+    ///Collision 
     glm::vec3 mCenter{ 0.f,0.f,0.f };
     glm::vec3 mExtent{ 0.5f,0.5f,0.5f };
+    bool mEnableCollison = false;
 
     ///Update Actors
     void UpdateActors(float dt);

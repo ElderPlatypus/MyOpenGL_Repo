@@ -90,6 +90,9 @@ public:
     const glm::vec3& GetScale() const { return mScale; } //Returns scale as correct datatype
     const glm::quat& GetOrientation() const { return mOrientation; } //Returns orientation as correct datatype
     const glm::vec3& GetPosition() const { return mPosition; } //Returns position as correct datatype
+    glm::vec3 GetPosition(bool notConst)  { return mPosition; } //Returns position as correct datatype
+
+
 
     //---------------------------------Vector Components------------------------------------------------
     glm::vec3 GetRightVector() const { return glm::rotate(mOrientation, glm::vec3(1.f, 0.f, 0.f));} // Returns right vector: invert axis to get oposite direction

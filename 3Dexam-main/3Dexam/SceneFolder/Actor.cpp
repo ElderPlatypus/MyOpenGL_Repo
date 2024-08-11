@@ -11,6 +11,7 @@ Actor::Actor(const std::string& name, std::vector<Vertex>& vertices,std::vector<
     mName = name;
     mUseTex = useTex;
     mDrawLine = drawLine;
+    mEnableCollison = false;
     configureMesh();
 
 
@@ -36,6 +37,7 @@ Actor::~Actor()
     glDeleteBuffers(1, &mEBO);
 }
 
+
 ///Create Meshes
 Actor* Actor::Create2DTriangle()
 {
@@ -54,7 +56,6 @@ Actor* Actor::Create2DTriangle()
 
    return new Actor("2DTriangle", vertices, indices, false, false);
 }
-
 
 Actor* Actor::CreatePyramid()
 {
@@ -259,7 +260,6 @@ Actor* Actor::CreatePlaneXZ(const double& xMin, const double& zMin, const double
     return new Actor("plane", vertices, inidces, true, false);
 }
 
-
 Actor* Actor::CreatePlaneXY(const double& xMin, const double& yMin, const double& xMax, const double& yMax, const double& resolution)
 {
     std::vector<Vertex> vertices;
@@ -304,6 +304,11 @@ Actor* Actor::CreatePlaneXY(const double& xMin, const double& yMin, const double
     return new Actor("planeXY", vertices, inidces, false, false);
 }
 
+void Actor::SetSurfaceActor(Actor* selectSurface)
+{
+    confirmSurface = selectSurface;
+}
+
 
 ///Configuring the mesh
 void Actor::configureMesh()
@@ -324,6 +329,82 @@ void Actor::configureMesh()
     glBindVertexArray(0);
 }
 
+
+///Barycentric Coordinates
+Actor* Actor::BarycentricCoordinates(Actor* surface, float dt)
+{
+    //glm::mat4 transformMatrix = glm::translate(glm::mat4(1.0f), plane->GetLocalPosition()) * glm::mat4_cast(plane->GetLocalRotation()) * glm::scale(glm::mat4(1.0f),plane->GetLocalScale()); 
+
+    //vector of verts and indices
+    for (int i = 0; i < surface->mVertices.size()-2; i += 3)
+    {
+        //Collect indices which creates each triangle in the plane
+        unsigned int index1;
+        unsigned int index2;
+        unsigned int index3;
+
+        //Assigning the values
+        index1 = surface->mIndices[i];
+        index2 = surface->mIndices[i+1];
+        index3 = surface->mIndices[i+2];
+
+        //Collecting the postions of the indices 
+        glm::vec3 point1{ surface->mVertices[index1].mPos + surface->GetLocalPosition() * surface->GetLocalScale() };
+        glm::vec3 point2{ surface->mVertices[index2].mPos + surface->GetLocalPosition() * surface->GetLocalScale() };
+        glm::vec3 point3{ surface->mVertices[index3].mPos + surface->GetLocalPosition() * surface->GetLocalScale() };
+
+  /*      point1 = glm::vec3(transformMatrix * glm::vec4(point1, 1.0f));
+        point2 = glm::vec3(transformMatrix * glm::vec4(point2, 1.0f));
+        point3 = glm::vec3(transformMatrix * glm::vec4(point3, 1.0f));*/
+
+        glm::vec3 baryCoords = CalculateBarycentricCoordinates(point1,point2,point3, GetLocalPosition(false));  
+
+        if (baryCoords.x < 0 && baryCoords.x > 1 &&
+            baryCoords.y < 0 && baryCoords.y > 1 &&
+            baryCoords.z < 0 && baryCoords.z > 1) 
+        {
+            std::cout << "Bary coords works: " << std::endl;
+        }
+         
+    }
+    return nullptr;
+}
+
+glm::vec3 Actor::CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,  glm::vec3 playerPos) 
+{
+    ///Setting default pos to zero
+    p1.y = 0.0f;
+    p2.y = 0.0f;
+    p3.y = 0.0f;
+    playerPos.y = 0.0f;
+    glm::vec3 baryCoords; 
+  
+    glm::vec3 p1p2 = { p2 - p1 };
+    glm::vec3 p1p3 = { p3 - p1 };
+    glm::vec3 n = glm::cross(p1p2, p1p3);  
+    float area_p123 = n.y;   
+
+    ///Sub Triangle vectors
+    glm::vec3 p2PlayerPos = { p2 - playerPos };
+    glm::vec3 p3PlayerPos = { p3 - playerPos }; 
+    glm::vec3 p1PlayerPos = { p1 - playerPos };
+
+    ///Calculate area with respect to clocwise direction
+    ///Sub Triangle 1 baryCoords X
+    n = { glm::cross(p2PlayerPos,p3PlayerPos) };
+    baryCoords.x = n.y / area_p123;
+
+    ///Sub Triangle 2 baryCoords Y
+    n = { glm::cross(p3PlayerPos,p1PlayerPos) };
+    baryCoords.y = n.y / area_p123;
+
+    ///Sub Triangle 3 baryCoords z
+    n = { glm::cross(p1PlayerPos,p2PlayerPos) }; 
+    baryCoords.z = n.y / area_p123; 
+
+    return baryCoords; 
+}
+
 ///Drawing the mesh
 void Actor::drawActor(const Shader* shader) const
 {
@@ -342,6 +423,7 @@ void Actor::drawActor(const Shader* shader) const
     }
     glBindVertexArray(0);
 }
+
 
 ///Actor movement
 void Actor::ActorMovementNoCameraAttachment(Direction direction, Camera* camera, float dt)
@@ -369,6 +451,15 @@ void Actor::ActorMovementNoCameraAttachment(Direction direction, Camera* camera,
 
         case Right:
             SetLocalPosition(GetLocalPosition() + glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt);
+            break;
+
+            //Up & Down
+        case Up:
+            SetLocalPosition(GetLocalPosition() + glm::vec3(0.f, 1.0f * mMovementSpeed, 0.f) * dt); 
+            break; 
+
+        case Down: 
+            SetLocalPosition(GetLocalPosition() + glm::vec3(0.f, -1.0f * mMovementSpeed, 0.f) * dt); 
             break;
 
             //Increase Speed
@@ -426,9 +517,15 @@ void Actor::CameraPlacement(Direction placement, Camera* camera, float dt)
     }*/
 }
 
+
+///Update Actors
 void Actor::UpdateActors(float dt)
 {
     mCenter = GetLocalPosition();
+    if (confirmSurface)
+    {
+      BarycentricCoordinates(confirmSurface,dt);
+    }
 }
 
 
