@@ -68,7 +68,7 @@ public:
         mUseTex = useBool;
         mShader->setBool("useTex", useBool);  
     } 
-    const bool& GetTexBool() { return mUseTex; }
+    const bool& GetTexBool() const { return mUseTex; }
 
     ///Members and Variables
     //---------------------------------Struct and Transform------------------------------------------ 
@@ -88,20 +88,37 @@ public:
 
 
     ///Actor movement 
+    //---------------------------------Camera------------------------------------------ 
     Camera* camera{ nullptr };
-    void ActorMovementNoCameraAttachment(Direction direction, Camera* camera, float dt); 
     bool mAttachCamera = false;  
+    void ActorMovementNoCameraAttachment(Direction direction, Camera* camera, float dt); 
+
+    //---------------------------------Speed------------------------------------------ 
+    void CameraPlacement(Direction placement, Camera* camera, float dt) const;
     float mMovementSpeed = 5.0f;
-    void CameraPlacement(Direction placement, Camera* camera, float dt);
     bool mIsMoving = false;
 
 
     ///Collision 
+    //---------------------------------Vectors Bounding Box------------------------------------------ 
     glm::vec3 mCenter{ 0.f,0.f,0.f };
     glm::vec3 mExtent{ 0.5f,0.5f,0.5f };
+
+    //---------------------------------Booleans------------------------------------------ 
     bool mEnableCollison = false;
+
 
     ///Update Actors
     void UpdateActors(float dt);
+
+    ///Spawner test
+    //---------------------------------Spawner Vector & Amount------------------------------------------ 
+    static std::vector<Actor*> getSpawnVector;     
+     
+    //---------------------------------Spawner function------------------------------------------ 
+    static void Spawner(int spawnAmount); 
+
+
+
 };
 

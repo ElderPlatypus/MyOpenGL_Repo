@@ -31,9 +31,9 @@ public:
 
 	//Loaders
 	void LoadActors();
-	void LoadContent(); //Load all content in scene
+	void LoadContent(); 
 	void UnloadContent();
-	void Spawner();
+	void Spawner(); 
 
 	//Updaters
 	void UpdateScene(float dt);
@@ -46,7 +46,7 @@ public:
 	void SpaceManipulation();
 
 	//Camera Binding
-	void BindCamera();
+	void BindCamera() const;
 
 	Scene() = default;
 

@@ -10,7 +10,7 @@ int main()
     Application::GetAPP()->Run_App();
 }
 
-///Template Given befor hand
+///Template Given before hand
    //#include "Shader.h"
    //#include "ShaderFileLoader.h"
     

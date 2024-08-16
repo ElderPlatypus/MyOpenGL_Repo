@@ -1,5 +1,5 @@
 #include "Actor.h"
-
+#include <random>
 //Includes
 #include <string>
 
@@ -304,11 +304,6 @@ Actor* Actor::CreatePlaneXY(const double& xMin, const double& yMin, const double
     return new Actor("planeXY", vertices, inidces, false, false);
 }
 
-void Actor::SetSurfaceActor(Actor* selectSurface)
-{
-    confirmSurface = selectSurface;
-}
-
 
 ///Configuring the mesh
 void Actor::configureMesh()
@@ -327,6 +322,11 @@ void Actor::configureMesh()
     Vertex::configureVertexAttribs();  
 
     glBindVertexArray(0);
+}
+
+void Actor::SetSurfaceActor(Actor* selectSurface)
+{
+    confirmSurface = selectSurface;
 }
 
 
@@ -489,7 +489,7 @@ void Actor::ActorMovementNoCameraAttachment(Direction direction, Camera* camera,
     }
 }
 
-void Actor::CameraPlacement(Direction placement, Camera* camera, float dt)
+void Actor::CameraPlacement(Direction placement, Camera* camera, float dt) const
 {
     switch (placement)
     {
@@ -527,6 +527,30 @@ void Actor::UpdateActors(float dt)
       BarycentricCoordinates(confirmSurface,dt);
     }
 }
+
+
+void Actor::Spawner(int spawnAmount)
+{
+    std::vector<Actor*> spawnVector; 
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> radiusXZ(-10.f, 10.f);
+    std::uniform_real_distribution<float> radiusY(-5.f, 5.f);
+
+    for (int amount = 0; amount < spawnAmount; amount++)
+    {
+        glm::vec3 spawnPos{ radiusXZ(gen),radiusY(gen),radiusXZ(gen) };
+        Actor* spawnedActor{ nullptr };
+        spawnedActor = Actor::CreateCube(); 
+        spawnedActor->SetLocalPosition(spawnPos); 
+        spawnedActor->mUseTex = true;
+        spawnedActor->mEnableCollison = true;
+        spawnVector.emplace_back(spawnedActor);    
+    }
+
+}
+
+
 
 
 
