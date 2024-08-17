@@ -28,11 +28,7 @@ void Scene::LoadActors()
 	///Test cube
 	uActorMap["testCube"] = Actor::CreateCube();
 	uActorMap["testCube"]->mEnableCollison = true;
-	uActorMap["testCube"]->SetLocalPosition(glm::vec3(0.f, 0.0f, -16.f));
-	//Actor::Spawner(10); 
-
-	//uActorMap["cube2"] = Actor::CreateCube();
-	//Actor::Spawner(10);
+	uActorMap["testCube"]->SetLocalPosition(glm::vec3(0.f, 0.0f, -16.f)); 
 
 	///Create camera object
     mSceneCamera = new Camera("SceneCamera"); 
@@ -40,36 +36,16 @@ void Scene::LoadActors()
 	 
 }
 
-void Scene::Spawner()
-{
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_real_distribution<float> radiusXZ(-10.f, 10.f);
-	std::uniform_real_distribution<float> radiusY(-5.f, 5.f);
-
-	for (int amount = 0; amount < mAmount; amount++) 
-	{
-		glm::vec3 spawnPos{ radiusXZ(gen),radiusY(gen),radiusXZ(gen) }; 
-		Actor* spawnedActor{ nullptr }; 
-		spawnedActor = Actor::CreatePyramid();
-		spawnedActor->SetLocalPosition(spawnPos);
-		spawnedActor->mUseTex = true;
-		spawnedActor->mEnableCollison = true;
-		spawnVector.emplace_back(spawnedActor); 
-	}
-}
-
 void Scene::LoadContent()
 {
-	Spawner(); 
+	Actor::Spawner(10); 
 	LoadActors();
 
 	mShader = new Shader("Shaders/Triangle.vs", "Shaders/Triangle.fs");
 	mTexture = new Texture("Shaders/wall.jpg",mShader);   
 	
 	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++) { actor->second->SetShader(mShader); }
-	for (auto object : spawnVector)  { object->SetShader(mShader);  }
-	//for (auto object : Actor::getSpawnVector) { object->SetShader(mShader); }        
+	for (auto object : Actor::spawnVector) { object->SetShader(mShader); }        
 
 
 }
@@ -81,15 +57,10 @@ void Scene::UnloadContent()
 		actor->second->~Actor(); 
 	}
 
-	for (auto it : spawnVector) 
+	for (auto it : Actor::spawnVector)
 	{
 		it->~Actor();
 	}
-
-	/*for (auto it : Actor::getSpawnVector)
-	{
-		it->~Actor();
-	}*/
 
 	delete uActorMap["pyramid"];
 	uActorMap["pyramid"] = nullptr;
@@ -134,11 +105,9 @@ void Scene::UpdateScene(float dt)
 
 	//Collision Update
 	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++) { actor->second->UpdateActors(dt); }
-	for (auto object : spawnVector){ object->UpdateActors(dt); }
-	for (auto object : spawnVector){  Collision::Intersect(uActorMap["player"], object); }
-
-	//for (auto object : Actor::getSpawnVector) { object->UpdateActors(dt); }
-	//for (auto object : Actor::getSpawnVector) { Collision::Intersect(uActorMap["player"], object); }
+	
+	for (auto object : Actor::spawnVector) { object->UpdateActors(dt); }
+	for (auto object : Actor::spawnVector) { Collision::Intersect(uActorMap["player"], object); }
 
 	Collision::Intersect(uActorMap["player"], uActorMap["testCube"]);
 
@@ -161,19 +130,13 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 		actor->second->UseTexture(actor->second->GetTexBool());    
 		actor->second->drawActor(mShader); 
 	}
-	for (auto object : spawnVector) 
+	
+	for (auto object : Actor::spawnVector)
 	{
-		mShader->setMat4("model", object->GetLocalTransformMatrix());  
-		object->UseTexture(object->GetTexBool()); 
+		mShader->setMat4("model", object->GetLocalTransformMatrix());
+		object->UseTexture(object->GetTexBool());
 		object->drawActor(mShader);
 	}
-
-	//for (auto object : Actor::getSpawnVector)
-	//{
-	//	mShader->setMat4("model", object->GetLocalTransformMatrix());
-	//	object->UseTexture(object->GetTexBool());
-	//	object->drawActor(mShader);
-	//}
 	
 }
 
@@ -204,7 +167,7 @@ void Scene::SpaceManipulation() //Only rotation can be manipulated before call i
 	/////Curve
 	//uActorMap["curve"]->SetLocalPosition(glm::vec3(-2.f, -1.0f, -8.f));
 
-	for (auto object : spawnVector)
+	for (auto object : Actor::spawnVector)
 	{
 		object->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
 	}

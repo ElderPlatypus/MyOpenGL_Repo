@@ -545,9 +545,8 @@ void Actor::Spawner(int spawnAmount)
         spawnedActor->SetLocalPosition(spawnPos); 
         spawnedActor->mUseTex = true;
         spawnedActor->mEnableCollison = true;
-        spawnVector.emplace_back(spawnedActor);    
+        Actor::spawnVector.emplace_back(spawnedActor);    
     }
-
 }
 
 

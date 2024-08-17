@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 
+
 //Includes glm
 #include "Vertex.h"
 #include "../Definitions.h"
@@ -113,12 +114,12 @@ public:
 
     ///Spawner test
     //---------------------------------Spawner Vector & Amount------------------------------------------ 
-    static std::vector<Actor*> getSpawnVector;     
+    inline static std::vector<Actor*> spawnVector;      
      
     //---------------------------------Spawner function------------------------------------------ 
     static void Spawner(int spawnAmount); 
-
-
+    
+    
 
 };
 

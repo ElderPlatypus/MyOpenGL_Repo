@@ -18,7 +18,6 @@
 class Scene 
 {
 	std::string mName;
-	std::vector<Actor*> spawnVector;
 
 
 public:
@@ -33,7 +32,6 @@ public:
 	void LoadActors();
 	void LoadContent(); 
 	void UnloadContent();
-	void Spawner(); 
 
 	//Updaters
 	void UpdateScene(float dt);
