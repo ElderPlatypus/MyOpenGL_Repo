@@ -56,7 +56,6 @@ public:
     //---------------------------------Loacal Getters------------------------------------------
     const Transform& GetTransform() const { return mTransform; }
     const glm::vec3& GetLocalPosition() const { return mTransform.GetPosition(); }
-    glm::vec3 GetLocalPosition(bool notConst)  { return mTransform.GetPosition(false); }
     const glm::quat& GetLocalRotation() const { return mTransform.GetOrientation(); }
     const glm::vec3& GetLocalScale() const { return mTransform.GetScale(); }
     const glm::mat4 GetLocalTransformMatrix() const { return mTransform.GetTransformMatrix(); }

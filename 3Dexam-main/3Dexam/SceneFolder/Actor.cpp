@@ -249,12 +249,11 @@ Actor* Actor::CreatePlaneXZ(const double& xMin, const double& zMin, const double
         }
     }
 
-    for (int i = 0; i < vertices.size(); i += 3)
+    for (int i = 0; i < vertices.size() - 2; i += 3)
     {
         inidces.emplace_back(i);
         inidces.emplace_back(i + 1);
         inidces.emplace_back(i + 2);
-
     }
 
     return new Actor("plane", vertices, inidces, true, false);
@@ -273,34 +272,32 @@ Actor* Actor::CreatePlaneXY(const double& xMin, const double& yMin, const double
             ///Lower Triangle
             z = glm::cos(x) * glm::cos(y); //Bottom Left 
             vertices.emplace_back(x, y, z, 1.f, 1.f, 1.f, x, y); 
+            inidces.emplace_back(y);
+
 
             z = glm::cos(x + resolution) * glm::cos(y); //Bottom Right  
             vertices.emplace_back(x + resolution, y, z, 1.f, 1.f, 1.f, x, y); 
+            inidces.emplace_back(y+1);
 
             z = glm::cos(x) * glm::cos(y + resolution); //Top Left 
             vertices.emplace_back(x, y + resolution, z); 
-
+            inidces.emplace_back(y + 2);
 
             ///Upper Triangle
-            z = glm::cos(x) * glm::cos(y + resolution); //Top Left 
-            vertices.emplace_back(x, y+resolution, z, 1.f, 1.f, 1.f, x, y); 
+            inidces.emplace_back(y + 2);
+            //z = glm::cos(x) * glm::cos(y + resolution); //Top Left  
+            //vertices.emplace_back(x, y+resolution, z, 1.f, 1.f, 1.f, x, y);   
 
-            z = glm::cos(x + resolution) * glm::cos(y); //Bottom Right
-            vertices.emplace_back(x + resolution, y, z, 1.f, 1.f, 1.f, x, y); 
+            inidces.emplace_back(y + 1);
+            //z = glm::cos(x + resolution) * glm::cos(y); //Bottom Right
+            //vertices.emplace_back(x + resolution, y, z, 1.f, 1.f, 1.f, x, y); 
+
 
             z = glm::cos(x + resolution) * glm::cos(y + resolution); //Top Rigth
             vertices.emplace_back(x + resolution, y +resolution, z, 1.f, 1.f, 1.f, x, y); 
+            inidces.emplace_back(y + 3); 
         }
     }
-
-    for (int i = 0; i < vertices.size(); i += 3)
-    {
-        inidces.emplace_back(i);
-        inidces.emplace_back(i + 1);
-        inidces.emplace_back(i + 2);
-
-    }
-
     return new Actor("planeXY", vertices, inidces, false, false);
 }
 
@@ -333,10 +330,9 @@ void Actor::SetSurfaceActor(Actor* selectSurface)
 ///Barycentric Coordinates
 Actor* Actor::BarycentricCoordinates(Actor* surface, float dt)
 {
-    //glm::mat4 transformMatrix = glm::translate(glm::mat4(1.0f), plane->GetLocalPosition()) * glm::mat4_cast(plane->GetLocalRotation()) * glm::scale(glm::mat4(1.0f),plane->GetLocalScale()); 
-
+    
     //vector of verts and indices
-    for (int i = 0; i < surface->mVertices.size()-2; i += 3)
+    for (int i = 0; i < surface->mVertices.size() - 2; i += 3)
     {
         //Collect indices which creates each triangle in the plane
         unsigned int index1;
@@ -349,23 +345,26 @@ Actor* Actor::BarycentricCoordinates(Actor* surface, float dt)
         index3 = surface->mIndices[i+2];
 
         //Collecting the postions of the indices 
-        glm::vec3 point1{ surface->mVertices[index1].mPos + surface->GetLocalPosition() * surface->GetLocalScale() };
-        glm::vec3 point2{ surface->mVertices[index2].mPos + surface->GetLocalPosition() * surface->GetLocalScale() };
-        glm::vec3 point3{ surface->mVertices[index3].mPos + surface->GetLocalPosition() * surface->GetLocalScale() };
+        glm::vec3 point1{ surface->mVertices[index1].mPos };
+        glm::vec3 point2{ surface->mVertices[index2].mPos };
+        glm::vec3 point3{ surface->mVertices[index3].mPos };
 
-  /*      point1 = glm::vec3(transformMatrix * glm::vec4(point1, 1.0f));
-        point2 = glm::vec3(transformMatrix * glm::vec4(point2, 1.0f));
-        point3 = glm::vec3(transformMatrix * glm::vec4(point3, 1.0f));*/
+        point1 += surface->GetLocalPosition();
+        point2 += surface->GetLocalPosition();
+        point3 += surface->GetLocalPosition();
 
-        glm::vec3 baryCoords = CalculateBarycentricCoordinates(point1,point2,point3, GetLocalPosition(false));  
+        point1 *= surface->GetLocalScale();
+        point2 *= surface->GetLocalScale();
+        point3 *= surface->GetLocalScale();
 
-        if (baryCoords.x < 0 && baryCoords.x > 1 &&
-            baryCoords.y < 0 && baryCoords.y > 1 &&
-            baryCoords.z < 0 && baryCoords.z > 1) 
+        glm::vec3 baryCoords = CalculateBarycentricCoordinates(point1,point2,point3, GetLocalPosition());  
+
+        if (baryCoords.x > 0 && baryCoords.x < 1 &&
+            baryCoords.y > 0 && baryCoords.y < 1 &&
+            baryCoords.z > 0 && baryCoords.z < 1) 
         {
             std::cout << "Bary coords works: " << std::endl;
         }
-         
     }
     return nullptr;
 }
@@ -373,33 +372,33 @@ Actor* Actor::BarycentricCoordinates(Actor* surface, float dt)
 glm::vec3 Actor::CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,  glm::vec3 playerPos) 
 {
     ///Setting default pos to zero
-    p1.y = 0.0f;
-    p2.y = 0.0f;
-    p3.y = 0.0f;
-    playerPos.y = 0.0f;
-    glm::vec3 baryCoords; 
+    p1.y = 0.f;
+    p2.y = 0.f;
+    p3.y = 0.f;
+    playerPos.y = 0.f;
+    glm::vec3 baryCoords{0.f,0.f,0.f};
   
-    glm::vec3 p1p2 = { p2 - p1 };
-    glm::vec3 p1p3 = { p3 - p1 };
-    glm::vec3 n = glm::cross(p1p2, p1p3);  
+    glm::vec3 u = { p2 - p1 };
+    glm::vec3 v = { p3 - p1 };
+    glm::vec3 n = abs(glm::cross(u, v)); 
     float area_p123 = n.y;   
 
     ///Sub Triangle vectors
-    glm::vec3 p2PlayerPos = { p2 - playerPos };
-    glm::vec3 p3PlayerPos = { p3 - playerPos }; 
-    glm::vec3 p1PlayerPos = { p1 - playerPos };
+    glm::vec3 PlayerPosP1 = { p1 - playerPos }; 
+    glm::vec3 PlayerPosP2 = { p2 - playerPos }; 
+    glm::vec3 PlayerPosP3 = { p3 - playerPos };  
 
     ///Calculate area with respect to clocwise direction
-    ///Sub Triangle 1 baryCoords X
-    n = { glm::cross(p2PlayerPos,p3PlayerPos) };
+    //Sub Triangle 1 baryCoords X
+    n = { abs(glm::cross(PlayerPosP2,PlayerPosP3)) }; 
     baryCoords.x = n.y / area_p123;
 
-    ///Sub Triangle 2 baryCoords Y
-    n = { glm::cross(p3PlayerPos,p1PlayerPos) };
+    //Sub Triangle 2 baryCoords Y
+    n = { abs(glm::cross(PlayerPosP3,PlayerPosP1)) }; 
     baryCoords.y = n.y / area_p123;
 
-    ///Sub Triangle 3 baryCoords z
-    n = { glm::cross(p1PlayerPos,p2PlayerPos) }; 
+    //Sub Triangle 3 baryCoords z
+    n = { abs(glm::cross(PlayerPosP2,PlayerPosP1)) };
     baryCoords.z = n.y / area_p123; 
 
     return baryCoords; 

@@ -17,6 +17,8 @@ void Scene::LoadActors()
 
 	///Plane
 	uActorMap["planeXZ"] = Actor::CreatePlaneXZ(-5, 0, 5, 5, 0.05f);  
+	uActorMap["planeXZ"]->mUseTex = false; 
+	uActorMap["planeXZ"]->SetLocalPosition(glm::vec3(-2.f, -1.0f, -8.f));
 
 	///Player
 	uActorMap["player"] = Actor::CreateCube();
@@ -38,14 +40,14 @@ void Scene::LoadActors()
 
 void Scene::LoadContent()
 {
-	Actor::Spawner(10); 
 	LoadActors();
+	Actor::Spawner(10); 
 
 	mShader = new Shader("Shaders/Triangle.vs", "Shaders/Triangle.fs");
 	mTexture = new Texture("Shaders/wall.jpg",mShader);   
 	
 	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++) { actor->second->SetShader(mShader); }
-	for (auto object : Actor::spawnVector) { object->SetShader(mShader); }        
+	for (auto object : Actor::spawnVector) { object->SetShader(mShader); }         
 
 
 }

@@ -53,8 +53,8 @@ void Application::Window_Init()
     if (mWindow == NULL)
     {
         /*std::cout << "Failed to create GLFW window" << std::endl;*/
-        glfwTerminate();
         assert(mWindow && "Failed to Load GLFWwindow!");
+        glfwTerminate();
     }
     glfwMakeContextCurrent(mWindow);
     glfwSwapInterval(1);
