@@ -359,11 +359,14 @@ Actor* Actor::BarycentricCoordinates(Actor* surface, float dt)
 
         glm::vec3 baryCoords = CalculateBarycentricCoordinates(point1,point2,point3, GetLocalPosition());  
 
-        if (baryCoords.x > 0 && baryCoords.x < 1 &&
+        if (
+            baryCoords.x > 0 && baryCoords.x < 1 &&
             baryCoords.y > 0 && baryCoords.y < 1 &&
-            baryCoords.z > 0 && baryCoords.z < 1) 
+            baryCoords.z > 0 && baryCoords.z < 1
+            ) 
         {
             std::cout << "Bary coords works: " << std::endl;
+            std::cout << "Bary x: " << baryCoords.x << std::endl;
         }
     }
     return nullptr;
