@@ -37,10 +37,13 @@ public:
     static Actor* CreatePlaneXY(const double& xMin, const double& yMin, const double& xMax, const double& yMax, const double& resolution);
 
     ///Barycentric Coordinates
+    //---------------------------------Bary-Coords Methods------------------------------------------------
     void SetSurfaceActor(Actor* selectSurface);
-    Actor* BarycentricCoordinates(Actor* surface, float dt);
+    Actor* BarycentricCoordinates(Actor* surface,float dt);
     glm::vec3 CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,  glm::vec3 playerPos); 
-
+   
+    //---------------------------------Bary Coords-members------------------------------------------------
+    Actor* confirmSurface = nullptr;
     ///Configure and Draw
     void configureMesh(); //Binds VAO,VB & EBO to respective mesh
     void drawActor(const Shader* shader)const ; 
@@ -53,7 +56,7 @@ public:
     void SetLocalScale(const glm::vec3& scale) {  mTransform.SetScale(scale);}
     void SetLocalTransformMatrix(const glm::mat4& transformMatrix) { mTransform.SetTransformMatrix(transformMatrix); }
   
-    //---------------------------------Loacal Getters------------------------------------------
+    //---------------------------------Local Getters------------------------------------------
     const Transform& GetTransform() const { return mTransform; }
     const glm::vec3& GetLocalPosition() const { return mTransform.GetPosition(); }
     const glm::quat& GetLocalRotation() const { return mTransform.GetOrientation(); }
@@ -79,7 +82,7 @@ public:
     VBO mVBO{ 0U }; 
     EBO mEBO{ 0U };
     Transform mTransform{};
-    Actor* confirmSurface = nullptr;
+
 
     //---------------------------------Draw and texture------------------------------------------
     bool mUseTex = false;
@@ -110,6 +113,7 @@ public:
 
     ///Update Actors
     void UpdateActors(float dt);
+
 
     ///Spawner test
     //---------------------------------Spawner Vector & Amount------------------------------------------ 

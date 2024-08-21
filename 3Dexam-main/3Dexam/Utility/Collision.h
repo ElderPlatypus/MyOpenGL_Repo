@@ -25,8 +25,7 @@ public:
 				//If difference per axis is less than sum of extent then no collision is detected
 				if (abs(diff[i]) >= sumExtent[i]) return false;
 			}
-			std::cout << "Collison Detected" << std::endl;
-
+			//std::cout << "Collison Detected" << std::endl;
 
 			return true;
 		}

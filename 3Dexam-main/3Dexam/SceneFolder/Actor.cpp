@@ -16,8 +16,8 @@ Actor::Actor(const std::string& name, std::vector<Vertex>& vertices,std::vector<
 
 
     //Offset for Boudning Box
-    glm::vec3 minExtent{0.f,0.f,0.f};
-    glm::vec3 maxExtent{ 0.f,0.f,0.f };
+    glm::vec3 minExtent{ 0.f, 0.f, 0.f };
+    glm::vec3 maxExtent{ 0.f, 0.f, 0.f };
 
     for (auto &it : vertices)
     {
@@ -26,8 +26,6 @@ Actor::Actor(const std::string& name, std::vector<Vertex>& vertices,std::vector<
     }
 
     mExtent = maxExtent - minExtent;
-
-
 }
 
 Actor::~Actor()
@@ -321,14 +319,14 @@ void Actor::configureMesh()
     glBindVertexArray(0);
 }
 
+
+///Barycentric Coordinates
 void Actor::SetSurfaceActor(Actor* selectSurface)
 {
     confirmSurface = selectSurface;
 }
 
-
-///Barycentric Coordinates
-Actor* Actor::BarycentricCoordinates(Actor* surface, float dt)
+Actor* Actor::BarycentricCoordinates(Actor* surface,float dt)
 {
     
     //vector of verts and indices
@@ -345,29 +343,21 @@ Actor* Actor::BarycentricCoordinates(Actor* surface, float dt)
         index3 = surface->mIndices[i+2];
 
         //Collecting the postions of the indices 
-        glm::vec3 point1{ surface->mVertices[index1].mPos };
-        glm::vec3 point2{ surface->mVertices[index2].mPos };
-        glm::vec3 point3{ surface->mVertices[index3].mPos };
+        glm::vec3 point1{ surface->mVertices[index1].mPos + surface->GetLocalPosition() * surface->GetLocalScale() };
+        glm::vec3 point2{ surface->mVertices[index2].mPos + surface->GetLocalPosition() * surface->GetLocalScale() };
+        glm::vec3 point3{ surface->mVertices[index3].mPos + surface->GetLocalPosition() * surface->GetLocalScale() };
 
-        point1 += surface->GetLocalPosition();
-        point2 += surface->GetLocalPosition();
-        point3 += surface->GetLocalPosition();
-
-        point1 *= surface->GetLocalScale();
-        point2 *= surface->GetLocalScale();
-        point3 *= surface->GetLocalScale();
-
+        //Initialising variable which calculates bary-coords using the CalcBary-coords method
         glm::vec3 baryCoords = CalculateBarycentricCoordinates(point1,point2,point3, GetLocalPosition());  
 
-        if (
-            baryCoords.x > 0 && baryCoords.x < 1 &&
-            baryCoords.y > 0 && baryCoords.y < 1 &&
-            baryCoords.z > 0 && baryCoords.z < 1
-            ) 
+        if (   baryCoords.x > 0 && baryCoords.x < 1
+            && baryCoords.y > 0 && baryCoords.y < 1 
+            && baryCoords.z > 0 && baryCoords.z < 1) 
         {
+            SetLocalPosition(glm::vec3(GetLocalPosition().x, baryCoords.y, GetLocalPosition().z)); 
             std::cout << "Bary coords works: " << std::endl;
-            std::cout << "Bary x: " << baryCoords.x << std::endl;
         }
+
     }
     return nullptr;
 }
@@ -406,6 +396,7 @@ glm::vec3 Actor::CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm
 
     return baryCoords; 
 }
+
 
 ///Drawing the mesh
 void Actor::drawActor(const Shader* shader) const
@@ -509,14 +500,6 @@ void Actor::CameraPlacement(Direction placement, Camera* camera, float dt) const
 
         }
     }
-   /* if (placement == UseCameraKey1 && mAttachCamera == true)
-    {
-        camera->mUseCameraMovement = true;
-    }
-    if (placement == StaticCameraKey2 && mAttachCamera == true)
-    {
-        camera->mUseCameraMovement = false;
-    }*/
 }
 
 
@@ -526,7 +509,7 @@ void Actor::UpdateActors(float dt)
     mCenter = GetLocalPosition();
     if (confirmSurface)
     {
-      BarycentricCoordinates(confirmSurface,dt);
+      BarycentricCoordinates(confirmSurface,dt); 
     }
 }
 
@@ -537,11 +520,11 @@ void Actor::Spawner(int spawnAmount)
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> radiusXZ(-10.f, 10.f);
-    std::uniform_real_distribution<float> radiusY(-5.f, 5.f);
+    //std::uniform_real_distribution<float> radiusY(-5.f, 5.f);
 
     for (int amount = 0; amount < spawnAmount; amount++)
     {
-        glm::vec3 spawnPos{ radiusXZ(gen),radiusY(gen),radiusXZ(gen) };
+        glm::vec3 spawnPos{ radiusXZ(gen),0.f,radiusXZ(gen) };
         Actor* spawnedActor{ nullptr };
         spawnedActor = Actor::CreateCube(); 
         spawnedActor->SetLocalPosition(spawnPos); 

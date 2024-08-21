@@ -22,8 +22,7 @@ void main()
     }
     else
     {
-        FragColor = vec4(Normal,1.0); 
-
+        FragColor = vec4(Normal,1.0);
     }
  
 

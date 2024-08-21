@@ -16,8 +16,8 @@ void Scene::LoadActors()
 	//uActorMap["planeXY"] = Actor::CreatePlaneXY(-5, 0, 5, 5, 0.05f); 
 
 	///Plane
-	uActorMap["planeXZ"] = Actor::CreatePlaneXZ(-5, 0, 5, 5, 0.05f);  
-	uActorMap["planeXZ"]->mUseTex = false; 
+	uActorMap["planeXZ"] = Actor::CreatePlaneXZ(-5.f, -5.f, 5.f, 5.f, 0.2f);  
+	uActorMap["planeXZ"]->mUseTex = true; 
 	uActorMap["planeXZ"]->SetLocalPosition(glm::vec3(-2.f, -1.0f, -8.f));
 
 	///Player
@@ -30,18 +30,24 @@ void Scene::LoadActors()
 	///Test cube
 	uActorMap["testCube"] = Actor::CreateCube();
 	uActorMap["testCube"]->mEnableCollison = true;
-	uActorMap["testCube"]->SetLocalPosition(glm::vec3(0.f, 0.0f, -16.f)); 
+	uActorMap["testCube"]->SetSurfaceActor(uActorMap["planeXZ"]);
+	uActorMap["testCube"]->SetLocalPosition(glm::vec3(-3.f, 0.0f, -6.f)); 
 
 	///Create camera object
     mSceneCamera = new Camera("SceneCamera"); 
 	//mSceneCamera->mUseCamerMovement = true; 
+
+	for (auto &it : Actor::spawnVector)
+	{
+		it->SetSurfaceActor(uActorMap["planeXZ"]);
+	}
 	 
 }
 
 void Scene::LoadContent()
 {
 	LoadActors();
-	Actor::Spawner(10); 
+	Actor::Spawner(5); 
 
 	mShader = new Shader("Shaders/Triangle.vs", "Shaders/Triangle.fs");
 	mTexture = new Texture("Shaders/wall.jpg",mShader);   
@@ -139,7 +145,6 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 		object->UseTexture(object->GetTexBool());
 		object->drawActor(mShader);
 	}
-	
 }
 
 ///Tranformations
@@ -169,11 +174,11 @@ void Scene::SpaceManipulation() //Only rotation can be manipulated before call i
 	/////Curve
 	//uActorMap["curve"]->SetLocalPosition(glm::vec3(-2.f, -1.0f, -8.f));
 
-	for (auto object : Actor::spawnVector)
+	///Spawn objects
+	/*for (auto object : Actor::spawnVector)
 	{
 		object->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
-	}
-
+	}*/
 
 } 
 
