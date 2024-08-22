@@ -175,10 +175,10 @@ void Scene::SpaceManipulation() //Only rotation can be manipulated before call i
 	//uActorMap["curve"]->SetLocalPosition(glm::vec3(-2.f, -1.0f, -8.f));
 
 	///Spawn objects
-	/*for (auto object : Actor::spawnVector)
+	for (auto object : Actor::spawnVector)
 	{
 		object->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
-	}*/
+	}
 
 } 
 

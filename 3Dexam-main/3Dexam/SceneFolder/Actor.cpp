@@ -343,19 +343,30 @@ Actor* Actor::BarycentricCoordinates(Actor* surface,float dt)
         index3 = surface->mIndices[i+2];
 
         //Collecting the postions of the indices 
-        glm::vec3 point1{ surface->mVertices[index1].mPos + surface->GetLocalPosition() * surface->GetLocalScale() };
-        glm::vec3 point2{ surface->mVertices[index2].mPos + surface->GetLocalPosition() * surface->GetLocalScale() };
+        glm::vec3 point1{ surface->mVertices[index1].mPos + surface->GetLocalPosition() * surface->GetLocalScale() }; 
+        glm::vec3 point2{ surface->mVertices[index2].mPos + surface->GetLocalPosition() * surface->GetLocalScale() }; 
         glm::vec3 point3{ surface->mVertices[index3].mPos + surface->GetLocalPosition() * surface->GetLocalScale() };
 
         //Initialising variable which calculates bary-coords using the CalcBary-coords method
         glm::vec3 baryCoords = CalculateBarycentricCoordinates(point1,point2,point3, GetLocalPosition());  
 
-        if (   baryCoords.x > 0 && baryCoords.x < 1
-            && baryCoords.y > 0 && baryCoords.y < 1 
-            && baryCoords.z > 0 && baryCoords.z < 1) 
+        //Creating a variable which utilizes the calc-bary method.
+        float baryHeight = ((baryCoords.x * point1.y) + (baryCoords.y * point2.y + mExtent.y/2) + (baryCoords.z * point3.y));
+
+        //If-checks if certain criterias are met folowing the rules for bary-coords behaviour
+        if (baryCoords.x == 0 || baryCoords.y == 0 || baryCoords.z == 0)
         {
-            SetLocalPosition(glm::vec3(GetLocalPosition().x, baryCoords.y, GetLocalPosition().z)); 
-            std::cout << "Bary coords works: " << std::endl;
+            SetLocalPosition(GetLocalPosition() + glm::vec3(0.01f, 0.f, 0.01f)); 
+            baryCoords = CalculateBarycentricCoordinates(point1, point2, point3, GetLocalPosition()); 
+        }
+
+        if (   baryCoords.x > 0 
+            && baryCoords.y > 0  
+            && baryCoords.z > 0 ) 
+        {
+            SetLocalPosition(glm::vec3(GetLocalPosition().x, baryHeight, GetLocalPosition().z));
+            //std::cout << "Bary coords works: " << std::endl;
+            //std::cout << baryHeight << std::endl;
         }
 
     }
@@ -364,35 +375,36 @@ Actor* Actor::BarycentricCoordinates(Actor* surface,float dt)
 
 glm::vec3 Actor::CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,  glm::vec3 playerPos) 
 {
-    ///Setting default pos to zero
+    ///Setting default values to zero
     p1.y = 0.f;
     p2.y = 0.f;
     p3.y = 0.f;
     playerPos.y = 0.f;
     glm::vec3 baryCoords{0.f,0.f,0.f};
   
+    ///Calculating triangle surface area
     glm::vec3 u = { p2 - p1 };
     glm::vec3 v = { p3 - p1 };
-    glm::vec3 n = abs(glm::cross(u, v)); 
-    float area_p123 = n.y;   
+    glm::vec3 n = glm::cross(u, v); 
+    float triangleSurfaceArea = n.y;  
 
     ///Sub Triangle vectors
-    glm::vec3 PlayerPosP1 = { p1 - playerPos }; 
-    glm::vec3 PlayerPosP2 = { p2 - playerPos }; 
-    glm::vec3 PlayerPosP3 = { p3 - playerPos };  
+    glm::vec3 newU = { glm::cross(p1 - playerPos, p2 - playerPos) };
+    glm::vec3 newV = { glm::cross(p2 - playerPos, p3 - playerPos) };
+    glm::vec3 newW = { glm::cross(p3 - playerPos, p1 - playerPos) };
 
-    ///Calculate area with respect to clocwise direction
+    ///Calculate area with respect to reverse clockwise direction
     //Sub Triangle 1 baryCoords X
-    n = { abs(glm::cross(PlayerPosP2,PlayerPosP3)) }; 
-    baryCoords.x = n.y / area_p123;
+    n = newU;  
+    baryCoords.x = n.y / triangleSurfaceArea; 
 
     //Sub Triangle 2 baryCoords Y
-    n = { abs(glm::cross(PlayerPosP3,PlayerPosP1)) }; 
-    baryCoords.y = n.y / area_p123;
+    n = newV; 
+    baryCoords.y = n.y / triangleSurfaceArea;
 
     //Sub Triangle 3 baryCoords z
-    n = { abs(glm::cross(PlayerPosP2,PlayerPosP1)) };
-    baryCoords.z = n.y / area_p123; 
+    n = newW;
+    baryCoords.z = n.y / triangleSurfaceArea;  
 
     return baryCoords; 
 }
@@ -520,7 +532,7 @@ void Actor::Spawner(int spawnAmount)
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> radiusXZ(-10.f, 10.f);
-    //std::uniform_real_distribution<float> radiusY(-5.f, 5.f);
+    //std::uniform_real_distribution<float> radiusY(-5.f, 5.f); som beveger den
 
     for (int amount = 0; amount < spawnAmount; amount++)
     {

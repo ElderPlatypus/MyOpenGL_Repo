@@ -41,7 +41,8 @@ public:
     void SetSurfaceActor(Actor* selectSurface);
     Actor* BarycentricCoordinates(Actor* surface,float dt);
     glm::vec3 CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,  glm::vec3 playerPos); 
-   
+    
+
     //---------------------------------Bary Coords-members------------------------------------------------
     Actor* confirmSurface = nullptr;
     ///Configure and Draw
