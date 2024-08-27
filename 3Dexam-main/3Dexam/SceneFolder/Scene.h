@@ -26,6 +26,7 @@ public:
 	Camera* mSceneCamera{ nullptr };
 	Texture* mTexture{ nullptr }; 
 	Scene(std::string name);
+	Scene() = default;
 
 
 	//Loaders
@@ -46,12 +47,10 @@ public:
 	//Camera Binding
 	void BindCamera() const;
 
-	Scene() = default;
-
-	//Spawner controll
-	int mAmount = 10;
-
 	//Collision control
 	Collision* mCollision{ nullptr };
+	void CollisionHandling(float dt); 
+
+	int score = 0;
 };
 

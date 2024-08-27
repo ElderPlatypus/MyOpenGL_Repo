@@ -32,7 +32,8 @@ public:
     static Actor* Create2DTriangle();
     static Actor* CreatePyramid();
     static Actor* CreateCube();
-    static Actor* CreateInterpolationCurve3Points(const double& startVal, const double& endingVal, const double& resolution);
+    static Actor* CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
+                                                  const double& startVal, const double& endingVal, const double& resolution);
     static Actor* CreatePlaneXZ(const double& xMin, const double& zMin, const double& xMax, const double& zMax, const double& resolution);
     static Actor* CreatePlaneXY(const double& xMin, const double& yMin, const double& xMax, const double& yMax, const double& resolution);
 
@@ -92,15 +93,16 @@ public:
 
 
     ///Actor movement 
-    //---------------------------------Camera------------------------------------------ 
+    //---------------------------------Actor MOvement------------------------------------------ 
     Camera* camera{ nullptr };
-    bool mAttachCamera = false;  
-    void ActorMovementNoCameraAttachment(Direction direction, Camera* camera, float dt); 
+    bool mRelativeCameraPosition = false;  
+    void ActorMovement(Direction direction, Camera* camera, float dt); 
 
-    //---------------------------------Speed------------------------------------------ 
-    void CameraPlacement(Direction placement, Camera* camera, float dt) const;
+    //---------------------------------Camera------------------------------------------ 
+    void CameraControll(Direction placement, Camera* camera, float dt) const;
     float mMovementSpeed = 5.0f;
     bool mIsMoving = false;
+    inline static bool mAttachCamera;
 
 
     ///Collision 
@@ -110,6 +112,7 @@ public:
 
     //---------------------------------Booleans------------------------------------------ 
     bool mEnableCollison = false;
+    bool mIsColliding = false; 
 
 
     ///Update Actors

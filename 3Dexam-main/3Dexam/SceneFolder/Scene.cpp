@@ -10,11 +10,6 @@ Scene::Scene(std::string name)
 ///Loaders & Unloaders
 void Scene::LoadActors()
 {
-	///Load Actors into U-Map
-	//uActorMap["pyramid"] = Actor::CreatePyramid();
-	//uActorMap["curve"] = Actor::CreateInterpolationCurve3Points(0, 13, 0.2f); 
-	//uActorMap["planeXY"] = Actor::CreatePlaneXY(-5, 0, 5, 5, 0.05f); 
-
 	///Plane
 	uActorMap["planeXZ"] = Actor::CreatePlaneXZ(-5.f, -5.f, 5.f, 5.f, 0.2f);  
 	uActorMap["planeXZ"]->mUseTex = true; 
@@ -25,7 +20,7 @@ void Scene::LoadActors()
 	uActorMap["player"]->mEnableCollison = true;
 	uActorMap["player"]->SetSurfaceActor(uActorMap["planeXZ"]);
 	uActorMap["player"]->SetLocalPosition(glm::vec3(-2.f, 0.0f, -8.f));  
-	uActorMap["player"]->mAttachCamera = true;
+	uActorMap["player"]->mRelativeCameraPosition = true; 
 
 	///Test cube
 	uActorMap["testCube"] = Actor::CreateCube();
@@ -33,28 +28,31 @@ void Scene::LoadActors()
 	uActorMap["testCube"]->SetSurfaceActor(uActorMap["planeXZ"]);
 	uActorMap["testCube"]->SetLocalPosition(glm::vec3(-3.f, 0.0f, -6.f)); 
 
+	///creating interpolation curve
+	uActorMap["Icurve"] = Actor::CreateInterpolationCurve3Points(glm::vec2(-5.f, -8.f), glm::vec2(-3.f, -2.f), glm::vec2(-1.f, -2.f), -5, 5, 0.2f);
+	uActorMap["Icurve"]->SetSurfaceActor(uActorMap["planeXZ"]);
+
 	///Create camera object
     mSceneCamera = new Camera("SceneCamera"); 
-	//mSceneCamera->mUseCamerMovement = true; 
 
+	///Spawning vectors
+	Actor::Spawner(5);
 	for (auto &it : Actor::spawnVector)
 	{
 		it->SetSurfaceActor(uActorMap["planeXZ"]);
 	}
-	 
+
 }
 
 void Scene::LoadContent()
 {
 	LoadActors();
-	Actor::Spawner(5); 
 
 	mShader = new Shader("Shaders/Triangle.vs", "Shaders/Triangle.fs");
 	mTexture = new Texture("Shaders/wall.jpg",mShader);   
 	
 	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++) { actor->second->SetShader(mShader); }
-	for (auto object : Actor::spawnVector) { object->SetShader(mShader); }         
-
+	for (auto object : Actor::spawnVector){ object->SetShader(mShader); }         
 
 }
 
@@ -62,37 +60,21 @@ void Scene::UnloadContent()
 {
 	for (auto actor = uActorMap.begin(); actor!= uActorMap.end(); actor++)
 	{
-		actor->second->~Actor(); 
+		if (actor->second != nullptr)
+		{
+			actor->second->~Actor();
+			delete actor->second;
+			actor->second = nullptr;
+		}
+	
 	}
 
 	for (auto it : Actor::spawnVector)
 	{
 		it->~Actor();
+		delete it;
+		it = nullptr;
 	}
-
-	delete uActorMap["pyramid"];
-	uActorMap["pyramid"] = nullptr;
-
-	delete uActorMap["planeXZ"];
-	uActorMap["planeXZ"] = nullptr;
-
-	delete uActorMap["planeXY"];
-	uActorMap["planeXY"] = nullptr;
-
-	delete uActorMap["curve"];
-	uActorMap["curve"] = nullptr;
-
-	delete uActorMap["player"];
-	uActorMap["player"] = nullptr;
-
-	delete uActorMap["cube2"];
-	uActorMap["cube2"] = nullptr;
-
-	delete uActorMap["curve"];
-	uActorMap["curve"] = nullptr;
-
-	delete uActorMap["testCube"];
-	uActorMap["testCube"] = nullptr;
 
 	delete mSceneCamera;
 	mSceneCamera = nullptr;
@@ -111,16 +93,13 @@ void Scene::UpdateScene(float dt)
 	//Camera Update
 	mSceneCamera->UpdateCamera(dt); 
 
-	//Collision Update
+	//Actor Update for Bary coords
 	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++) { actor->second->UpdateActors(dt); }
-	
 	for (auto object : Actor::spawnVector) { object->UpdateActors(dt); }
-	for (auto object : Actor::spawnVector) { Collision::Intersect(uActorMap["player"], object); }
 
-	Collision::Intersect(uActorMap["player"], uActorMap["testCube"]);
+	//Collison Update
+	CollisionHandling(dt);
 
-	//Barysentric Update
-	
 }
 
 ///Rednerer
@@ -129,7 +108,6 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 	SpaceManipulation(); 
 	BindCamera();
 	UpdateScene(dt);  
-
 
 	for (auto actor = uActorMap.begin(); actor!= uActorMap.end(); actor++) 
 	{
@@ -141,6 +119,7 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 	
 	for (auto object : Actor::spawnVector)
 	{
+		globaltransform.SetTransformMatrix(object->GetLocalTransformMatrix());
 		mShader->setMat4("model", object->GetLocalTransformMatrix());
 		object->UseTexture(object->GetTexBool());
 		object->drawActor(mShader);
@@ -150,34 +129,11 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 ///Tranformations
 void Scene::SpaceManipulation() //Only rotation can be manipulated before call in Render. Offset needs to be set in LoacActors.
 {
-	///Pyramid
-	//uActorMap["pyramid"]->SetLocalPosition(glm::vec3(0.0f, 0.5f, -4.f));
-	//uActorMap["pyramid"]->SetLocalRotation(glm::vec3(0.f, float(glfwGetTime()), 0.f)); 
-
-	///PlaneXZ
-	//uActorMap["planeXZ"]->SetLocalPosition(glm::vec3(-2.f, -1.f,-10.f));
-	//uActorMap["planeXZ"]->SetLocalRotation(glm::vec3(0.f, 0.f, 0.f));
-
-	/////PlaneXY
-	//uActorMap["planeXY"]->SetLocalPosition(uActorMap["planeXZ"]->GetLocalPosition() + glm::vec3(-10.f,0.f,0.f));
-	//uActorMap["planeXY"]->SetLocalRotation(glm::vec3(0.f, 0.f,0.f));
-
-
-	///Cube
-	//uActorMap["cube"]->SetLocalPosition(glm::vec3(-2.f, 0.0f, -8.f)); 
-	//uActorMap["cube"]->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime()));
-
-	//uActorMap["cube2"]->SetLocalPosition(glm::vec3(2.f, 0.0f, -8.f));
-	//uActorMap["cube2"]->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime()));
-
-	
-	/////Curve
-	//uActorMap["curve"]->SetLocalPosition(glm::vec3(-2.f, -1.0f, -8.f));
-
 	///Spawn objects
+
 	for (auto object : Actor::spawnVector)
 	{
-		object->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
+		 object->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
 	}
 
 } 
@@ -188,6 +144,40 @@ void Scene::BindCamera() const
 	mShader->setMat4("view", mSceneCamera->GetViewMatrix()); 
 	mShader->setMat4("projection", mSceneCamera->GetProjectionMatrix());
 	mShader->setVec3("viewPos", mSceneCamera->GetLocalPosition());   
+}
+
+void Scene::CollisionHandling(float dt)
+{
+	//Player & spawned objects
+	int max_i = Actor::spawnVector.size();
+	
+	
+	for (auto object : Actor::spawnVector) 
+	{ 
+		if (Collision::Intersect(uActorMap["player"], object) == true) 
+		{
+			std::cout << "Spawned Cube Deleted" << std::endl;
+
+			object->~Actor();
+			object->mEnableCollison = false;
+			score++;
+		    std::cout << "Points earned: " << score << " off " << max_i << std:: endl;
+
+			if (score == 10)
+			{
+				std::cout << "Maximum points earned!!!: " << std::endl;
+			}
+		}
+	}
+	
+	//Player & TestCube
+	Collision::Intersect(uActorMap["player"], uActorMap["testCube"]);
+	if (Collision::Intersect(uActorMap["player"], uActorMap["testCube"]) == true)
+	{ 
+		std::cout << "Test Cube Deleted" << std::endl;
+		uActorMap["testCube"]->~Actor();
+		uActorMap["testCube"]->mEnableCollison = false;
+	}
 }
 
 

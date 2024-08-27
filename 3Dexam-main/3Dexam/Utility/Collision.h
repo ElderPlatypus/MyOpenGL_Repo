@@ -8,7 +8,6 @@ class Collision
 public:
 
 	///Notice GetPos er vektorene ikke posisjonen til vertex!!!!!!!!!!!!
-
 	static bool Intersect(Actor* a, Actor* b) 
 	{
 
@@ -26,11 +25,17 @@ public:
 				if (abs(diff[i]) >= sumExtent[i]) return false;
 			}
 			//std::cout << "Collison Detected" << std::endl;
-
+			a->mIsColliding = true;
+			b->mIsColliding = true;
 			return true;
 		}
-		else return false;
-	
+		else
+		{
+			a->mIsColliding = false;
+			b->mIsColliding = false;
+
+			return false;
+		}
 	}
 
 	

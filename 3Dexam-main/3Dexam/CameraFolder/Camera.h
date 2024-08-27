@@ -22,7 +22,9 @@ enum Direction
 	MouseMotionX, MouseMotionY,
 
 	//Other buttons
-	UseCameraKey1,StaticCameraKey2
+	CameraFreeMovment_1,
+	CameraStatic_CharacterMovement_2,
+	CameraStatic_FollowPlayer_3
 };
 
 
@@ -119,8 +121,5 @@ public:
 	void CameraMouseButton(double xPos, double yPos);
 	void CameraMouseMovement(double xPos, double yPos);
 	bool mUseCameraMovement = true; 
-
-
-
 };
 

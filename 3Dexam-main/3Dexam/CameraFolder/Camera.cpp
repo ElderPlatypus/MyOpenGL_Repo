@@ -196,9 +196,9 @@ void Camera::CameraMouseMovement(double xPos, double yPos)
 		newOrientation = glm::normalize(newOrientation); 
 		SetLocalRotation(newOrientation);
 	}
-
-
 }
+
+
 
 
 

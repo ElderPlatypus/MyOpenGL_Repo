@@ -7,6 +7,7 @@ out vec4 FragColor;
 in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoord;
+//in vec3 LightColor;
 
 uniform sampler2D texture1; 
 uniform bool useTex; 

@@ -12,6 +12,8 @@ Actor::Actor(const std::string& name, std::vector<Vertex>& vertices,std::vector<
     mUseTex = useTex;
     mDrawLine = drawLine;
     mEnableCollison = false;
+    mIsColliding = false;
+    mAttachCamera = false;
     configureMesh();
 
 
@@ -124,10 +126,10 @@ Actor* Actor::CreateCube()
         {{ 0.5f,  0.5f, -0.5f}, {0.0f,  0.0f, -1.0f}, {0.0f, 1.0f}},
         {{-0.5f,  0.5f, -0.5f}, {0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}},
         // Left face
-        {{-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}},
-        {{-0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}},
-        {{-0.5f,  0.5f,  0.5f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}},
-        {{-0.5f,  0.5f, -0.5f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}},
+        {{-0.5f, -0.5f, -0.5f}, {-1.0f,  0.0f, 0.0f}, {0.0f, 0.0f}},
+        {{-0.5f, -0.5f,  0.5f}, {-1.0f,  0.0f, 0.0f}, {1.0f, 0.0f}},
+        {{-0.5f,  0.5f,  0.5f}, {-1.0f,  0.0f, 0.0f}, {1.0f, 1.0f}},
+        {{-0.5f,  0.5f, -0.5f}, {-1.0f,  0.0f, 0.0f}, {0.0f, 1.0f}},
         // Right face
         {{ 0.5f, -0.5f, -0.5f}, {1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}},
         {{ 0.5f, -0.5f,  0.5f}, {1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}},
@@ -163,7 +165,8 @@ Actor* Actor::CreateCube()
     return new Actor("cube", vertices, indices, true, false);
 }
 
-Actor* Actor::CreateInterpolationCurve3Points(const double& startVal, const double& endingVal, const double& resolution)
+Actor* Actor::CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
+                                              const double& startVal, const double& endingVal, const double& resolution)
 {
     std::vector<Vertex> Vertices;
     ///Creating random numbers
@@ -173,14 +176,17 @@ Actor* Actor::CreateInterpolationCurve3Points(const double& startVal, const doub
     //Creating an array of vec2/points
     std::vector<glm::vec2> Points
     {
-        glm::vec2(0,0),
+        p1,
+        p2,
+        p3
+       /* glm::vec2(0,0),
         glm::vec2(1,1),
-        glm::vec2(5,2)
+        glm::vec2(5,2)*/
     };
 
     //Creating variables for matrix A and vector b
-    glm::mat3x3 A;
-    glm::vec3 b;
+    glm::mat3x3 A{0.f};
+    glm::vec3 b{0.f,0.f,0.f};
 
     //Iterating over Points.size and adding respective values to respective variable
     for (auto i = 0; i < Points.size(); i++)
@@ -197,7 +203,7 @@ Actor* Actor::CreateInterpolationCurve3Points(const double& startVal, const doub
     auto getInverse = glm::inverse(A);
     auto getX = getInverse * b;
 
-    //Crating a array of Vertices
+    //Crating an array of Vertices
     std::vector<unsigned int> Indices;
 
     for (double x = startVal; x <= endingVal; x += resolution)
@@ -217,86 +223,80 @@ Actor* Actor::CreateInterpolationCurve3Points(const double& startVal, const doub
 Actor* Actor::CreatePlaneXZ(const double& xMin, const double& zMin, const double& xMax, const double& zMax, const double& resolution)
 {
     std::vector<Vertex> vertices;
-    std::vector<Index> inidces;
+    std::vector<Index> indices;
     double y;
+    double i = 0.f;  
 
-    for (auto x = zMin; x < zMax; x += resolution)
+    for (auto x = xMin; x < xMax; x += resolution)  
     {
         for (auto z = zMin; z < zMax; z += resolution)
         {
+       
             ///Lower Triangle
-            y = glm::cos(x) * glm::cos(z); //Bottom Left 
-            vertices.emplace_back(x, y, z, 1.f,1.f,1.f, x,z);
+            y = glm::cos(x) * glm::cos(z); //Bottom Left  
+            vertices.emplace_back(x, y, z, 0.f, 1.f, 0.f, x, z);  
+            indices.emplace_back(i);     
 
             y = glm::cos(x + resolution) * glm::cos(z); //Bottom Right 
-            vertices.emplace_back(x + resolution, y, z, 1.f, 1.f, 1.f, x, z);
+            vertices.emplace_back(x + resolution, y, z, 0.f, 1.f, 0.f, x, z); 
+            indices.emplace_back(i + 1);
 
-            y = glm::cos(x) * glm::cos(z + resolution); //Top Left 
-            vertices.emplace_back(x, y, z + resolution);
-
+            y = glm::cos(x) * glm::cos(z + resolution); //Top Left  
+            vertices.emplace_back(x, y, z + resolution, 0.f, 1.f, 0.f, x, z); 
+            indices.emplace_back(i + 2);
 
             ///Upper Triangle
-            y = glm::cos(x) * glm::cos(z + resolution); //Top Left 
-            vertices.emplace_back(x, y, z + resolution, 1.f, 1.f, 1.f, x, z); 
+            indices.emplace_back(i + 2);  //Top Left   
 
-            y = glm::cos(x + resolution) * glm::cos(z); //Bottom Right
-            vertices.emplace_back(x + resolution, y, z, 1.f, 1.f, 1.f, x, z);
+            indices.emplace_back(i + 1); //Bottom Right 
 
             y = glm::cos(x + resolution) * glm::cos(z + resolution); //Top Rigth
-            vertices.emplace_back(x + resolution, y, z + resolution, 1.f, 1.f, 1.f, x, z);
+            vertices.emplace_back(x + resolution, y, z + resolution, 0.f, 1.f, 0.f, x, z);
+            indices.emplace_back(i + 3); 
+            
+            i += 4.f; //Inrementing by 4 to get newt square
         }
     }
-
-    for (int i = 0; i < vertices.size() - 2; i += 3)
-    {
-        inidces.emplace_back(i);
-        inidces.emplace_back(i + 1);
-        inidces.emplace_back(i + 2);
-    }
-
-    return new Actor("plane", vertices, inidces, true, false);
+    return new Actor("planeXZ", vertices, indices, false, false);
 }
 
 Actor* Actor::CreatePlaneXY(const double& xMin, const double& yMin, const double& xMax, const double& yMax, const double& resolution)
 {
     std::vector<Vertex> vertices;
-    std::vector<Index> inidces;
+    std::vector<Index> indices;
     double z;
+    double i = 0.f;
 
-    for (auto x = yMin; x < yMax; x += resolution) 
+    for (auto x = xMin; x < xMax; x += resolution) 
     {
         for (auto y = yMin; y < yMax; y += resolution) 
         {
             ///Lower Triangle
             z = glm::cos(x) * glm::cos(y); //Bottom Left 
             vertices.emplace_back(x, y, z, 1.f, 1.f, 1.f, x, y); 
-            inidces.emplace_back(y);
-
+            indices.emplace_back(i);
 
             z = glm::cos(x + resolution) * glm::cos(y); //Bottom Right  
             vertices.emplace_back(x + resolution, y, z, 1.f, 1.f, 1.f, x, y); 
-            inidces.emplace_back(y+1);
+            indices.emplace_back(i + 1);
 
             z = glm::cos(x) * glm::cos(y + resolution); //Top Left 
             vertices.emplace_back(x, y + resolution, z); 
-            inidces.emplace_back(y + 2);
+            indices.emplace_back(i + 2);
 
             ///Upper Triangle
-            inidces.emplace_back(y + 2);
-            //z = glm::cos(x) * glm::cos(y + resolution); //Top Left  
-            //vertices.emplace_back(x, y+resolution, z, 1.f, 1.f, 1.f, x, y);   
-
-            inidces.emplace_back(y + 1);
-            //z = glm::cos(x + resolution) * glm::cos(y); //Bottom Right
-            //vertices.emplace_back(x + resolution, y, z, 1.f, 1.f, 1.f, x, y); 
-
-
+            indices.emplace_back(i + 2); //Top Left 
+          
+            indices.emplace_back(i + 1); //Bottom Right
+       
             z = glm::cos(x + resolution) * glm::cos(y + resolution); //Top Rigth
             vertices.emplace_back(x + resolution, y +resolution, z, 1.f, 1.f, 1.f, x, y); 
-            inidces.emplace_back(y + 3); 
+            indices.emplace_back(i + 3);
+
+            i += 4.f; //Incrementing to next square
         }
     }
-    return new Actor("planeXY", vertices, inidces, false, false);
+    return new Actor("planeXY", vertices, indices, false, false);
 }
 
 
@@ -329,8 +329,8 @@ void Actor::SetSurfaceActor(Actor* selectSurface)
 Actor* Actor::BarycentricCoordinates(Actor* surface,float dt)
 {
     
-    //vector of verts and indices
-    for (int i = 0; i < surface->mVertices.size() - 2; i += 3)
+    //vector of vertices and indices
+    for (int i = 0; i < surface->mIndices.size(); i += 3)
     {
         //Collect indices which creates each triangle in the plane
         unsigned int index1;
@@ -351,7 +351,7 @@ Actor* Actor::BarycentricCoordinates(Actor* surface,float dt)
         glm::vec3 baryCoords = CalculateBarycentricCoordinates(point1,point2,point3, GetLocalPosition());  
 
         //Creating a variable which utilizes the calc-bary method.
-        float baryHeight = ((baryCoords.x * point1.y) + (baryCoords.y * point2.y + mExtent.y/2) + (baryCoords.z * point3.y));
+        float baryHeight = ((baryCoords.x * point1.y) + (baryCoords.y * point2.y + (mExtent.y / 2)) + (baryCoords.z * point3.y));
 
         //If-checks if certain criterias are met folowing the rules for bary-coords behaviour
         if (baryCoords.x == 0 || baryCoords.y == 0 || baryCoords.z == 0)
@@ -360,9 +360,9 @@ Actor* Actor::BarycentricCoordinates(Actor* surface,float dt)
             baryCoords = CalculateBarycentricCoordinates(point1, point2, point3, GetLocalPosition()); 
         }
 
-        if (   baryCoords.x > 0 
-            && baryCoords.y > 0  
-            && baryCoords.z > 0 ) 
+        if (    baryCoords.x > 0 
+             && baryCoords.y > 0 
+             && baryCoords.z > 0 )
         {
             SetLocalPosition(glm::vec3(GetLocalPosition().x, baryHeight, GetLocalPosition().z));
             //std::cout << "Bary coords works: " << std::endl;
@@ -383,15 +383,15 @@ glm::vec3 Actor::CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm
     glm::vec3 baryCoords{0.f,0.f,0.f};
   
     ///Calculating triangle surface area
-    glm::vec3 u = { p2 - p1 };
-    glm::vec3 v = { p3 - p1 };
+    glm::vec3 u = { p2 - p1}; //sw
+    glm::vec3 v = { p3 - p1 }; //sw
     glm::vec3 n = glm::cross(u, v); 
     float triangleSurfaceArea = n.y;  
 
     ///Sub Triangle vectors
-    glm::vec3 newU = { glm::cross(p1 - playerPos, p2 - playerPos) };
-    glm::vec3 newV = { glm::cross(p2 - playerPos, p3 - playerPos) };
-    glm::vec3 newW = { glm::cross(p3 - playerPos, p1 - playerPos) };
+    glm::vec3 newU = { glm::cross(p2 - playerPos, p3 - playerPos) };
+    glm::vec3 newV = { glm::cross(p3 - playerPos, p1 - playerPos) };
+    glm::vec3 newW = { glm::cross(p1 - playerPos, p2 - playerPos) };
 
     ///Calculate area with respect to reverse clockwise direction
     //Sub Triangle 1 baryCoords X
@@ -431,22 +431,20 @@ void Actor::drawActor(const Shader* shader) const
 
 
 ///Actor movement
-void Actor::ActorMovementNoCameraAttachment(Direction direction, Camera* camera, float dt)
+void Actor::ActorMovement(Direction direction, Camera* camera, float dt)
 {
   
-    if (mAttachCamera == true && camera->mUseCameraMovement == false)  
+    if (mRelativeCameraPosition == true && camera->mUseCameraMovement == false && mAttachCamera == false)   
     {
         switch (direction)
         {
             //Forward & Backwards
         case Forward:
             SetLocalPosition(GetLocalPosition() - glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt); 
-            SetLocalRotation(glm::quat(0, 0, 1, 0));
             break;
 
         case Backwards:
             SetLocalPosition(GetLocalPosition() + glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt);
-            SetLocalRotation(glm::quat(0, 0, 0, 0));
             break;
 
             //Left & Right
@@ -483,34 +481,98 @@ void Actor::ActorMovementNoCameraAttachment(Direction direction, Camera* camera,
             mIsMoving = false;
             mMovementSpeed = 5.0f;
         }
-  
-      /*  std::cout << "Speed " <<  mMovementSpeed << std::endl;
-        std::cout << "IsMoving " << mIsMoving << std::endl; 
-        std::cout << "Check Local pos: "
-        << GetLocalPosition().x << " "
-        << GetLocalPosition().y << " "
-        << GetLocalPosition().z << " "
-        << std::endl;  */
     }
+
+    if (mRelativeCameraPosition == true && camera->mUseCameraMovement == false && mAttachCamera == true)
+    {
+        switch (direction)
+        {
+            //Forward & Backwards
+        case Forward:
+            SetLocalPosition(GetLocalPosition() - glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt);
+            break;
+
+        case Backwards:
+            SetLocalPosition(GetLocalPosition() + glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt);
+            break;
+
+            //Left & Right
+        case Left:
+            SetLocalPosition(GetLocalPosition() - glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt);
+            break;
+
+        case Right:
+            SetLocalPosition(GetLocalPosition() + glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt);
+            break;
+
+            //Up & Down
+        case Up:
+            SetLocalPosition(GetLocalPosition() + glm::vec3(0.f, 1.0f * mMovementSpeed, 0.f) * dt);
+            break;
+
+        case Down:
+            SetLocalPosition(GetLocalPosition() + glm::vec3(0.f, -1.0f * mMovementSpeed, 0.f) * dt);
+            break;
+
+            //Increase Speed
+        case IncreaseSpeed:
+            mIsMoving = true;
+            break;
+        }
+
+        if (mIsMoving == true)
+        {
+            mMovementSpeed = 10.0f;
+            mIsMoving = false;
+        }
+        else
+        {
+            mIsMoving = false;
+            mMovementSpeed = 5.0f;
+        }
+
+        camera->SetLocalPosition(glm::vec3(
+            GetLocalPosition().x,
+            GetLocalPosition().y + 2.f,
+            GetLocalPosition().z + 5.f));
+    }
+
+    /*  std::cout << "Speed " <<  mMovementSpeed << std::endl;
+      std::cout << "IsMoving " << mIsMoving << std::endl;
+      std::cout << "Check Local pos: "
+      << GetLocalPosition().x << " "
+      << GetLocalPosition().y << " "
+      << GetLocalPosition().z << " "
+      << std::endl;  */
 }
 
-void Actor::CameraPlacement(Direction placement, Camera* camera, float dt) const
+void Actor::CameraControll(Direction placement, Camera* camera, float dt) const
 {
     switch (placement)
     {
-    case UseCameraKey1:
-        if (mAttachCamera == true)
+    case CameraFreeMovment_1:
+        if (mRelativeCameraPosition == true)
         {
+            mAttachCamera = false;
             camera->mUseCameraMovement = true;
+        } 
+        break;
+
+    case CameraStatic_CharacterMovement_2:
+        if (mRelativeCameraPosition == true)
+        {
+            mAttachCamera = false;
+            camera->mUseCameraMovement = false;
         }
         break;
 
-    case StaticCameraKey2:
-        if (mAttachCamera == true)
+    case CameraStatic_FollowPlayer_3: 
+        if (mRelativeCameraPosition == true)
         {
+            mAttachCamera = true; 
             camera->mUseCameraMovement = false;
-
         }
+        break;
     }
 }
 

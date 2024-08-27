@@ -292,28 +292,29 @@ void Application::UpdateCameraController(float dt)
  
 void Application::UpdateActorMovement(float dt) 
 {
-    for (auto actor : mScene->uActorMap) 
+    for (auto &actor : mScene->uActorMap) 
     {
        //Movement Keys
-       if (mKeyState[GLFW_KEY_W]) actor.second->ActorMovementNoCameraAttachment(Forward, mScene->mSceneCamera,dt);    
-       if (mKeyState[GLFW_KEY_A]) actor.second->ActorMovementNoCameraAttachment(Left, mScene->mSceneCamera, dt); 
-       if (mKeyState[GLFW_KEY_S]) actor.second->ActorMovementNoCameraAttachment(Backwards, mScene->mSceneCamera, dt); 
-       if (mKeyState[GLFW_KEY_D]) actor.second->ActorMovementNoCameraAttachment(Right, mScene->mSceneCamera, dt);
-       if (mKeyState[GLFW_KEY_SPACE]) actor.second->ActorMovementNoCameraAttachment(Up, mScene->mSceneCamera, dt);
-       if (mKeyState[GLFW_KEY_LEFT_ALT]) actor.second->ActorMovementNoCameraAttachment(Down, mScene->mSceneCamera, dt); 
-
+       if (mKeyState[GLFW_KEY_W]) actor.second->ActorMovement(Forward, mScene->mSceneCamera,dt);    
+       if (mKeyState[GLFW_KEY_A]) actor.second->ActorMovement(Left, mScene->mSceneCamera, dt);
+       if (mKeyState[GLFW_KEY_S]) actor.second->ActorMovement(Backwards, mScene->mSceneCamera, dt);
+       if (mKeyState[GLFW_KEY_D]) actor.second->ActorMovement(Right, mScene->mSceneCamera, dt);
+       if (mKeyState[GLFW_KEY_SPACE]) actor.second->ActorMovement(Up, mScene->mSceneCamera, dt);
+       if (mKeyState[GLFW_KEY_LEFT_ALT]) actor.second->ActorMovement(Down, mScene->mSceneCamera, dt);
 
        //Increase Speed
-       if (mKeyState[GLFW_KEY_LEFT_SHIFT]) actor.second->ActorMovementNoCameraAttachment(IncreaseSpeed, mScene->mSceneCamera, dt);  
+       if (mKeyState[GLFW_KEY_LEFT_SHIFT]) actor.second->ActorMovement(IncreaseSpeed, mScene->mSceneCamera, dt);
     }
 }
 
 void Application::UpdateCameraPlacement(float dt)
 {
-    for (auto actor : mScene->uActorMap)
+    for (auto &actor : mScene->uActorMap)
     {
-        if (mKeyState[GLFW_KEY_1]) actor.second->CameraPlacement(UseCameraKey1,mScene->mSceneCamera, dt); 
-        if (mKeyState[GLFW_KEY_2]) actor.second->CameraPlacement(StaticCameraKey2, mScene->mSceneCamera, dt);   
+        if (mKeyState[GLFW_KEY_1]) actor.second->CameraControll(CameraFreeMovment_1,mScene->mSceneCamera, dt);
+        if (mKeyState[GLFW_KEY_2]) actor.second->CameraControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
+        if (mKeyState[GLFW_KEY_3]) actor.second->CameraControll(CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt); 
+
     }
 }
 
