@@ -18,6 +18,7 @@ void Scene::LoadActors()
 	///Player
 	uActorMap["player"] = Actor::CreateCube();
 	uActorMap["player"]->mEnableCollison = true;
+	uActorMap["player"]->mUseTex = false;
 	uActorMap["player"]->SetSurfaceActor(uActorMap["planeXZ"]);
 	uActorMap["player"]->SetLocalPosition(glm::vec3(-2.f, 0.0f, -8.f));  
 	uActorMap["player"]->mRelativeCameraPosition = true; 
@@ -25,13 +26,21 @@ void Scene::LoadActors()
 	///Test cube
 	uActorMap["testCube"] = Actor::CreateCube();
 	uActorMap["testCube"]->mEnableCollison = true;
+	uActorMap["testCube"]->mUseTex = false;
 	uActorMap["testCube"]->SetSurfaceActor(uActorMap["planeXZ"]);
 	uActorMap["testCube"]->SetLocalPosition(glm::vec3(-3.f, 0.0f, -6.f)); 
+
+	///Light Switch Actor
+	uActorMap["lightSwitch"] = Actor::CreatePyramid();
+	uActorMap["lightSwitch"]->mEnableCollison = true;
+	uActorMap["lightSwitch"]->mUseTex = false;
+	uActorMap["lightSwitch"]->SetSurfaceActor(uActorMap["planeXZ"]);
+	uActorMap["lightSwitch"]->SetLocalPosition(glm::vec3(0.f, 0.0f, -6.f));
 
 	///creating interpolation curve
 	uActorMap["Icurve"] = Actor::CreateInterpolationCurve3Points(glm::vec2(-5.f, -8.f), glm::vec2(-3.f, -2.f), glm::vec2(-1.f, -2.f), -5, 5, 0.2f);
 	uActorMap["Icurve"]->SetSurfaceActor(uActorMap["planeXZ"]);
-
+	
 	///Create camera object
     mSceneCamera = new Camera("SceneCamera"); 
 
@@ -50,6 +59,7 @@ void Scene::LoadContent()
 
 	mShader = new Shader("Shaders/Triangle.vs", "Shaders/Triangle.fs");
 	mTexture = new Texture("Shaders/wall.jpg",mShader);   
+	mLight = new Light(mShader,uActorMap["player"]);
 	
 	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++) { actor->second->SetShader(mShader); }
 	for (auto object : Actor::spawnVector){ object->SetShader(mShader); }         
@@ -85,6 +95,10 @@ void Scene::UnloadContent()
 	mTexture->~Texture(); 
 	delete mTexture; 
 	mTexture = nullptr; 
+
+	mLight->~Light();
+	delete mLight;
+	mLight = nullptr;
 }
 
 ///Updater
@@ -92,6 +106,7 @@ void Scene::UpdateScene(float dt)
 {
 	//Camera Update
 	mSceneCamera->UpdateCamera(dt); 
+	mLight;
 
 	//Actor Update for Bary coords
 	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++) { actor->second->UpdateActors(dt); }
@@ -158,9 +173,9 @@ void Scene::CollisionHandling(float dt)
 		{
 			std::cout << "Spawned Cube Deleted" << std::endl;
 
+			score++;
 			object->~Actor();
 			object->mEnableCollison = false;
-			score++;
 		    std::cout << "Points earned: " << score << " off " << max_i << std:: endl;
 
 			if (score == 10)
@@ -174,9 +189,13 @@ void Scene::CollisionHandling(float dt)
 	Collision::Intersect(uActorMap["player"], uActorMap["testCube"]);
 	if (Collision::Intersect(uActorMap["player"], uActorMap["testCube"]) == true)
 	{ 
-		std::cout << "Test Cube Deleted" << std::endl;
-		uActorMap["testCube"]->~Actor();
-		uActorMap["testCube"]->mEnableCollison = false;
+		std::cout << "LIGHTS OUT" << std::endl;
+		mLight->setObjectColor(glm::vec3(0.f,0.f,0.f));
+		mLight->setAmbientStrength(0.f);
+	}
+	else
+	{
+		uActorMap["player"]->mUseTex = false;
 	}
 }
 
