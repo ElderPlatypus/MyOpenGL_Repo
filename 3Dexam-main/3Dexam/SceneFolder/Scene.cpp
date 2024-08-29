@@ -41,6 +41,12 @@ void Scene::LoadActors()
 	uActorMap["Icurve"] = Actor::CreateInterpolationCurve3Points(glm::vec2(-5.f, -8.f), glm::vec2(-3.f, -2.f), glm::vec2(-1.f, -2.f), -5, 5, 0.2f);
 	uActorMap["Icurve"]->SetSurfaceActor(uActorMap["planeXZ"]);
 	
+	uActorMap["Sphere"] = Actor::CreateSphere(100,100,10);
+	uActorMap["Sphere"]->SetSurfaceActor(uActorMap["planeXZ"]); 
+	uActorMap["Sphere"]->mUseTex = true;
+	uActorMap["Sphere"]->SetLocalPosition(glm::vec3(-8.f, 0.0f, -6.f));
+
+
 	///Create camera object
     mSceneCamera = new Camera("SceneCamera"); 
 
@@ -106,7 +112,6 @@ void Scene::UpdateScene(float dt)
 {
 	//Camera Update
 	mSceneCamera->UpdateCamera(dt); 
-	mLight;
 
 	//Actor Update for Bary coords
 	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++) { actor->second->UpdateActors(dt); }

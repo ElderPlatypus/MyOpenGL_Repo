@@ -36,6 +36,7 @@ public:
                                                   const double& startVal, const double& endingVal, const double& resolution);
     static Actor* CreatePlaneXZ(const double& xMin, const double& zMin, const double& xMax, const double& zMax, const double& resolution);
     static Actor* CreatePlaneXY(const double& xMin, const double& yMin, const double& xMax, const double& yMax, const double& resolution);
+    static Actor* CreateSphere(const int& stackCount, const int& sectorCount, const int& radius);
 
     ///Barycentric Coordinates
     //---------------------------------Bary-Coords Methods------------------------------------------------
@@ -129,4 +130,7 @@ public:
     
 
 };
+
+
+
 

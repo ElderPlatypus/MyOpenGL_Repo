@@ -1,7 +1,11 @@
 #include "Actor.h"
-#include <random>
+
 //Includes
+#include <random>
 #include <string>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 ///Acor constructor/destructor
 Actor::Actor(const std::string& name, std::vector<Vertex>& vertices,std::vector<Index>& indices, const bool& useTex, const bool& drawLine)
@@ -297,6 +301,75 @@ Actor* Actor::CreatePlaneXY(const double& xMin, const double& yMin, const double
         }
     }
     return new Actor("planeXY", vertices, indices, false, false);
+}
+
+Actor* Actor::CreateSphere(const int& stackCount, const int& sectorCount, const int& radius)
+{
+    std::vector<Vertex> vertices;
+    std::vector<Index> indices;
+
+    //uniform variables
+    float x, y, z, xy; //position
+    float nx, ny, nz, invertLength = 1.0f / radius; //normal
+    float s, t; //textCoord
+
+    //sphere segment logic
+    float sectorStep = 2 * M_PI / sectorCount; //Y->direction sub-divisons
+    float stackStep = M_PI / stackCount; //x->direction sub-divisons
+    float sectorAngle, stackAngle; //angle variables for y|x
+
+    for (int i = 0; i <= stackCount; i++)
+    {
+        stackAngle = M_PI / 2 - i * stackStep; //pi->-pi domain
+        xy = radius * glm::cos(stackAngle); // cos
+        z = radius * glm::sin(stackAngle); // sin
+
+        for (int j = 0; j <= sectorCount; j++)
+        {
+            sectorAngle = j * sectorStep;
+
+            //Vertex pos
+            x = xy * glm::cos(sectorAngle);
+            y = xy * glm::sin(sectorAngle);
+        
+            //normal pos
+            nx = x * invertLength;
+            ny = y * invertLength;
+            nz = z * invertLength; 
+       
+            //tex pos
+            s = (float)j / sectorCount;
+            t = (float)i / stackCount; 
+
+            vertices.emplace_back(Vertex({ x,y,z }, { nx,ny,nz }, { s,t }));
+
+        }
+    }
+
+    int k1, k2;
+
+    for (int i = 0; i < stackCount; i++)
+    {
+        k1 = i * (sectorCount + 1);
+        k2 = k1 + sectorCount + 1;
+
+        for (int j = 0; j < sectorCount; j++, k1++, k2++)
+        {
+            if (i != 0)
+            {
+                indices.emplace_back(k1);
+                indices.emplace_back(k2);
+                indices.emplace_back(k1 + 1);
+            }
+            if (i != (stackCount - 1)) 
+            {
+                indices.emplace_back(k1 + 1);
+                indices.emplace_back(k2);
+                indices.emplace_back(k2 + 1);
+            }
+        }
+    }
+    return new Actor("Sphere", vertices, indices, true, false);
 }
 
 

@@ -12,9 +12,9 @@ Light::Light(Shader* shader) : mShader(shader)
 Light::Light(Shader* shader, Actor* actor) : mShader(shader), mActor(actor)
 {
 	mShader->use();
+	mShader->setVec3("objectColor", mObjectColor);
 	mShader->setVec3("lightColor", mLightColor);
 	mShader->setVec3("lightPos", actor->GetLocalPosition());  
-	mShader->setVec3("objectColor", mObjectColor);
 }
 
 void Light::setObjectColor(glm::vec3 newObjectColor)

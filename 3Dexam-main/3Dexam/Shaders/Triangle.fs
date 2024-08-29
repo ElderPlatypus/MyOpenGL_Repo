@@ -23,15 +23,15 @@ uniform vec3 viewPos;
   
 void main()
 {
-    vec3 viewDirection = normalize(viewPos - FragPos);
+    vec3 viewDirection = normalize(viewPos - FragPos); 
 
     //Ambient Light
-    vec3 ambient = ambientStrength * ligthColor;
+    vec3 ambient = ambientStrength * ligthColor; 
 
     //Diffuse Light
     vec3 norm = normalize(Normal);
-    vec3 lightDirection = normalize(lightPos - FragPos);
-    float diffuse = max(dot(norm,lightDirection),0.0f);
+    vec3 lightDirection = normalize(lightPos - FragPos); 
+    float diffuse = max(dot(norm,lightDirection),0.0f); 
 
     //Specualr Light
     float specularStrength = 0.5f;
