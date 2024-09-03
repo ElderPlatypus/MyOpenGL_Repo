@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|3Dexam\\3Dexam.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\3Dexam.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|3Dexam\\3Dexam.vcxproj|solutionrelative:3Dexam\\3Dexam.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|3Dexam\\3Dexam.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\SceneFolder\\Actor.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|3Dexam\\3Dexam.vcxproj|solutionrelative:3Dexam\\SceneFolder\\Actor.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|3Dexam\\3Dexam.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\3Dexam.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|3Dexam\\3Dexam.vcxproj|solutionrelative:3Dexam\\3Dexam.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|3Dexam\\3Dexam.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\SceneFolder\\Actor.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
@@ -42,17 +42,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 304,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Actor.cpp",
               "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\SceneFolder\\Actor.cpp",
               "RelativeDocumentMoniker": "3Dexam\\SceneFolder\\Actor.cpp",
               "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\SceneFolder\\Actor.cpp",
               "RelativeToolTip": "3Dexam\\SceneFolder\\Actor.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAKAAAAAAAAAA==",
+              "ViewState": "AgIAAMQCAAAAAAAAAIAwwNQCAABKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-08-02T13:58:59.244Z",
               "EditorCaption": ""
@@ -67,12 +67,11 @@
               "RelativeToolTip": "3Dexam\\Application.cpp",
               "ViewState": "AgIAAGEAAAAAAAAAAAASwG8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-08-29T08:04:55.491Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-29T08:04:55.491Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "3Dexam.cpp",
               "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\Konte_Eksamen\\OpenGLExam\\3Dexam-main\\3Dexam\\3Dexam.cpp",
               "RelativeDocumentMoniker": "3Dexam\\3Dexam.cpp",
@@ -111,8 +110,7 @@
               "RelativeToolTip": "3Dexam\\SceneFolder\\Scene.cpp",
               "ViewState": "AgIAAIEAAAAAAAAAAAASwIYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-08-02T13:55:47.056Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-02T13:55:47.056Z"
             },
             {
               "$type": "Document",

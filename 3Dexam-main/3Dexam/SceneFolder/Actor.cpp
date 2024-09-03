@@ -726,7 +726,7 @@ void Actor::ActorWalking(Actor* lerpActor, float dt)
         }
     }
     //update local variable with use of lerp-function
-    getPos = Lerp(lerpActor->mVertices[index].mPos + lerpActor->GetLocalPosition(), lerpActor->mVertices[index + movementDir].mPos + lerpActor->GetLocalPosition(), deltaTime);
+    getPos = Lerp(lerpActor->mVertices[(unsigned __int64)index].mPos + lerpActor->GetLocalPosition(), lerpActor->mVertices[(unsigned __int64)index + (unsigned __int64)movementDir].mPos + lerpActor->GetLocalPosition(), deltaTime);
     this->SetLocalPosition(getPos);
 }
 
