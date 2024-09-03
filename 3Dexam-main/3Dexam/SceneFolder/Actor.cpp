@@ -660,6 +660,10 @@ void Actor::UpdateActors(float dt)
     {
       BarycentricCoordinates(confirmSurface,dt); 
     }
+    if (confirmLerp)
+    {
+        ActorWalking(confirmLerp, dt);
+    }
 }
 
 void Actor::Spawner(const int& spawnAmount)
@@ -699,6 +703,42 @@ void Actor::Spawner(const int& spawnAmount)
             return;
         }
     }
+}
+
+///Lerp and Lerp along interpolation curve
+void Actor::ActorWalking(Actor* lerpActor, float dt)
+{
+    if (lerpActor == nullptr || lerpActor->mVertices.empty()) return;
+
+    //Essential local variables
+    glm::vec3 getPos(0.f);
+    deltaTime += dt * movementDir;
+
+    //Checking if timer is greater or equal to lerpTime
+    if (deltaTime >= lerpTime) 
+    {   
+        deltaTime = 0.0f; //Resetting deltaTime
+        index += movementDir; //Index Counter
+
+        if (index == lerpActor->mVertices.size() - 1 || index == 0) 
+        {
+            movementDir *= -1; //Change direction if index criteria is met
+        }
+    }
+    //update local variable with use of lerp-function
+    getPos = Lerp(lerpActor->mVertices[index].mPos + lerpActor->GetLocalPosition(), lerpActor->mVertices[index + movementDir].mPos + lerpActor->GetLocalPosition(), deltaTime);
+    this->SetLocalPosition(getPos);
+}
+
+void Actor::SetLerpActor(Actor* selectLerpActor)
+{
+    confirmLerp = selectLerpActor;
+}
+
+glm::vec3 Actor::Lerp(glm::vec3 a, glm::vec3 b, float t)
+{
+    //Lerp formula
+    return a + t * (b - a); 
 }
 
 

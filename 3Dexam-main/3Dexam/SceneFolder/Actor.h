@@ -48,9 +48,10 @@ public:
     Actor* BarycentricCoordinates(Actor* surface,float dt);
     glm::vec3 CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,  glm::vec3 playerPos); 
     
-
     //---------------------------------Bary Coords-members------------------------------------------------
     Actor* confirmSurface = nullptr;
+
+
     ///Configure and Draw
     void configureMesh(); //Binds VAO,VB & EBO to respective mesh
     void drawActor(const Shader* shader)const ; 
@@ -104,7 +105,6 @@ public:
             mShader->setVec3("objectColor", glm::vec3(0.f));
         }
     }
-
     const bool& GetLightBool() const { return mUseLight; }
 
 
@@ -117,7 +117,6 @@ public:
     VBO mVBO{ 0U }; 
     EBO mEBO{ 0U };
     Transform mTransform{};
-
 
     //---------------------------------Draw and texture------------------------------------------
     bool mUseTex = false;
@@ -152,7 +151,7 @@ public:
     void UpdateActors(float dt);
 
 
-    ///Spawner test
+    ///Spawner 
     //---------------------------------Spawner Vector & Amount------------------------------------------ 
     inline static std::vector<Actor*> spawnVector;    
     inline static Actor* spawnedActor;
@@ -161,9 +160,14 @@ public:
     inline static int ActorType; //1 = cube, 2 = Sphere, 3 = Pyramid
    
     static void Spawner(const int& spawnAmount);  
-    
+
+    ///Lerp
+    void ActorWalking(Actor* lerpActor,float dt);
+    void SetLerpActor(Actor* selectLerpActor);
+    Actor* confirmLerp = nullptr;
+    glm::vec3 Lerp(glm::vec3 a, glm::vec3 b, float t);
+    float deltaTime = 0.0f;
+    float movementDir = 0.5f;
+    float index = 0.0f;
+    float lerpTime = -15.0f;
 };
-
-
-
-

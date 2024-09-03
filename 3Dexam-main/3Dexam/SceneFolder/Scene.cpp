@@ -28,7 +28,7 @@ void Scene::LoadActors()
 	uActorMap["testCube"]->mEnableCollison = true;
 	uActorMap["testCube"]->mUseTex = false;
 	uActorMap["testCube"]->SetSurfaceActor(uActorMap["planeXZ"]);
-	uActorMap["testCube"]->SetLocalPosition(glm::vec3(-3.f, 0.0f, -6.f)); 
+	//uActorMap["testCube"]->SetLocalPosition(glm::vec3(-3.f, 0.0f, -6.f)); 
 
 	///Light Switch Actor
 	uActorMap["lightSwitch"] = Actor::CreatePyramid();
@@ -43,7 +43,7 @@ void Scene::LoadActors()
 	
 	///Spawning vectors
 	Actor::ActorType = 2;
-	Actor::Spawner(1000);
+	Actor::Spawner(1);
 
 	for (int i = 0; i < Actor::spawnVector.size(); i++)
 	{
@@ -142,6 +142,7 @@ void Scene::SpaceManipulation() //Only rotation can be manipulated before call i
 	{
 		 object->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
 	}
+	uActorMap["testCube"]->SetLerpActor(uActorMap["Icurve"]);
 } 
 
 ///Shader Binder
