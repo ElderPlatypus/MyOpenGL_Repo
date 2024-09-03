@@ -137,7 +137,6 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="SceneFolder\Actor.cpp" />
     <ClCompile Include="SceneFolder\Scene.cpp" />
-    <ClCompile Include="Shaders\Light.cpp" />
     <ClCompile Include="Shaders\Shader.cpp" />
     <ClCompile Include="Shaders\ShaderFileLoader.cpp" />
     <ClCompile Include="Shaders\Texture.cpp" />
@@ -151,7 +150,6 @@
     <ClInclude Include="includes\GLFW\glfw3native.h" />
     <ClInclude Include="includes\glm\mat4x3.hpp" />
     <ClInclude Include="includes\KHR\khrplatform.h" />
-    <ClInclude Include="Shaders\Light.h" />
     <ClInclude Include="Shaders\Texture.h" />
     <ClInclude Include="Utility\Collision.h" />
     <ClInclude Include="Utility\pathDefinition.h" />

@@ -24,8 +24,12 @@ public:
           const bool& drawLine = false
          );
 
-    Actor() = default; 
     Actor(const Actor&) = delete;
+    Actor& operator = (const Actor&) = delete;
+    Actor(const Actor&&) = delete;
+    Actor& operator = (const Actor&&) = delete;
+
+    Actor() = default; 
     ~Actor();
 
     ///Actor vertex data
@@ -33,9 +37,9 @@ public:
     static Actor* CreatePyramid();
     static Actor* CreateCube();
     static Actor* CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
-                                                  const double& startVal, const double& endingVal, const double& resolution);
-    static Actor* CreatePlaneXZ(const double& xMin, const double& zMin, const double& xMax, const double& zMax, const double& resolution);
-    static Actor* CreatePlaneXY(const double& xMin, const double& yMin, const double& xMax, const double& yMax, const double& resolution);
+                                                  const float& startVal, const float& endingVal, const float& resolution);
+    static Actor* CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution);
+    static Actor* CreatePlaneXY(const float& xMin, const float& yMin, const float& xMax, const float& yMax, const float& resolution);
     static Actor* CreateSphere(const int& stackCount, const int& sectorCount, const int& radius);
 
     ///Barycentric Coordinates
@@ -75,6 +79,34 @@ public:
         mShader->setBool("useTex", useBool);  
     } 
     const bool& GetTexBool() const { return mUseTex; }
+
+    ///Lighting
+    float mAmbientStrength = 1.0f;
+    glm::vec3 mLightColor{ 1.f, 1.f, 1.f };
+    glm::vec3 mLightPos{ 0.f,0.f,0.f };
+    glm::vec3 mObjectColor{ 1.f,0.7f,0.2f };
+    bool mUseLight = true;
+    void UseLight(const bool& useBool)
+    {
+        mUseLight = useBool;
+        if (mUseLight == true)
+        {
+            mShader->use();
+            mShader->setVec3("lightColor", mLightColor);
+            mShader->setVec3("lightPos", mLightPos);
+            mShader->setVec3("objectColor", mObjectColor);
+        }
+        else
+        {
+            mShader->use();
+            mShader->setVec3("lightColor", glm::vec3(0.f));
+            mShader->setVec3("lightPos", glm::vec3(0.f));
+            mShader->setVec3("objectColor", glm::vec3(0.f));
+        }
+    }
+
+    const bool& GetLightBool() const { return mUseLight; }
+
 
     ///Members and Variables
     //---------------------------------Struct and Transform------------------------------------------ 
@@ -122,13 +154,14 @@ public:
 
     ///Spawner test
     //---------------------------------Spawner Vector & Amount------------------------------------------ 
-    inline static std::vector<Actor*> spawnVector;      
+    inline static std::vector<Actor*> spawnVector;    
+    inline static Actor* spawnedActor;
      
     //---------------------------------Spawner function------------------------------------------ 
-    static void Spawner(int spawnAmount); 
+    inline static int ActorType; //1 = cube, 2 = Sphere, 3 = Pyramid
+   
+    static void Spawner(const int& spawnAmount);  
     
-    
-
 };
 
 

@@ -80,14 +80,12 @@ void Application::Run_App()
   
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
-    Scene* scene1 = new Scene("Scene1");
-    scene1->LoadContent();    
+    Scene* scene1 = new Scene("Scene1"); 
 
     ///Fillig the unordered map
     mScene = scene1;
     mScene->LoadContent();
  
-    
     
     ///Creating the deltaTime variable
     float lastFrame = static_cast<float>(glfwGetTime());
@@ -100,14 +98,14 @@ void Application::Run_App()
         float currentFrame = static_cast<float>(glfwGetTime());
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        UpdateCameraController(deltaTime);
-        UpdateActorMovement(deltaTime);  
+
+        UpdateCameraController(deltaTime); 
+        UpdateActorMovement(deltaTime);   
         UpdateCameraPlacement(deltaTime);
 
         // input
         // -----
         ExitApplication(deltaTime);    
-        float timer = (float)glfwGetTime();
 
         // render
         // ------
@@ -117,14 +115,13 @@ void Application::Run_App()
         // render the Actores
         mScene->RenderScene(deltaTime);  
         
-       
-        
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(mWindow);
         glfwPollEvents();
     }
     mScene->UnloadContent();
+    this->~Application();
   
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -270,19 +267,19 @@ void Application::ExitApplication(float dt)
 void Application::UpdateCameraController(float dt)
 {
     //Forward and Backwards
-    if (mKeyState[GLFW_KEY_W]) mScene->mSceneCamera->CameraMovement(Forward,dt), std::cout << "W pressed\n" << std::endl;
-    if (mKeyState[GLFW_KEY_S]) mScene->mSceneCamera->CameraMovement(Backwards, dt), std::cout << "S pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_W]) mScene->mSceneCamera->CameraMovement(Forward,dt)/*, std::cout << "W pressed\n" << std::endl*/;
+    if (mKeyState[GLFW_KEY_S]) mScene->mSceneCamera->CameraMovement(Backwards, dt)/*, std::cout << "S pressed\n" << std::endl*/;
 
     //Left and right
-    if (mKeyState[GLFW_KEY_D]) mScene->mSceneCamera->CameraMovement(Right, dt), std::cout << "D pressed\n" << std::endl;
-    if (mKeyState[GLFW_KEY_A]) mScene->mSceneCamera->CameraMovement(Left, dt), std::cout << "A pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_D]) mScene->mSceneCamera->CameraMovement(Right, dt)/*, std::cout << "D pressed\n" << std::endl*/;
+    if (mKeyState[GLFW_KEY_A]) mScene->mSceneCamera->CameraMovement(Left, dt)/*, std::cout << "A pressed\n" << std::endl*/;
 
     //Up and Down
-    if (mKeyState[GLFW_KEY_SPACE]) mScene->mSceneCamera->CameraMovement(Up, dt), std::cout << "Space pressed\n" << std::endl;
-    if (mKeyState[GLFW_KEY_LEFT_ALT]) mScene->mSceneCamera->CameraMovement(Down, dt), std::cout << "Alt pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_SPACE]) mScene->mSceneCamera->CameraMovement(Up, dt)/*, std::cout << "Space pressed\n" << std::endl*/;
+    if (mKeyState[GLFW_KEY_LEFT_ALT]) mScene->mSceneCamera->CameraMovement(Down, dt)/*, std::cout << "Alt pressed\n" << std::endl*/;
 
     //Increase of Speed
-    if (mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->mSceneCamera->CameraMovement(IncreaseSpeed, dt), std::cout << "Shift pressed\n" << std::endl;
+    if (mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->mSceneCamera->CameraMovement(IncreaseSpeed, dt)/*, std::cout << "Shift pressed\n" << std::endl*/;
    
 
     /*glm::vec3 getPos = mScene->mSceneCamera->mTransform.GetPosition();
@@ -292,30 +289,29 @@ void Application::UpdateCameraController(float dt)
  
 void Application::UpdateActorMovement(float dt) 
 {
-    for (auto &actor : mScene->uActorMap) 
-    {
+   auto getPlayer =  mScene->uActorMap["player"];
+   
        //Movement Keys
-       if (mKeyState[GLFW_KEY_W]) actor.second->ActorMovement(Forward, mScene->mSceneCamera,dt);    
-       if (mKeyState[GLFW_KEY_A]) actor.second->ActorMovement(Left, mScene->mSceneCamera, dt);
-       if (mKeyState[GLFW_KEY_S]) actor.second->ActorMovement(Backwards, mScene->mSceneCamera, dt);
-       if (mKeyState[GLFW_KEY_D]) actor.second->ActorMovement(Right, mScene->mSceneCamera, dt);
-       if (mKeyState[GLFW_KEY_SPACE]) actor.second->ActorMovement(Up, mScene->mSceneCamera, dt);
-       if (mKeyState[GLFW_KEY_LEFT_ALT]) actor.second->ActorMovement(Down, mScene->mSceneCamera, dt);
+       if (mKeyState[GLFW_KEY_W]) getPlayer->ActorMovement(Forward, mScene->mSceneCamera,dt);
+       if (mKeyState[GLFW_KEY_A]) getPlayer->ActorMovement(Left, mScene->mSceneCamera, dt);
+       if (mKeyState[GLFW_KEY_S]) getPlayer->ActorMovement(Backwards, mScene->mSceneCamera, dt);
+       if (mKeyState[GLFW_KEY_D]) getPlayer->ActorMovement(Right, mScene->mSceneCamera, dt);
+       if (mKeyState[GLFW_KEY_SPACE]) getPlayer->ActorMovement(Up, mScene->mSceneCamera, dt);
+       if (mKeyState[GLFW_KEY_LEFT_ALT]) getPlayer->ActorMovement(Down, mScene->mSceneCamera, dt);
 
        //Increase Speed
-       if (mKeyState[GLFW_KEY_LEFT_SHIFT]) actor.second->ActorMovement(IncreaseSpeed, mScene->mSceneCamera, dt);
-    }
+       if (mKeyState[GLFW_KEY_LEFT_SHIFT]) getPlayer->ActorMovement(IncreaseSpeed, mScene->mSceneCamera, dt);
+    
 }
 
 void Application::UpdateCameraPlacement(float dt)
 {
-    for (auto &actor : mScene->uActorMap)
-    {
-        if (mKeyState[GLFW_KEY_1]) actor.second->CameraControll(CameraFreeMovment_1,mScene->mSceneCamera, dt);
-        if (mKeyState[GLFW_KEY_2]) actor.second->CameraControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
-        if (mKeyState[GLFW_KEY_3]) actor.second->CameraControll(CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt); 
+    auto getPlayer = mScene->uActorMap["player"];
 
-    }
+    if (mKeyState[GLFW_KEY_1]) getPlayer->CameraControll(CameraFreeMovment_1,mScene->mSceneCamera, dt);
+    if (mKeyState[GLFW_KEY_2]) getPlayer->CameraControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
+    if (mKeyState[GLFW_KEY_3]) getPlayer->CameraControll(CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt);
+
 }
 
 

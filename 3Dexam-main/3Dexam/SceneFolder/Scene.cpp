@@ -41,21 +41,17 @@ void Scene::LoadActors()
 	uActorMap["Icurve"] = Actor::CreateInterpolationCurve3Points(glm::vec2(-5.f, -8.f), glm::vec2(-3.f, -2.f), glm::vec2(-1.f, -2.f), -5, 5, 0.2f);
 	uActorMap["Icurve"]->SetSurfaceActor(uActorMap["planeXZ"]);
 	
-	uActorMap["Sphere"] = Actor::CreateSphere(100,100,10);
-	uActorMap["Sphere"]->SetSurfaceActor(uActorMap["planeXZ"]); 
-	uActorMap["Sphere"]->mUseTex = true;
-	uActorMap["Sphere"]->SetLocalPosition(glm::vec3(-8.f, 0.0f, -6.f));
+	///Spawning vectors
+	Actor::ActorType = 2;
+	Actor::Spawner(1000);
 
-
+	for (int i = 0; i < Actor::spawnVector.size(); i++)
+	{
+	  uActorMap["spawnedObjects" + std::to_string(i)] = Actor::spawnVector[i];
+	}
 	///Create camera object
     mSceneCamera = new Camera("SceneCamera"); 
 
-	///Spawning vectors
-	Actor::Spawner(5);
-	for (auto &it : Actor::spawnVector)
-	{
-		it->SetSurfaceActor(uActorMap["planeXZ"]);
-	}
 
 }
 
@@ -65,31 +61,29 @@ void Scene::LoadContent()
 
 	mShader = new Shader("Shaders/Triangle.vs", "Shaders/Triangle.fs");
 	mTexture = new Texture("Shaders/wall.jpg",mShader);   
-	mLight = new Light(mShader,uActorMap["player"]);
+	//mLight = new Light(mShader);
 	
-	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++) { actor->second->SetShader(mShader); }
-	for (auto object : Actor::spawnVector){ object->SetShader(mShader); }         
-
+	for (auto &actor : uActorMap) { actor.second->SetShader(mShader); }
+	//for (auto &object : Actor::spawnVector){ object->SetShader(mShader); }         
 }
 
 void Scene::UnloadContent()
 {
-	for (auto actor = uActorMap.begin(); actor!= uActorMap.end(); actor++)
+	for (auto &actor : uActorMap)
 	{
-		if (actor->second != nullptr)
+		if (actor.second != nullptr)
 		{
-			actor->second->~Actor();
-			delete actor->second;
-			actor->second = nullptr;
+			actor.second->~Actor();
+			delete actor.second;
+			actor.second = nullptr;
 		}
-	
 	}
 
-	for (auto it : Actor::spawnVector)
+	for (auto &object : Actor::spawnVector) 
 	{
-		it->~Actor();
-		delete it;
-		it = nullptr;
+		object->~Actor();
+		delete object; 
+		object = nullptr;
 	}
 
 	delete mSceneCamera;
@@ -101,10 +95,10 @@ void Scene::UnloadContent()
 	mTexture->~Texture(); 
 	delete mTexture; 
 	mTexture = nullptr; 
+	
 
-	mLight->~Light();
-	delete mLight;
-	mLight = nullptr;
+	uActorMap.clear();
+	Actor::spawnVector.clear();
 }
 
 ///Updater
@@ -114,48 +108,40 @@ void Scene::UpdateScene(float dt)
 	mSceneCamera->UpdateCamera(dt); 
 
 	//Actor Update for Bary coords
-	for (auto actor = uActorMap.begin(); actor != uActorMap.end(); actor++) { actor->second->UpdateActors(dt); }
-	for (auto object : Actor::spawnVector) { object->UpdateActors(dt); }
+	for (auto &actor : uActorMap) { actor.second->UpdateActors(dt); }
+	for (auto &object : Actor::spawnVector) { object->UpdateActors(dt); }
 
 	//Collison Update
 	CollisionHandling(dt);
 
+	SpaceManipulation();
+	BindCamera();
 }
 
 ///Rednerer
 void Scene::RenderScene(float dt, Transform globaltransform)
 { 
-	SpaceManipulation(); 
-	BindCamera();
 	UpdateScene(dt);  
 
-	for (auto actor = uActorMap.begin(); actor!= uActorMap.end(); actor++) 
+	for (auto &actor : uActorMap) 
 	{
-		globaltransform.SetTransformMatrix(actor->second->GetLocalTransformMatrix());
+		globaltransform.SetTransformMatrix(actor.second->GetLocalTransformMatrix());
 		mShader->setMat4("model", globaltransform.GetTransformMatrix());   
-		actor->second->UseTexture(actor->second->GetTexBool());    
-		actor->second->drawActor(mShader); 
+		actor.second->UseTexture(actor.second->GetTexBool());    
+		actor.second->UseLight(actor.second->GetLightBool());
+		actor.second->drawActor(mShader); 
 	}
 	
-	for (auto object : Actor::spawnVector)
-	{
-		globaltransform.SetTransformMatrix(object->GetLocalTransformMatrix());
-		mShader->setMat4("model", object->GetLocalTransformMatrix());
-		object->UseTexture(object->GetTexBool());
-		object->drawActor(mShader);
-	}
 }
 
 ///Tranformations
 void Scene::SpaceManipulation() //Only rotation can be manipulated before call in Render. Offset needs to be set in LoacActors.
 {
 	///Spawn objects
-
-	for (auto object : Actor::spawnVector)
+	for (auto &object : Actor::spawnVector)
 	{
 		 object->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
 	}
-
 } 
 
 ///Shader Binder
@@ -169,10 +155,9 @@ void Scene::BindCamera() const
 void Scene::CollisionHandling(float dt)
 {
 	//Player & spawned objects
-	int max_i = Actor::spawnVector.size();
+	auto max_i = Actor::spawnVector.size();
 	
-	
-	for (auto object : Actor::spawnVector) 
+	for (auto &object : Actor::spawnVector) 
 	{ 
 		if (Collision::Intersect(uActorMap["player"], object) == true) 
 		{
@@ -183,7 +168,7 @@ void Scene::CollisionHandling(float dt)
 			object->mEnableCollison = false;
 		    std::cout << "Points earned: " << score << " off " << max_i << std:: endl;
 
-			if (score == 10)
+			if (score == max_i)
 			{
 				std::cout << "Maximum points earned!!!: " << std::endl;
 			}
@@ -191,16 +176,31 @@ void Scene::CollisionHandling(float dt)
 	}
 	
 	//Player & TestCube
-	Collision::Intersect(uActorMap["player"], uActorMap["testCube"]);
+
 	if (Collision::Intersect(uActorMap["player"], uActorMap["testCube"]) == true)
 	{ 
-		std::cout << "LIGHTS OUT" << std::endl;
-		mLight->setObjectColor(glm::vec3(0.f,0.f,0.f));
-		mLight->setAmbientStrength(0.f);
+		//std::cout << "LIGHTS OUT" << std::endl;
+		for (auto &actor : uActorMap)
+		{
+			actor.second->mUseLight = false;  
+		}
+
+		for (auto &object : Actor::spawnVector)
+		{
+			object->mUseLight = false;
+		}
 	}
 	else
 	{
-		uActorMap["player"]->mUseTex = false;
+		for (auto &actor : uActorMap)
+		{
+			actor.second->mUseLight = true;
+		}
+
+		for (auto &object : Actor::spawnVector)
+		{
+			object->mUseLight = true;
+		}
 	}
 }
 

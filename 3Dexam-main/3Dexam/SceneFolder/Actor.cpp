@@ -18,6 +18,7 @@ Actor::Actor(const std::string& name, std::vector<Vertex>& vertices,std::vector<
     mEnableCollison = false;
     mIsColliding = false;
     mAttachCamera = false;
+    mUseLight = true;
     configureMesh();
 
 
@@ -40,6 +41,7 @@ Actor::~Actor()
     glDeleteBuffers(1, &mVBO);
     glDeleteBuffers(1, &mEBO);
 }
+
 
 
 ///Create Meshes
@@ -170,7 +172,7 @@ Actor* Actor::CreateCube()
 }
 
 Actor* Actor::CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
-                                              const double& startVal, const double& endingVal, const double& resolution)
+                                              const float& startVal, const float& endingVal, const float& resolution)
 {
     std::vector<Vertex> Vertices;
     ///Creating random numbers
@@ -189,15 +191,15 @@ Actor* Actor::CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::ve
     };
 
     //Creating variables for matrix A and vector b
-    glm::mat3x3 A{0.f};
-    glm::vec3 b{0.f,0.f,0.f};
+    glm::mat3x3 A{0.0f};
+    glm::vec3 b{0.0f,0.0f,0.0f};
 
     //Iterating over Points.size and adding respective values to respective variable
-    for (auto i = 0; i < Points.size(); i++)
+    for (auto i = 0; i < Points.size(); i++) 
     {
-        A[0][i] = pow(Points[i].x, 2.0f);
-        A[1][i] = Points[i].x;
-        A[2][i] = 1.f;
+        A[0][i] = pow(Points[i].x, 2.0f); //quadric X-term
+        A[1][i] = Points[i].x;            //X-term
+        A[2][i] = 1.0f;                   //Constant scalar-term
 
         b[i] = Points[i].y;
 
@@ -210,10 +212,10 @@ Actor* Actor::CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::ve
     //Crating an array of Vertices
     std::vector<unsigned int> Indices;
 
-    for (double x = startVal; x <= endingVal; x += resolution)
+    for (float x = startVal; x <= endingVal; x += resolution)
     {
-        double calcF = (getX.x * pow(x, 2)) + (getX.y * x) + (getX.z);
-        Vertices.emplace_back(x, 0, calcF);
+        float calcF = (getX.x * (float)pow(x, 2)) + (getX.y * x) + (getX.z);
+        Vertices.emplace_back(x, 0.0f, calcF);
     }
 
     for (int i = 0; i < Vertices.size(); i++) 
@@ -224,12 +226,12 @@ Actor* Actor::CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::ve
     return new Actor("InterpolationCurve",Vertices, Indices, false, true);
 }
 
-Actor* Actor::CreatePlaneXZ(const double& xMin, const double& zMin, const double& xMax, const double& zMax, const double& resolution)
+Actor* Actor::CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution)
 {
     std::vector<Vertex> vertices;
     std::vector<Index> indices;
-    double y;
-    double i = 0.f;  
+    float y;
+    int i = 0;
 
     for (auto x = xMin; x < xMax; x += resolution)  
     {
@@ -258,18 +260,18 @@ Actor* Actor::CreatePlaneXZ(const double& xMin, const double& zMin, const double
             vertices.emplace_back(x + resolution, y, z + resolution, 0.f, 1.f, 0.f, x, z);
             indices.emplace_back(i + 3); 
             
-            i += 4.f; //Inrementing by 4 to get newt square
+            i += 4; //Inrementing by 4 to get newt square
         }
     }
     return new Actor("planeXZ", vertices, indices, false, false);
 }
 
-Actor* Actor::CreatePlaneXY(const double& xMin, const double& yMin, const double& xMax, const double& yMax, const double& resolution)
+Actor* Actor::CreatePlaneXY(const float& xMin, const float& yMin, const float& xMax, const float& yMax, const float& resolution)
 {
     std::vector<Vertex> vertices;
     std::vector<Index> indices;
-    double z;
-    double i = 0.f;
+    float z;
+    int i = 0;
 
     for (auto x = xMin; x < xMax; x += resolution) 
     {
@@ -297,7 +299,7 @@ Actor* Actor::CreatePlaneXY(const double& xMin, const double& yMin, const double
             vertices.emplace_back(x + resolution, y +resolution, z, 1.f, 1.f, 1.f, x, y); 
             indices.emplace_back(i + 3);
 
-            i += 4.f; //Incrementing to next square
+            i += 4; //Incrementing to next square
         }
     }
     return new Actor("planeXY", vertices, indices, false, false);
@@ -314,13 +316,13 @@ Actor* Actor::CreateSphere(const int& stackCount, const int& sectorCount, const 
     float s, t; //textCoord
 
     //sphere segment logic
-    float sectorStep = 2 * M_PI / sectorCount; //Y->direction sub-divisons
-    float stackStep = M_PI / stackCount; //x->direction sub-divisons
+    float sectorStep = (float)(2 * M_PI / sectorCount); //Y->direction sub-divisons
+    float stackStep = (float)(M_PI / stackCount); //x->direction sub-divisons
     float sectorAngle, stackAngle; //angle variables for y|x
 
     for (int i = 0; i <= stackCount; i++)
     {
-        stackAngle = M_PI / 2 - i * stackStep; //pi->-pi domain
+        stackAngle = (float) M_PI / 2 - i * stackStep; //pi->-pi domain
         xy = radius * glm::cos(stackAngle); // cos
         z = radius * glm::sin(stackAngle); // sin
 
@@ -403,7 +405,7 @@ Actor* Actor::BarycentricCoordinates(Actor* surface,float dt)
 {
     
     //vector of vertices and indices
-    for (int i = 0; i < surface->mIndices.size(); i += 3)
+    for (auto i = 0; i < surface->mIndices.size(); i += 3)
     {
         //Collect indices which creates each triangle in the plane
         unsigned int index1;
@@ -412,8 +414,8 @@ Actor* Actor::BarycentricCoordinates(Actor* surface,float dt)
 
         //Assigning the values
         index1 = surface->mIndices[i];
-        index2 = surface->mIndices[i+1];
-        index3 = surface->mIndices[i+2];
+        index2 = surface->mIndices[static_cast<std::vector<std::seed_seq::result_type, std::allocator<std::seed_seq::result_type>>::size_type>(i) + 1];
+        index3 = surface->mIndices[static_cast<std::vector<std::seed_seq::result_type, std::allocator<std::seed_seq::result_type>>::size_type>(i) + 2];
 
         //Collecting the postions of the indices 
         glm::vec3 point1{ surface->mVertices[index1].mPos + surface->GetLocalPosition() * surface->GetLocalScale() }; 
@@ -660,26 +662,45 @@ void Actor::UpdateActors(float dt)
     }
 }
 
-
-void Actor::Spawner(int spawnAmount)
+void Actor::Spawner(const int& spawnAmount)
 {
-    std::vector<Actor*> spawnVector; 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> radiusXZ(-10.f, 10.f);
-    //std::uniform_real_distribution<float> radiusY(-5.f, 5.f); som beveger den
-
-    for (int amount = 0; amount < spawnAmount; amount++)
+    for (int amount = 0; amount < spawnAmount; amount++) 
     {
-        glm::vec3 spawnPos{ radiusXZ(gen),0.f,radiusXZ(gen) };
-        Actor* spawnedActor{ nullptr };
-        spawnedActor = Actor::CreateCube(); 
-        spawnedActor->SetLocalPosition(spawnPos); 
-        spawnedActor->mUseTex = true;
-        spawnedActor->mEnableCollison = true;
-        Actor::spawnVector.emplace_back(spawnedActor);    
+        if (spawnAmount > 0)
+        {
+            switch (ActorType)
+            {
+            case 1:
+                spawnedActor = Actor::CreateCube();
+                spawnedActor->mUseTex = true;
+                spawnedActor->mEnableCollison = true;
+                break;
+            case 2:
+                spawnedActor = Actor::CreateSphere(5, 5, 1);
+                spawnedActor->mUseTex = true;
+                spawnedActor->mEnableCollison = true;
+                break;
+            case 3:
+                spawnedActor = Actor::CreatePyramid();
+                spawnedActor->mUseTex = true;
+                spawnedActor->mEnableCollison = true;
+                break;
+            }
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_real_distribution<float> radiusXZ(-5.f, 5.f);
+            glm::vec3 spawnPos{ radiusXZ(gen),0.f,radiusXZ(gen) };
+            spawnedActor->SetLocalPosition(spawnPos);  
+            Actor::spawnVector.emplace_back(spawnedActor); 
+        }
+        else
+        {
+            std::cout << "Amount is 0" << std::endl;
+            return;
+        }
     }
 }
+
 
 
 

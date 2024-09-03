@@ -14,7 +14,6 @@
 #include "../CameraFolder/Camera.h"
 #include "../Shaders/Texture.h"
 #include "../Utility/Collision.h"
-#include "../Shaders/Light.h"
 
 class Scene 
 {
@@ -26,7 +25,6 @@ public:
 	Shader* mShader{ nullptr };
 	Camera* mSceneCamera{ nullptr };
 	Texture* mTexture{ nullptr }; 
-	Light* mLight{ nullptr };
 	Scene(std::string name);
 	Scene() = default;
 

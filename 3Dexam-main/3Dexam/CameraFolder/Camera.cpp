@@ -175,7 +175,7 @@ void Camera::CameraMouseMovement(double xPos, double yPos)
 	else
 	{
 
-		std::cout << "Mouse Button Pressed \n" << std::endl; 
+		/*std::cout << "Mouse Button Pressed \n" << std::endl;*/ 
 
 		float xOffset = mLastX - static_cast<float>(xPos); 
 		float yOffset = mLastY - static_cast<float>(yPos);
