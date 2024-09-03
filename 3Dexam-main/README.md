@@ -1,12 +1,15 @@
 # 3Dexam
  
  /*
-This code is inspired by ealier "group work" and a code basis from lectures
-GIt link: https://github.com/Zartok89/3DCompulsoryFinal.git 
+This code is inspired by earlier "group work" and a code basis from lectures:
 
-his git is following: https://github.com/3Dprog24-Guest-Lecture/3Dprog24/tree/SQ3D-18-Add-model-loading 
+Group Work| Git link: https://github.com/Zartok89/3DCompulsoryFinal.git 
 
-The rest is based on; general setup for OpenGL is from their own tutorial: https://learnopengl.com/Introduction  
+Substitute Teacher: https://github.com/3Dprog24-Guest-Lecture/3Dprog24/tree/SQ3D-18-Add-model-loading 
 
-The documentation for how glm-lib works is fro this site: https://glm.g-truc.net/0.9.6/api/modules.html 
+OpenGL tutorial: https://learnopengl.com/Introduction  
+
+GLM documentation: https://glm.g-truc.net/0.9.6/api/modules.html 
+
+My own Git-Repo: https://github.com/Neko-Manager/OpenGLExam.git
 */
