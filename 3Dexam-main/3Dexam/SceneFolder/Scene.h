@@ -10,6 +10,7 @@
 #include "../Shaders/Shader.h"
 #include "../Utility/Transform.h"
 #include "../SceneFolder/Actor.h"
+#include "../SceneFolder/Mesh.h"
 #include "../Application.h"
 #include "../CameraFolder/Camera.h"
 #include "../Shaders/Texture.h"

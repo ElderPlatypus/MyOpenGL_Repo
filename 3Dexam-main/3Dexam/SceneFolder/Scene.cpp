@@ -10,48 +10,45 @@ Scene::Scene(std::string name)
 ///Loaders & Unloaders
 void Scene::LoadActors()
 {
-	///Plane
-	uActorMap["planeXZ"] = Actor::CreatePlaneXZ(-5.f, -5.f, 5.f, 5.f, 0.2f);  
-	uActorMap["planeXZ"]->mUseTex = true; 
-	uActorMap["planeXZ"]->SetLocalPosition(glm::vec3(-2.f, -1.0f, -8.f));
-
 	///Player
-	uActorMap["player"] = Actor::CreateCube();
-	uActorMap["player"]->mEnableCollison = true;
-	uActorMap["player"]->mUseTex = false;
-	uActorMap["player"]->SetSurfaceActor(uActorMap["planeXZ"]);
-	uActorMap["player"]->SetLocalPosition(glm::vec3(-2.f, 0.0f, -8.f));  
+	uActorMap["player"] = new Actor(Mesh::CreateCube(2.0f),"player");
+	uActorMap["player"]->mMesh->mUseTex = false;
 	uActorMap["player"]->mRelativeCameraPosition = true; 
+	uActorMap["player"]->mMesh->SetLocalPosition(glm::vec3( 0.0f, 5.0f, 0.0));
+
+
+	///Curve
+	uActorMap["Icurve"] = new Actor(Mesh::CreatePlaneXZ(-5, -5, 5, 5, 0.5),"Icurve");
+	/*uActorMap["Icurve"]->mMesh->mUseTex = true;  
+	uActorMap["player"]->SetBarySurfaceMesh(uActorMap["Icurve"]->mMesh);  */
+
 
 	///Test cube
-	uActorMap["testCube"] = Actor::CreateCube();
-	uActorMap["testCube"]->mEnableCollison = true;
-	uActorMap["testCube"]->mUseTex = false;
-	uActorMap["testCube"]->SetSurfaceActor(uActorMap["planeXZ"]);
-	//uActorMap["testCube"]->SetLocalPosition(glm::vec3(-3.f, 0.0f, -6.f)); 
+	uActorMap["testCube"] = new Actor(Mesh::CreateCube(2.0f),"TestCube"); 
+	uActorMap["testCube"]->mMesh->SetLocalPosition(glm::vec3(0.0f, 10.0f, -6.f));
+	uActorMap["testCube"]->mMesh->mDrawLine = true;
+	uActorMap["testCube"]->ExtrudeMesh(Extrude::increase, 10.0f);
+	
 
-	///Light Switch Actor
-	uActorMap["lightSwitch"] = Actor::CreatePyramid();
-	uActorMap["lightSwitch"]->mEnableCollison = true;
-	uActorMap["lightSwitch"]->mUseTex = false;
-	uActorMap["lightSwitch"]->SetSurfaceActor(uActorMap["planeXZ"]);
-	uActorMap["lightSwitch"]->SetLocalPosition(glm::vec3(0.f, 0.0f, -6.f));
-
-	///creating interpolation curve
-	uActorMap["Icurve"] = Actor::CreateInterpolationCurve3Points(glm::vec2(-5.f, -8.f), glm::vec2(-3.f, -2.f), glm::vec2(-1.f, -2.f), -5, 5, 0.2f);
-	uActorMap["Icurve"]->SetSurfaceActor(uActorMap["planeXZ"]);
 	
 	///Spawning vectors
 	Actor::ActorType = 2;
-	Actor::Spawner(1);
+	Actor::Spawner(10);
 
-	for (int i = 0; i < Actor::spawnVector.size(); i++)
+	for (int i = 0; i < Actor::spawnVector.size(); i++) 
 	{
-	  uActorMap["spawnedObjects" + std::to_string(i)] = Actor::spawnVector[i];
+	  uActorMap["spawnedObjects" + std::to_string(i)] = Actor::spawnVector[i]; 
 	}
+
+	//for (auto& objects : uActorMap)
+	//{
+	//	if (objects.second->mName == "spawnedObjects")
+	//	{
+	//		objects.second->SetBarySurfaceMesh(uActorMap["Icurve"]->mMesh);
+	//	}
+	//}
 	///Create camera object
     mSceneCamera = new Camera("SceneCamera"); 
-
 
 }
 
@@ -61,10 +58,8 @@ void Scene::LoadContent()
 
 	mShader = new Shader("Shaders/Triangle.vs", "Shaders/Triangle.fs");
 	mTexture = new Texture("Shaders/wall.jpg",mShader);   
-	//mLight = new Light(mShader);
 	
-	for (auto &actor : uActorMap) { actor.second->SetShader(mShader); }
-	//for (auto &object : Actor::spawnVector){ object->SetShader(mShader); }         
+	for (auto &actor : uActorMap) { actor.second->mMesh->SetShader(mShader); }       
 }
 
 void Scene::UnloadContent()
@@ -77,13 +72,6 @@ void Scene::UnloadContent()
 			delete actor.second;
 			actor.second = nullptr;
 		}
-	}
-
-	for (auto &object : Actor::spawnVector) 
-	{
-		object->~Actor();
-		delete object; 
-		object = nullptr;
 	}
 
 	delete mSceneCamera;
@@ -106,6 +94,7 @@ void Scene::UpdateScene(float dt)
 {
 	//Camera Update
 	mSceneCamera->UpdateCamera(dt); 
+	/*uActorMap["player"]->cameraTracker(mSceneCamera, dt); */
 
 	//Actor Update for Bary coords
 	for (auto &actor : uActorMap) { actor.second->UpdateActors(dt); }
@@ -125,11 +114,11 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 
 	for (auto &actor : uActorMap) 
 	{
-		globaltransform.SetTransformMatrix(actor.second->GetLocalTransformMatrix());
+		globaltransform.SetTransformMatrix(actor.second->mMesh->GetLocalTransformMatrix());
 		mShader->setMat4("model", globaltransform.GetTransformMatrix());   
-		actor.second->UseTexture(actor.second->GetTexBool());    
-		actor.second->UseLight(actor.second->GetLightBool());
-		actor.second->drawActor(mShader); 
+		actor.second->mMesh->UseTexture(actor.second->mMesh->GetTexBool());    
+		actor.second->mMesh->UseLight(actor.second->mMesh->GetLightBool());
+		actor.second->mMesh->drawActor(mShader); 
 	}
 	
 }
@@ -138,11 +127,10 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 void Scene::SpaceManipulation() //Only rotation can be manipulated before call in Render. Offset needs to be set in LoacActors.
 {
 	///Spawn objects
-	for (auto &object : Actor::spawnVector)
+	/*for (auto &object : Actor::spawnVector)
 	{
-		 object->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
-	}
-	uActorMap["testCube"]->SetLerpActor(uActorMap["Icurve"]);
+		 object->mMesh->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
+	}*/
 } 
 
 ///Shader Binder
@@ -162,11 +150,9 @@ void Scene::CollisionHandling(float dt)
 	{ 
 		if (Collision::Intersect(uActorMap["player"], object) == true) 
 		{
-			std::cout << "Spawned Cube Deleted" << std::endl;
-
 			score++;
-			object->~Actor();
-			object->mEnableCollison = false;
+			object->mMesh->~Mesh();
+			object->mMesh->mEnableCollision = false;
 		    std::cout << "Points earned: " << score << " off " << max_i << std:: endl;
 
 			if (score == max_i)
@@ -175,34 +161,11 @@ void Scene::CollisionHandling(float dt)
 			}
 		}
 	}
-	
-	//Player & TestCube
 
-	if (Collision::Intersect(uActorMap["player"], uActorMap["testCube"]) == true)
-	{ 
-		//std::cout << "LIGHTS OUT" << std::endl;
-		for (auto &actor : uActorMap)
-		{
-			actor.second->mUseLight = false;  
-		}
-
-		for (auto &object : Actor::spawnVector)
-		{
-			object->mUseLight = false;
-		}
-	}
-	else
+	/*if (Collision::InvertIntersect(uActorMap["player"], uActorMap["testCube"]))
 	{
-		for (auto &actor : uActorMap)
-		{
-			actor.second->mUseLight = true;
-		}
-
-		for (auto &object : Actor::spawnVector)
-		{
-			object->mUseLight = true;
-		}
-	}
+		std::cout << "Collision" << std::endl;
+	}*/
 }
 
 

@@ -7,17 +7,16 @@ class Collision
 {
 public:
 
-	///Notice GetPos er vektorene ikke posisjonen til vertex!!!!!!!!!!!!
-	static bool Intersect(Actor* a, Actor* b) 
+	static bool Intersect(Actor* a, Actor* b)
 	{
 
-		if (a->mEnableCollison == true && b->mEnableCollison == true)
+		if (a->mMesh->mEnableCollision == true && b->mMesh->mEnableCollision == true)
 		{
-			//Center differnce
-			glm::vec3 diff{ a->mCenter - b->mCenter };
+			//Center difference
+			glm::vec3 diff{ a->mMesh->mCenter - b->mMesh->mCenter };
 
 			//Sum of extent
-			glm::vec3 sumExtent{ a->mExtent + b->mExtent };
+			glm::vec3 sumExtent{ a->mMesh->mExtent + b->mMesh->mExtent };
 
 			for (int i = 0; i < 3; i++)
 			{
@@ -25,28 +24,39 @@ public:
 				if (abs(diff[i]) >= sumExtent[i]) return false;
 			}
 			//std::cout << "Collison Detected" << std::endl;
-			a->mIsColliding = true;
-			b->mIsColliding = true;
 			return true;
 		}
 		else
 		{
-			a->mIsColliding = false;
-			b->mIsColliding = false;
-
 			return false;
 		}
 	}
 
-	
+	//static bool InvertIntersect(Actor* a, Actor* b)
+	//{
 
+	//	if (a->mMesh->mEnableCollision == true && b->mMesh->mEnableCollision == true)
+	//	{
+	//		//Center difference
+	//		glm::vec3 diff{ a->mMesh->mCenter - b->mMesh->mCenter };
+
+	//		//Sum of extent
+	//		glm::vec3 wallDiff{ b->mMesh->mExtent - b->mMesh->mCenter };
+	//		glm::vec3 wallDiff2{ a->mMesh->mExtent - a->mMesh->mCenter };
+	//		auto a = diff + wallDiff2;
+
+	//		for (int i = 0; i < 3; i++)
+	//		{
+	//			//If difference per axis is less than sum of extent then no collision is detected
+	//			if (abs(a[i]) <= abs(wallDiff[i])) return false;
+	//		}
+	//		//std::cout << "Collison Detected" << std::endl;
+	//		return true;
+	//	}
+	//	else
+	//	{
+	//		return false;
+	//	}
+	//}
 };
 
-//glm::vec3 distance{ abs(A->GetLocalPosition().x - B->GetLocalPosition().x), abs(A->GetLocalPosition().y - B->GetLocalPosition().y), abs(A->GetLocalPosition().z - B->GetLocalPosition().z) };
-////distanceX = abs(A->GetLocalPosition().x - B->GetLocalPosition().x);
-//if (distance.x < A->GetLocalPosition().x + A->GetLocalPosition().length() && distance.x < B->GetLocalPosition().x + A->GetLocalPosition().length())
-//{
-//	std::cout << "Collison X " << A->GetTransform().GetPosition().x << std::endl;
-//	std::cout << "Collison Y " << A->GetTransform().GetPosition().y << std::endl;
-//	std::cout << "Collison Z " << A->GetTransform().GetPosition().z << std::endl;
-//}

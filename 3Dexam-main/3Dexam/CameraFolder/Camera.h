@@ -62,32 +62,30 @@ public:
 	void UpdateProjectionMatrix();
 	
 	///Getters
-	//______________Vector handling_____________
+	//---------------------------------Vector Methods Getters--------------------------------------------
 	glm::vec3 GetForwardVector() const;
 	glm::vec3 GetUpVector() const;
-	//______________Matrix handling_____________
+	//---------------------------------Matrix Methods Getters--------------------------------------------
 	glm::mat4 GetViewMatrix() const;
 	const glm::mat4& GetProjectionMatrix() const;
 	glm::mat4 GetFrustumMatrix() const;
-	//______________Speed handling_____________
+	//---------------------------------Speed Methods Getters--------------------------------------------
 	const glm::vec3& GetVelocity() const { return mVelocity; }
 	const glm::vec3& GetAcceleration() const { return mAcceleration; }
 	float GetAccelerationSpeed() const { return mAccelerationSpeed; }
 	float GetMaxMovementSpeed() const { return mMaxMovementSpeed; }
-	//______________View_____________
+	//---------------------------------AspectARtio Methods Getter--------------------------------------------
 	float GetAspectRatio() const { return mAspectRatio; }
 	
 
    ///Transformation
-   //---------------------------------Local Setters------------------------------------------------
+   //---------------------------------Methods Setters--------------------------------------------
 	void SetTransformation(const Transform& transform) { mTransform = transform; }
 	void SetLocalPosition(const glm::vec3& position) { mTransform.SetPosition(position); }
 	void SetLocalRotation(const glm::quat& rotation) { mTransform.SetRotation(rotation); }
 	void SetLocalScale(const glm::vec3& scale) { mTransform.SetScale(scale); }
 	void SetLocalTransformMatrix(const glm::mat4& transformMatrix) { mTransform.SetTransformMatrix(transformMatrix); }
-
-
-	//---------------------------------Loacal Getters------------------------------------------
+	//---------------------------------Methods Getters------------------------------------------
 	const Transform& GetTransform() const { return mTransform; }
 	const glm::vec3& GetLocalPosition() const { return mTransform.GetPosition(); }
 	const glm::quat& GetLocalRotation() const { return mTransform.GetOrientation(); }
@@ -96,6 +94,7 @@ public:
 	glm::vec3 GetRightVector() const { return mTransform.GetRightVector(); }
 
 	///Members
+	//---------------------------------Members------------------------------------------
 	Transform mTransform{};
 	std::string mName;
 	glm::vec3 mVelocity{ 0.f,0.f,0.f };
@@ -104,22 +103,24 @@ public:
 	float mDampeningFactor;
 	float mMaxMovementSpeed; 
 	float mAccelerationSpeed;
-
 	float mAspectRatio;
 	float mNearPlane;
 	float mFarplane;
 	float mFOV;
 
-	///Mouse members
+	///Mouse 
+	//---------------------------------Members------------------------------------------
 	float mLastX; 
 	float mLastY; 
 	bool mRightMouseButtonPressed = false;
 	float mMouseSensitivity = 0.05f;
 
 	///CamerControll
+	//---------------------------------Members------------------------------------------
+	bool mUseCameraMovement = true; 
+	//---------------------------------Methods------------------------------------------
 	void CameraMovement(Direction direction,float dt);
 	void CameraMouseButton(double xPos, double yPos);
 	void CameraMouseMovement(double xPos, double yPos);
-	bool mUseCameraMovement = true; 
 };
 

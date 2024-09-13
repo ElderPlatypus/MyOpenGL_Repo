@@ -164,39 +164,47 @@ void Camera::CameraMovement(Direction direction, float dt)
 void Camera::CameraMouseButton(double xPos, double yPos)
 {
 	//Saves the x and y pos for lather when rotating camera
-	mRightMouseButtonPressed = true;
-	mLastX = static_cast<float>(xPos);
-	mLastY = static_cast<float>(yPos);
+	if (mUseCameraMovement == true)
+	{
+		mRightMouseButtonPressed = true;
+		mLastX = static_cast<float>(xPos);
+		mLastY = static_cast<float>(yPos);
+	}
+	
 }
 
 void Camera::CameraMouseMovement(double xPos, double yPos) 
 {
 	if (!mRightMouseButtonPressed) return;
+
 	else
 	{
 
-		/*std::cout << "Mouse Button Pressed \n" << std::endl;*/ 
+		/*std::cout << "Mouse Button Pressed \n" << std::endl;*/
 
-		float xOffset = mLastX - static_cast<float>(xPos); 
+		float xOffset = mLastX - static_cast<float>(xPos);
 		float yOffset = mLastY - static_cast<float>(yPos);
 
-		xOffset *= mMouseSensitivity; 
-		yOffset *= mMouseSensitivity; 
+		xOffset *= mMouseSensitivity;
+		yOffset *= mMouseSensitivity;
 
-		float yawRadians = glm::radians(xOffset); 
-		float pitchRadians = glm::radians(yOffset); 
+		float yawRadians = glm::radians(xOffset);
+		float pitchRadians = glm::radians(yOffset);
 
 
 		//Creating a quaternion from angle and a normalized axis: projecting the normalized axis with the given angel whic is now the rotation domain for the quaternion.
 		//Can bed visualize as a  cone where the flat surface is the where the quaternions merges from.
-		glm::quat currentOrientation = GetLocalRotation(); 
+		glm::quat currentOrientation = GetLocalRotation();
 		glm::quat yawRotation = glm::angleAxis(yawRadians, glm::vec3(0.0f, 1.0f, 0.0f)); //normal axis is not 0 for y-axis --> gets yaw
 		glm::quat pitchRotation = glm::angleAxis(pitchRadians, glm::vec3(1.0f, 0.0f, 0.0f));  //normal axis is not 0 for x-axis --> gets pitch
-		glm::quat newOrientation = yawRotation * currentOrientation * pitchRotation; 
-		newOrientation = glm::normalize(newOrientation); 
+		glm::quat newOrientation = yawRotation * currentOrientation * pitchRotation;
+		newOrientation = glm::normalize(newOrientation);
 		SetLocalRotation(newOrientation);
 	}
+	
 }
+
+
 
 
 

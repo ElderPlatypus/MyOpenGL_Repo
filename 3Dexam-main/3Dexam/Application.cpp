@@ -49,7 +49,7 @@ void Application::GLFW_Init()
 
 void Application::Window_Init()
 {   ///Creating the actual window
-    mWindow = glfwCreateWindow(mWidth, mHeight, "Test Win", NULL, NULL);
+    mWindow = glfwCreateWindow(mWidth, mHeight, "Test Win", NULL, nullptr);
     if (mWindow == NULL)
     {
         /*std::cout << "Failed to create GLFW window" << std::endl;*/
@@ -281,7 +281,6 @@ void Application::UpdateCameraController(float dt)
     //Increase of Speed
     if (mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->mSceneCamera->CameraMovement(IncreaseSpeed, dt)/*, std::cout << "Shift pressed\n" << std::endl*/;
    
-
     /*glm::vec3 getPos = mScene->mSceneCamera->mTransform.GetPosition();
     std::cout << "getcameraPos:" << getPos.x << " " << getPos.y << " " << getPos.z << std::endl;*/
 
@@ -289,7 +288,7 @@ void Application::UpdateCameraController(float dt)
  
 void Application::UpdateActorMovement(float dt) 
 {
-   auto getPlayer =  mScene->uActorMap["player"];
+       auto getPlayer =  mScene->uActorMap["player"];
    
        //Movement Keys
        if (mKeyState[GLFW_KEY_W]) getPlayer->ActorMovement(Forward, mScene->mSceneCamera,dt);
