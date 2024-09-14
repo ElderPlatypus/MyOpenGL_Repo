@@ -72,7 +72,8 @@ public:
 
     ///Camera
     //---------------------------------Members------------------------------------------ 
-    float mMovementSpeed = 5.0f;
+    float mMovementSpeed = 10.0f;
+    glm::vec3 mVelocity = glm::vec3(0.f,0.f,0.f); 
     bool mIsMoving = false;
     inline static bool mAttachCamera;
     //---------------------------------Methods------------------------------------------ 
@@ -89,6 +90,6 @@ public:
     inline static Actor* spawnedActor; 
     inline static int ActorType; //1 = cube, 2 = Sphere, 3 = Pyramid
     //---------------------------------Methods------------------------------------------ 
-    static void Spawner(const int& spawnAmount);
+    static void Spawner(const int& spawnAmount, const float& distributionX, const float& distributionZ);
 
 };

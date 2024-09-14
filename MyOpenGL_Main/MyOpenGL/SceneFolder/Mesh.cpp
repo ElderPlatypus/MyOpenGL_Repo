@@ -17,11 +17,6 @@ Mesh::Mesh(const std::string& name, std::vector<Vertex>& vertices, std::vector<I
     mDrawLine = drawLine;
     configureMesh();
 
-
-    //Offset for Boudning Box
-    glm::vec3 minExtent{ 0.f, 0.f, 0.f };
-    glm::vec3 maxExtent{ 0.f, 0.f, 0.f };
-
     for (auto& it : vertices)
     {
         minExtent = glm::min(minExtent, it.mPos);
@@ -39,14 +34,14 @@ Mesh::~Mesh()
 }
 
 ///Create Meshes
-Mesh* Mesh::Create2DTriangle()
+Mesh* Mesh::Create2DTriangle(float size)
 {
     std::vector<Vertex> vertices =
     {
         // positions           // colors           //textures
-       {{ 0.5f, -0.5f, 0.0f},  {0.5f, 0.0f, 0.0f}, {1.f,0.f}},  // bottom right
-       {{-0.5f, -0.5f, 0.0f},  {0.0f, 1.0f, 0.0f}, {0.f,0.f}},  // bottom left
-       {{ 0.0f,  0.5f, 0.0f},  {0.0f, 0.0f, 1.0f}, {1.f,1.f}}   // top 
+       {{ size, -size, size},  {size, 0.0f, 0.0f}, {1.0f,0.0f}},  // bottom right
+       {{-size, -size, size},  {0.0f, 1.0f, 0.0f}, {0.0f,0.0f}},  // bottom left
+       {{ size,  size, size},  {0.0f, 0.0f, 1.0f}, {1.0f,1.0f}}   // top 
     };
 
     std::vector<Index> indices =
@@ -57,38 +52,35 @@ Mesh* Mesh::Create2DTriangle()
     return new Mesh("2DTriangle", vertices, indices, false, false);
 }
 
-Mesh* Mesh::CreatePyramid()
+Mesh* Mesh::CreatePyramid(float size)
 {
     std::vector<Vertex> vertices =
     {
         // positions              // normals           //textures
         //Bottom Square Indices(0-3)
-        {{ -0.5f, -0.5f, -0.5f},  {0.0f, -1.0f, 0.0f}, {0.f,1.f}},  // bottom closeLeft | Vertex(0)
-        {{  0.5f, -0.5f, -0.5f},  {0.0f, -1.0f, 0.0f}, {1.f,1.f}},  // bottom closeRight | Vertex(1)
-        {{  0.5f, -0.5f, 0.5f},   {0.0f, -1.0f, 0.0f}, {1.f,0.f}},  // bottom farRight | Vertex(2)
-        {{ -0.5f, -0.5f, 0.5f},   {0.0f, -1.0f, 0.0f}, {0.f,0.f}},  // bottom farLeft | Vertex(3)
+        {{ -size, -size, -size},  {0.0f, -1.0f, 0.0f}, {0.f,1.f}},  // bottom closeLeft | Vertex(0)
+        {{  size, -size, -size},  {0.0f, -1.0f, 0.0f}, {1.f,1.f}},  // bottom closeRight | Vertex(1)
+        {{  size, -size, size},   {0.0f, -1.0f, 0.0f}, {1.f,0.f}},  // bottom farRight | Vertex(2)
+        {{ -size, -size, size},   {0.0f, -1.0f, 0.0f}, {0.f,0.f}},  // bottom farLeft | Vertex(3)
 
         //_________________________front & back-face_____________________
         //Front Triangle Indices(4-6)
-        {{  0.0f,  0.5f, 0.0f},   {0.0f,  0.0f, 0.0f}, {0.5f,1.f}},  // top centre | Vertex(4)
-        {{ -0.5f, -0.5f, -0.5f},  {0.0f, -1.0f, 0.0f}, {0.f,0.f}},   // bottom closeLeft | Vertex(5)
-        {{  0.5f, -0.5f, -0.5f},  {0.0f, -1.0f, 0.0f}, {1.f,0.f}},   // bottom closeRight | Vertex(6)
+        {{  size,  size,  size},  {0.0f,  0.0f, 0.0f}, {0.5f,1.0f}},  // top centre | Vertex(4)
+        {{ -size, -size, -size},  {0.0f, -1.0f, 0.0f}, {0.0f,0.0f}},   // bottom closeLeft | Vertex(5)
+        {{  size, -size, -size},  {0.0f, -1.0f, 0.0f}, {1.0f,0.0f}},   // bottom closeRight | Vertex(6)
 
         //Back Triangle Indices(7-9)
-        {{  0.0f,  0.5f, 0.0f},  {0.0f,  0.0f, 0.0f}, {0.5f,1.f}},  // top centre | Vertex(7)
-        {{ -0.5f, -0.5f, 0.5f},  {0.0f, -1.0f, 0.0f}, {0.f,0.f}},   // bottom farLeft | Vertex(9)
-        {{  0.5f, -0.5f, 0.5f},  {0.0f, -1.0f, 0.0f}, {1.f,0.f}},   // bottom farRight | Vertex(8)
+        {{  size,  size, size},  {0.0f,  0.0f, 0.0f}, {0.5f,1.0f}},  // top centre | Vertex(7)
+        {{ -size, -size, size},  {0.0f, -1.0f, 0.0f}, {0.0f,0.0f}},   // bottom farLeft | Vertex(9)
+        {{  size, -size, size},  {0.0f, -1.0f, 0.0f}, {1.0f,0.0f}},   // bottom farRight | Vertex(8)
 
         //_________________________left & right-face_____________________
         //Right Triangle Indices(10-12)
-        {{  0.0f,  0.5f, 0.0f},   {0.0f,  0.0f, 0.0f}, {0.5,1.f}},  // top centre | Vertex(10)
-        {{ -0.5f, -0.5f, 0.5f},   {0.0f, -1.0f, 0.0f}, {1.f,0.f}},   // bottom farLeft | Vertex(11)
-        {{ -0.5f, -0.5f, -0.5f},  {0.0f, -1.0f, 0.0f}, {0.f,0.f}},   // bottom closeLeft | Vertex(12)
-
-        //Left Triangle Indices(13-15)
-        {{  0.0f,  0.5f, 0.0f},   {0.0f,  0.0f, 0.0f}, {0.5f,1.f}},  // top centre | Vertex(10)
-        {{  0.5f, -0.5f, 0.5f},   {0.0f, -1.0f, 0.0f}, {1.f,0.f}},   // bottom farRight | Vertex(2)
-        {{  0.5f, -0.5f, -0.5f},  {0.0f, -1.0f, 0.0f}, {0.f,0.f}}    // bottom closeRight | Vertex(1)
+        {{  size,  size,  size},  {0.0f,  0.0f, 0.0f}, {0.05,1.0f}},  // top centre | Vertex(10)
+        {{ -size, -size,  size},  {0.0f, -1.0f, 0.0f}, {1.0f,0.0f}},   // bottom farLeft | Vertexsize
+        {{ -size, -size, -size},  {0.0f, -1.0f, 0.0f}, {0.0f,0.0f}},   // bottom closeLeft | Vertex(1size        //Left Triangle Indices(13-15)
+        {{  size,  size,  size},  {0.0f,  0.0f, 0.0f}, {0.5f,1.0f}},  // top centre | Vertex(size        {{  0.5f, -0.5f, 0.5f},   {0.0f, -1.0f, 0.0f}, {1.f,0.f}},   // bottom farRight | Vertex(2)
+        {{  size, -size, -size},  {0.0f, -1.0f, 0.0f}, {0.0f,0.0f}}    // bottom closeRight |sizetex(1)
     };
 
     std::vector<Index> indices =
@@ -114,7 +106,6 @@ Mesh* Mesh::CreatePyramid()
 
 Mesh* Mesh::CreateCube(float size)
 {
-    getSize = size;
     std::vector<Vertex> vertices = {
         // Front face
         {{-size, -size,  size}, {0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}}, // Bottom-left 

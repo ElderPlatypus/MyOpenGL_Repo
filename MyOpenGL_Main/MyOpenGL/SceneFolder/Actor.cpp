@@ -29,6 +29,10 @@ Actor::~Actor()
 
 void Actor::ExtrudeMesh(Extrude increase_or_decrease, const float extrude)
 {
+    if (extrude == 1.0f)
+    {
+        std::cout << "Value has no influence. Try a value < or > than 1.0f \n";
+    }
     switch (increase_or_decrease)
     {
     case increase:
@@ -36,7 +40,10 @@ void Actor::ExtrudeMesh(Extrude increase_or_decrease, const float extrude)
          for (auto& getVert : mMesh->mVertices)
          {
              getVert.mPos *= extrude; 
+             mMesh->minExtent = glm::min(mMesh->minExtent, getVert.mPos); 
+             mMesh->maxExtent = glm::max(mMesh->maxExtent, getVert.mPos);
          }
+         mMesh->mExtent = (mMesh->maxExtent - mMesh->minExtent) * 0.5f;
          mMesh->configureMesh();
          break;
         }
@@ -153,9 +160,10 @@ glm::vec3 Actor::CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm
 ///Actor movement
 void Actor::ActorMovement(Direction direction, Camera* camera, float dt)
 {
-  
-    if (mRelativeCameraPosition == true && camera->mUseCameraMovement == false && mAttachCamera == false)   
+    
+    if (mRelativeCameraPosition && !camera->mUseCameraMovement && !mAttachCamera)   
     {
+        mVelocity = mMesh->GetLocalPosition()*dt;  
         switch (direction)
         {
             //Forward & Backwards
@@ -187,25 +195,19 @@ void Actor::ActorMovement(Direction direction, Camera* camera, float dt)
 
             //Increase Speed
         case IncreaseSpeed:
-            mIsMoving = true;
+            mMovementSpeed = 15.0f;
             break; 
-        }
 
-        if (mIsMoving == true)
-        {
-            mMovementSpeed = 10.0f;
-            mIsMoving = false;
-        }
-        else
-        {
+        default:
             mIsMoving = false;
             mMovementSpeed = 5.0f;
         }
-        
     }
 
-    if (mRelativeCameraPosition == true && camera->mUseCameraMovement == false && mAttachCamera == true)
+    if (mRelativeCameraPosition && !camera->mUseCameraMovement && mAttachCamera)
     {
+        mVelocity = mMesh->GetLocalPosition() * dt;
+
         switch (direction)
         {
             //Forward & Backwards
@@ -237,17 +239,10 @@ void Actor::ActorMovement(Direction direction, Camera* camera, float dt)
 
             //Increase Speed
         case IncreaseSpeed:
-            mIsMoving = true;
+            mMovementSpeed = 15.0f;
             break;
-        }
 
-        if (mIsMoving == true)
-        {
-            mMovementSpeed = 10.0f;
-            mIsMoving = false;
-        }
-        else
-        {
+        default:
             mIsMoving = false;
             mMovementSpeed = 5.0f;
         }
@@ -272,7 +267,7 @@ void Actor::CameraControll(Direction placement, Camera* camera, float dt) const
     switch (placement)
     {
     case CameraFreeMovment_1:
-        if (mRelativeCameraPosition == true)
+        if (mRelativeCameraPosition)
         {
             mAttachCamera = false;
             camera->mUseCameraMovement = true;
@@ -280,7 +275,7 @@ void Actor::CameraControll(Direction placement, Camera* camera, float dt) const
         break;
 
     case CameraStatic_CharacterMovement_2:
-        if (mRelativeCameraPosition == true)
+        if (mRelativeCameraPosition)
         {
             mAttachCamera = false;
             camera->mUseCameraMovement = false;
@@ -288,7 +283,7 @@ void Actor::CameraControll(Direction placement, Camera* camera, float dt) const
         break;
 
     case CameraStatic_FollowPlayer_3: 
-        if (mRelativeCameraPosition == true)
+        if (mRelativeCameraPosition)
         {
             mAttachCamera = true; 
             camera->mUseCameraMovement = false;
@@ -336,7 +331,7 @@ void Actor::AI_Path(float dt)
 ///Camera Support
 void Actor::cameraTracker(Camera* camera, float dt) const  
 {
-    if (mRelativeCameraPosition == true && camera->mUseCameraMovement == false && camera->mRightMouseButtonPressed == false)
+    if (mRelativeCameraPosition && !camera->mUseCameraMovement && !camera->mRightMouseButtonPressed)
     {
         float xOffset = mMesh->GetLocalPosition().x - camera->GetLocalPosition().x;
         float yOffset = mMesh->GetLocalPosition().y - camera->GetLocalPosition().y;
@@ -359,7 +354,7 @@ void Actor::cameraTracker(Camera* camera, float dt) const
 }
 
 ///Spawner
-void Actor::Spawner(const int& spawnAmount)
+void Actor::Spawner(const int& spawnAmount, const float& distributionX, const float& distributionZ)
 {
     for (int amount = 0; amount < spawnAmount; amount++)
     {
@@ -368,7 +363,7 @@ void Actor::Spawner(const int& spawnAmount)
             switch (ActorType)
             {
             case 1:
-                spawnedActor = new Actor(Mesh::CreateCube(5.0f),"spawnedCube");
+                spawnedActor = new Actor(Mesh::CreateCube(1.0f),"spawnedCube");
                 spawnedActor->mMesh->mUseTex = true;
                 spawnedActor->mMesh->mEnableCollision = true;
                 break;
@@ -378,14 +373,14 @@ void Actor::Spawner(const int& spawnAmount)
                 spawnedActor->mMesh->mEnableCollision = true;
                 break;
             case 3:
-                spawnedActor = new Actor(Mesh::CreatePyramid(), "spawnedPyramid");
+                spawnedActor = new Actor(Mesh::CreatePyramid(5.0f), "spawnedPyramid");
                 spawnedActor->mMesh->mUseTex = true;
                 spawnedActor->mMesh->mEnableCollision = true;
                 break;
             }
             std::random_device rd;
             std::mt19937 gen(rd());
-            std::uniform_real_distribution<float> radiusXZ(-10.f, 10.f);
+            std::uniform_real_distribution<float> radiusXZ(distributionX, distributionZ);
             glm::vec3 spawnPos{ radiusXZ(gen),0.f,radiusXZ(gen) };
             spawnedActor->mMesh->SetLocalPosition(spawnPos);
             Actor::spawnVector.emplace_back(spawnedActor);

@@ -34,7 +34,6 @@ void Camera::SetAspectRatio(float aspectRatio)
 	UpdateProjectionMatrix(); 
 }
 
-
 void Camera::UpdateCamera(float dt)
 {
 	UpdateVelocity(dt);
@@ -73,6 +72,7 @@ void Camera::UpdateDampening(float dt)
 		mVelocity = glm::vec3(0.0f);
 	}
 }
+
 void Camera::UpdatePosition(float dt)
 {
 	
@@ -128,43 +128,39 @@ glm::mat4 Camera::GetFrustumMatrix() const
 ///Camera movement
 void Camera::CameraMovement(Direction direction, float dt)
 {
-	if (mUseCameraMovement == true)
+	if (!mUseCameraMovement) return;
+
+	switch(direction)
 	{
 		//Forward and Backwards
-		if (direction == Forward) mAcceleration.z += GetAccelerationSpeed(); 
-		if (direction == Backwards) mAcceleration.z -= GetAccelerationSpeed();
-
-		//Left and right 
-		if (direction == Right) mAcceleration.x += GetAccelerationSpeed();
-		if (direction == Left) mAcceleration.x -= GetAccelerationSpeed();  
-
-		//Up and Down 
-		if (direction == Up) mAcceleration.y += GetAccelerationSpeed();
-		if (direction == Down) mAcceleration.y -= GetAccelerationSpeed(); 
-
-		//Increase of Speed
-		if (mAcceleration != glm::vec3(0.f,0.f,0.f) && direction == IncreaseSpeed) SetAccelerationSpeed(100.f);   
-		else SetAccelerationSpeed(50.f); 
-
-		SetAcceleration(mAcceleration);
-
+	case Forward: mAcceleration.z += GetAccelerationSpeed(); break;
+	case Backwards:mAcceleration.z -= GetAccelerationSpeed(); break;;
+	case Right:mAcceleration.x += GetAccelerationSpeed(); break;
+	case Left:mAcceleration.x -= GetAccelerationSpeed(); break;
+	case Up:mAcceleration.y += GetAccelerationSpeed(); break;
+	case Down:mAcceleration.y -= GetAccelerationSpeed(); break;
+	case IncreaseSpeed: 
+		if (mAcceleration != glm::vec3(0.0f, 0.0f, 0.0f))
+        { 
+          SetAccelerationSpeed(100.f); 
+        }
+		else
+        {
+          SetAccelerationSpeed(50.f);
+        }
+	default: break;
 		/*std::cout << "Check acceleration: "
 			<< mAcceleration.x << " "
 			<< mAcceleration.y << " "
 			<< mAcceleration.z << " "
 			<< std::endl; */
-
-	}
-	else
-	{
-		//std::cout << "Camera Movement Not in Use" << std::endl;
 	}
 }
 
 void Camera::CameraMouseButton(double xPos, double yPos)
 {
 	//Saves the x and y pos for lather when rotating camera
-	if (mUseCameraMovement == true)
+	if (mUseCameraMovement)
 	{
 		mRightMouseButtonPressed = true;
 		mLastX = static_cast<float>(xPos);

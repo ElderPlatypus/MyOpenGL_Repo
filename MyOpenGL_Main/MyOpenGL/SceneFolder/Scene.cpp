@@ -14,7 +14,7 @@ void Scene::LoadActors()
 	uActorMap["player"] = new Actor(Mesh::CreateCube(2.0f),"player");
 	uActorMap["player"]->mMesh->mUseTex = false;
 	uActorMap["player"]->mRelativeCameraPosition = true; 
-	uActorMap["player"]->mMesh->SetLocalPosition(glm::vec3( 0.0f, 5.0f, 0.0));
+	//uActorMap["player"]->ExtrudeMesh(Extrude::increase, 1.0f);
 
 
 	///Curve
@@ -25,15 +25,14 @@ void Scene::LoadActors()
 
 	///Test cube
 	uActorMap["testCube"] = new Actor(Mesh::CreateCube(2.0f),"TestCube"); 
-	uActorMap["testCube"]->mMesh->SetLocalPosition(glm::vec3(0.0f, 10.0f, -6.f));
 	uActorMap["testCube"]->mMesh->mDrawLine = true;
 	uActorMap["testCube"]->ExtrudeMesh(Extrude::increase, 10.0f);
 	
 
 	
 	///Spawning vectors
-	Actor::ActorType = 2;
-	Actor::Spawner(10);
+	Actor::ActorType = 1;
+	Actor::Spawner(10,-20.f,20.f);
 
 	for (int i = 0; i < Actor::spawnVector.size(); i++) 
 	{
@@ -84,9 +83,7 @@ void Scene::UnloadContent()
 	delete mTexture; 
 	mTexture = nullptr; 
 	
-
 	uActorMap.clear();
-	Actor::spawnVector.clear();
 }
 
 ///Updater
@@ -148,7 +145,7 @@ void Scene::CollisionHandling(float dt)
 	
 	for (auto &object : Actor::spawnVector) 
 	{ 
-		if (Collision::Intersect(uActorMap["player"], object) == true) 
+		if (Collision::Intersect(uActorMap["player"], object)) 
 		{
 			score++;
 			object->mMesh->~Mesh();
@@ -162,10 +159,10 @@ void Scene::CollisionHandling(float dt)
 		}
 	}
 
-	/*if (Collision::InvertIntersect(uActorMap["player"], uActorMap["testCube"]))
+	if (Collision::InvertIntersect(uActorMap["player"], uActorMap["testCube"],dt))
 	{
-		std::cout << "Collision" << std::endl;
-	}*/
+		//std::cout << "Inverse Collision" << std::endl;
+	}
 }
 
 

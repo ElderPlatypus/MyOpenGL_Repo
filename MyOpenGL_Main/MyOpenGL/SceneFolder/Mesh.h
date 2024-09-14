@@ -30,8 +30,8 @@ public:
 	~Mesh();
 
 	///Actor vertex data
-	static Mesh* Create2DTriangle();
-	static Mesh* CreatePyramid();
+	static Mesh* Create2DTriangle(float size);
+	static Mesh* CreatePyramid(float size);
 	static Mesh* CreateCube(float size);
 	inline static float getSize;
 	static Mesh* CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
@@ -53,8 +53,12 @@ public:
 	VBO mVBO{ 0U };
 	EBO mEBO{ 0U };
 	Transform mTransform{};
-	glm::vec3 mCenter{ 0.f,0.f,0.f };
-	glm::vec3 mExtent{ 0.5f,0.5f,0.5f };
+
+	//Bounding Box extent
+	glm::vec3 mCenter{ 0.0f,0.0f,0.0f };
+	glm::vec3 mExtent{ 0.0f,0.0f,0.0f };
+	glm::vec3 minExtent{ 0.0f, 0.0f, 0.0f };
+	glm::vec3 maxExtent{ 0.0f, 0.0f, 0.0f };
 	bool mEnableCollision = true;
     //---------------------------------Methods Setters------------------------------------------------
 	void SetTransformation(const Transform& transform) { mTransform = transform; }
