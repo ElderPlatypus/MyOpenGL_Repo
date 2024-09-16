@@ -3,9 +3,12 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <random>
+#ifndef M_PI
+#define M_PI (constexpr)3.14159265358979323846
+#endif
 
-
-//Includes glm
+//Class includes
 #include "Vertex.h"
 #include "../SceneFolder/Mesh.h"
 #include "../Definitions.h"
@@ -13,6 +16,8 @@
 #include "../Utility/Transform.h"
 #include "../Shaders/Shader.h"
 #include "../CameraFolder/Camera.h"
+#include "../Physics/RigidBody.h"
+#include "../Physics/Environment.h" 
 
 enum Extrude
 {
@@ -27,7 +32,7 @@ public:
     Mesh* mMesh = nullptr;
     std::string mName;
     //---------------------------------Methods------------------------------------------------
-    Actor(Mesh* mesh, std::string name);
+    Actor(Mesh* mesh, const std::string &name);
 
     Actor(const Actor&) = delete;
     Actor& operator = (const Actor&) = delete;
@@ -38,10 +43,13 @@ public:
     ~Actor();
 
     ///Mesh Modifications
-
     //---------------------------------Methods------------------------------------------------
-    void ExtrudeMesh(Extrude increase_or_decrease, const float extrude);
+    void ExtrudeMesh(Extrude increase_or_decrease, const float &extrude);
     
+    ///Physics
+    //---------------------------------Methods------------------------------------------------
+    RigidBody rigidB;
+    bool EnablePhysics = true;
 
     ///Barycentric Coordinates
     //---------------------------------Members------------------------------------------------
@@ -72,9 +80,9 @@ public:
 
     ///Camera
     //---------------------------------Members------------------------------------------ 
-    float mMovementSpeed = 10.0f;
-    glm::vec3 mVelocity = glm::vec3(0.f,0.f,0.f); 
-    bool mIsMoving = false;
+    float mMovementSpeed = 15.0f;
+    float mMaxSpeed = 20.f;
+    bool mIncreasingSpeed = false;
     inline static bool mAttachCamera;
     //---------------------------------Methods------------------------------------------ 
     void CameraControll(Direction placement, Camera* camera, float dt) const;

@@ -1,7 +1,4 @@
 #include "Camera.h"
-#include <iostream>
-#include "../Application.h"
-
 
 Camera::Camera(const std::string& name,
 	glm::vec3 position,
@@ -51,11 +48,6 @@ void Camera::UpdateVelocity(float dt)
 	if (glm::length(mVelocity) > mMaxMovementSpeed) 
 	{
 		mVelocity = glm::normalize(mVelocity) * mMaxMovementSpeed; 
-
-		/*std::cout << "Check velocity vec: " << mVelocity.x << " "
-			<< mVelocity.y << " "
-			<< mVelocity.z << " "
-			<< std::endl;*/
 	}
 	
  	mAcceleration = glm::vec3(0.f);
@@ -82,12 +74,6 @@ void Camera::UpdatePosition(float dt)
 	 
 	//Updating the position as a 
 	SetLocalPosition(GetLocalPosition() + mVelocity.x * dt * right + mVelocity.y * dt * up + mVelocity.z * dt * front);
-	/*std::cout << "Check acceleration pos: " 
-		<< GetLocalPosition().x << " " 
-		<< GetLocalPosition().y << " " 
-		<< GetLocalPosition().z << " " 
-		<< std::endl; */
-
 }
 
 void Camera::UpdateProjectionMatrix()
@@ -130,31 +116,19 @@ void Camera::CameraMovement(Direction direction, float dt)
 {
 	if (!mUseCameraMovement) return;
 
-	switch(direction)
-	{
-		//Forward and Backwards
-	case Forward: mAcceleration.z += GetAccelerationSpeed(); break;
-	case Backwards:mAcceleration.z -= GetAccelerationSpeed(); break;;
-	case Right:mAcceleration.x += GetAccelerationSpeed(); break;
-	case Left:mAcceleration.x -= GetAccelerationSpeed(); break;
-	case Up:mAcceleration.y += GetAccelerationSpeed(); break;
-	case Down:mAcceleration.y -= GetAccelerationSpeed(); break;
-	case IncreaseSpeed: 
-		if (mAcceleration != glm::vec3(0.0f, 0.0f, 0.0f))
-        { 
-          SetAccelerationSpeed(100.f); 
-        }
-		else
-        {
-          SetAccelerationSpeed(50.f);
-        }
-	default: break;
-		/*std::cout << "Check acceleration: "
-			<< mAcceleration.x << " "
-			<< mAcceleration.y << " "
-			<< mAcceleration.z << " "
-			<< std::endl; */
-	}
+    switch (direction)
+    {
+    	//Forward and Backwards
+        case Forward: mAcceleration.z += GetAccelerationSpeed(); break;
+        case Backwards:mAcceleration.z -= GetAccelerationSpeed(); break;;
+        case Right:mAcceleration.x += GetAccelerationSpeed(); break;
+        case Left:mAcceleration.x -= GetAccelerationSpeed(); break;
+        case Up:mAcceleration.y += GetAccelerationSpeed(); break;
+        case Down:mAcceleration.y -= GetAccelerationSpeed(); break;
+        case IncreaseSpeed: mAcceleration *= 3.0f, mMaxMovementSpeed = 70.f; break;
+        default: mAcceleration = glm::vec3(0.f, 0.f, 0.f), mMaxMovementSpeed = 50.f;
+    }
+	
 }
 
 void Camera::CameraMouseButton(double xPos, double yPos)
@@ -166,7 +140,6 @@ void Camera::CameraMouseButton(double xPos, double yPos)
 		mLastX = static_cast<float>(xPos);
 		mLastY = static_cast<float>(yPos);
 	}
-	
 }
 
 void Camera::CameraMouseMovement(double xPos, double yPos) 

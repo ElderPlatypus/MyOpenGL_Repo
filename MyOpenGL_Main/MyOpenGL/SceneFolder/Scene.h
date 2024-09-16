@@ -1,9 +1,10 @@
 #pragma once
 
-//Includes standard lib
+//External
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <random>
 
 //Includes
 #include "../CameraFolder/Camera.h"
@@ -14,12 +15,11 @@
 #include "../Application.h"
 #include "../CameraFolder/Camera.h"
 #include "../Shaders/Texture.h"
-#include "../Utility/Collision.h"
+#include "../Physics/Collision.h"
 
 class Scene 
 {
 	std::string mName;
-
 
 public:
 	std::unordered_map<std::string,Actor*> uActorMap;

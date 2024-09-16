@@ -113,7 +113,11 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)../MyOpenGL/Dependency/libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -136,6 +140,8 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="CameraFolder\Camera.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="Physics\Environment.cpp" />
+    <ClCompile Include="Physics\RigidBody.cpp" />
     <ClCompile Include="SceneFolder\Actor.cpp" />
     <ClCompile Include="SceneFolder\Mesh.cpp" />
     <ClCompile Include="SceneFolder\Scene.cpp" />
@@ -152,9 +158,11 @@
     <ClInclude Include="includes\GLFW\glfw3native.h" />
     <ClInclude Include="includes\glm\mat4x3.hpp" />
     <ClInclude Include="includes\KHR\khrplatform.h" />
+    <ClInclude Include="Physics\Environment.h" />
+    <ClInclude Include="Physics\RigidBody.h" />
     <ClInclude Include="SceneFolder\Mesh.h" />
     <ClInclude Include="Shaders\Texture.h" />
-    <ClInclude Include="Utility\Collision.h" />
+    <ClInclude Include="Physics\Collision.h" />
     <ClInclude Include="Utility\pathDefinition.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="SceneFolder\Actor.h" />

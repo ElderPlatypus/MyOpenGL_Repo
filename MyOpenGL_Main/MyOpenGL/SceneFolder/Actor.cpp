@@ -1,18 +1,16 @@
 #include "Actor.h"
 
-//Includes
-#include <random>
-#include <string>
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
 
 ///Acor constructor/destructor
-Actor::Actor(Mesh* mesh, std::string name)
+Actor::Actor(Mesh* mesh, const std::string& name)
 {
     mMesh = mesh;
-    mMesh->mName = name;
+    mName = name;
+    EnablePhysics = true;
+    rigidB.pos = mMesh->GetLocalPosition(); 
+    rigidB.acceleration = Environment::gravitationalAcceleraton; 
 }
+
 
 Actor::~Actor()
 {
@@ -27,7 +25,7 @@ Actor::~Actor()
     spawnVector.clear();
 }
 
-void Actor::ExtrudeMesh(Extrude increase_or_decrease, const float extrude)
+void Actor::ExtrudeMesh(Extrude increase_or_decrease, const float &extrude)
 {
     if (extrude == 1.0f)
     {
@@ -160,135 +158,102 @@ glm::vec3 Actor::CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm
 ///Actor movement
 void Actor::ActorMovement(Direction direction, Camera* camera, float dt)
 {
-    
-    if (mRelativeCameraPosition && !camera->mUseCameraMovement && !mAttachCamera)   
+    auto &getCamera = camera;
+    if (!getCamera->mUseCameraMovement && !mAttachCamera)
     {
-        mVelocity = mMesh->GetLocalPosition()*dt;  
-        switch (direction)
-        {
-            //Forward & Backwards
-        case Forward:
-            mMesh->SetLocalPosition(mMesh->GetLocalPosition() - glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt);
-            break;
-
-        case Backwards:
-            mMesh->SetLocalPosition(mMesh->GetLocalPosition() + glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt);
-            break;
-
-            //Left & Right
-        case Left:
-            mMesh->SetLocalPosition(mMesh->GetLocalPosition() - glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt);
-            break;
-
-        case Right:
-            mMesh->SetLocalPosition(mMesh->GetLocalPosition() + glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt);
-            break;
-
-            //Up & Down
-        case Up:
-            mMesh->SetLocalPosition(mMesh->GetLocalPosition() + glm::vec3(0.f, 1.0f * mMovementSpeed, 0.f) * dt);
-            break; 
-
-        case Down: 
-            mMesh->SetLocalPosition(mMesh->GetLocalPosition() + glm::vec3(0.f, -1.0f * mMovementSpeed, 0.f) * dt);
-            break;
-
-            //Increase Speed
-        case IncreaseSpeed:
-            mMovementSpeed = 15.0f;
-            break; 
-
-        default:
-            mIsMoving = false;
-            mMovementSpeed = 5.0f;
-        }
-    }
-
-    if (mRelativeCameraPosition && !camera->mUseCameraMovement && mAttachCamera)
-    {
-        mVelocity = mMesh->GetLocalPosition() * dt;
+        glm::vec3 currentPosition = mMesh->GetLocalPosition();
+        glm::vec3 movement(0.f);
 
         switch (direction)
         {
             //Forward & Backwards
         case Forward:
-            mMesh->SetLocalPosition(mMesh->GetLocalPosition() - glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt);
-            break;
-
+            movement.z -= mMovementSpeed * dt; break;
         case Backwards:
-            mMesh->SetLocalPosition(mMesh->GetLocalPosition() + glm::vec3(0.f, 0.f, 1.5f * mMovementSpeed) * dt);
-            break;
+            movement.z += mMovementSpeed * dt; break;
 
             //Left & Right
         case Left:
-            mMesh->SetLocalPosition(mMesh->GetLocalPosition() - glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt);
-            break;
-
+            movement.x -= mMovementSpeed * dt; break;
         case Right:
-            mMesh->SetLocalPosition(mMesh->GetLocalPosition() + glm::vec3(1.0f * mMovementSpeed, 0.f, 0.f) * dt);
-            break;
+            movement.x += mMovementSpeed * dt; break;
 
             //Up & Down
         case Up:
-            mMesh->SetLocalPosition(mMesh->GetLocalPosition() + glm::vec3(0.f, 1.0f * mMovementSpeed, 0.f) * dt);
-            break;
-
+            movement.y += mMovementSpeed * dt; break;
         case Down:
-            mMesh->SetLocalPosition(mMesh->GetLocalPosition() + glm::vec3(0.f, -1.0f * mMovementSpeed, 0.f) * dt);
-            break;
+            movement.y -= mMovementSpeed * dt; break;
 
             //Increase Speed
         case IncreaseSpeed:
-            mMovementSpeed = 15.0f;
             break;
 
         default:
-            mIsMoving = false;
-            mMovementSpeed = 5.0f;
+            mMovementSpeed = 15.0f;
+            break;
         }
-
-        camera->SetLocalPosition(glm::vec3(
-            mMesh->GetLocalPosition().x,
-            mMesh->GetLocalPosition().y + 5.f,
-            mMesh->GetLocalPosition().z + mMesh->mExtent.z + 5.f));
+        mMesh->SetLocalPosition(currentPosition + movement);
     }
+    if (!getCamera->mUseCameraMovement && mAttachCamera)
+    {
+        glm::vec3 currentPosition = mMesh->GetLocalPosition();
+        glm::vec3 movement(0.f);
 
-    /*  std::cout << "Speed " <<  mMovementSpeed << std::endl;
-      std::cout << "IsMoving " << mIsMoving << std::endl;
-      std::cout << "Check Local pos: "
-      << GetLocalPosition().x << " "
-      << GetLocalPosition().y << " "
-      << GetLocalPosition().z << " "
-      << std::endl;  */
+        switch (direction)
+        {
+            //Forward & Backwards
+        case Forward:
+            movement.z -= mMovementSpeed * dt; break;
+        case Backwards:
+            movement.z += mMovementSpeed * dt; break;
+
+            //Left & Right
+        case Left:
+            movement.x -= mMovementSpeed * dt; break;
+        case Right:
+            movement.x += mMovementSpeed * dt; break;
+
+            //Up & Down
+        case Up:
+            movement.y += mMovementSpeed * dt; break;
+        case Down:
+            movement.y -= mMovementSpeed * dt; break;
+
+            //Increase Speed
+        case IncreaseSpeed:
+            break;
+
+        default:
+            mMovementSpeed = 15.0f;
+            break;
+        }
+        mMesh->SetLocalPosition(currentPosition + movement);
+        camera->SetLocalPosition(currentPosition + glm::vec3(0.f, mMesh->mExtent.y, mMesh->mExtent.z + 20.f));
+    }
 }
 
 void Actor::CameraControll(Direction placement, Camera* camera, float dt) const
 {
+    auto &getCamera = camera; 
     switch (placement)
     {
-    case CameraFreeMovment_1:
-        if (mRelativeCameraPosition)
-        {
+      case CameraFreeMovment_1:
             mAttachCamera = false;
-            camera->mUseCameraMovement = true;
-        } 
-        break;
+            getCamera->mUseCameraMovement = true;
+            break;
 
-    case CameraStatic_CharacterMovement_2:
-        if (mRelativeCameraPosition)
-        {
+      case CameraStatic_CharacterMovement_2:
             mAttachCamera = false;
-            camera->mUseCameraMovement = false;
-        }
-        break;
+            getCamera->mUseCameraMovement = false;
+            break;
 
-    case CameraStatic_FollowPlayer_3: 
-        if (mRelativeCameraPosition)
-        {
+      case CameraStatic_FollowPlayer_3:  
             mAttachCamera = true; 
-            camera->mUseCameraMovement = false;
-        }
-        break;
+            getCamera->mUseCameraMovement = false;
+            break;
+      default:
+          mAttachCamera = false;
+          getCamera->mUseCameraMovement = true;
     }
 }
 
@@ -329,28 +294,28 @@ void Actor::AI_Path(float dt)
 }
 
 ///Camera Support
-void Actor::cameraTracker(Camera* camera, float dt) const  
+void Actor::cameraTracker(Camera* camera, float dt) const
 {
-    if (mRelativeCameraPosition && !camera->mUseCameraMovement && !camera->mRightMouseButtonPressed)
-    {
-        float xOffset = mMesh->GetLocalPosition().x - camera->GetLocalPosition().x;
-        float yOffset = mMesh->GetLocalPosition().y - camera->GetLocalPosition().y;
+    //if (!camera->mUseCameraMovement && !camera->mRightMouseButtonPressed)
+    //{
+    //    float xOffset = mMesh->GetLocalPosition().x - camera->GetLocalPosition().x;
+    //    float yOffset = mMesh->GetLocalPosition().y - camera->GetLocalPosition().y;
 
 
-        float yawRadians = glm::radians(xOffset);
-        float pitchRadians = glm::radians(yOffset);
+    //    float yawRadians = glm::radians(xOffset);
+    //    float pitchRadians = glm::radians(yOffset);
 
 
-        //Creating a quaternion from angle and a normalized axis: projecting the normalized axis with the given angel whic is now the rotation domain for the quaternion.
-        //Can bed visualize as a  cone where the flat surface is the where the quaternions merges from.
-        glm::quat currentOrientation = mMesh->GetLocalRotation(); 
-        glm::quat yawRotation = glm::angleAxis(yawRadians, glm::vec3(0.0f, 1.0f, 0.0f)); //normal axis is not 0 for y-axis --> gets yaw
-        glm::quat pitchRotation = glm::angleAxis(pitchRadians, glm::vec3(1.0f, 0.0f, 0.0f));  //normal axis is not 0 for x-axis --> gets pitch
-        glm::quat newOrientation = glm::inverse(yawRotation) * currentOrientation * pitchRotation;
-        newOrientation = glm::normalize(newOrientation); 
-       
-        camera->SetLocalRotation(newOrientation);
-    }
+    //    //Creating a quaternion from angle and a normalized axis: projecting the normalized axis with the given angel whic is now the rotation domain for the quaternion.
+    //    //Can bed visualize as a  cone where the flat surface is the where the quaternions merges from.
+    //    glm::quat currentOrientation = mMesh->GetLocalRotation(); 
+    //    glm::quat yawRotation = glm::angleAxis(yawRadians, glm::vec3(0.0f, 1.0f, 0.0f)); //normal axis is not 0 for y-axis --> gets yaw
+    //    glm::quat pitchRotation = glm::angleAxis(pitchRadians, glm::vec3(1.0f, 0.0f, 0.0f));  //normal axis is not 0 for x-axis --> gets pitch
+    //    glm::quat newOrientation = glm::inverse(yawRotation) * currentOrientation * pitchRotation;
+    //    newOrientation = glm::normalize(newOrientation); 
+    //   
+    //    camera->SetLocalRotation(newOrientation);
+    //}
 }
 
 ///Spawner
@@ -363,17 +328,17 @@ void Actor::Spawner(const int& spawnAmount, const float& distributionX, const fl
             switch (ActorType)
             {
             case 1:
-                spawnedActor = new Actor(Mesh::CreateCube(1.0f),"spawnedCube");
+                spawnedActor = new Actor(Mesh::CreateCube(1.0f),"spawnedCube " + std::to_string(amount));
                 spawnedActor->mMesh->mUseTex = true;
                 spawnedActor->mMesh->mEnableCollision = true;
                 break;
             case 2:
-                spawnedActor = new Actor(Mesh::CreateSphere(16, 16, 1), "spawnedSphere");
+                spawnedActor = new Actor(Mesh::CreateSphere(16, 16, 1), "spawnedSphere " + std::to_string(amount));
                 spawnedActor->mMesh->mUseTex = true;
                 spawnedActor->mMesh->mEnableCollision = true;
                 break;
             case 3:
-                spawnedActor = new Actor(Mesh::CreatePyramid(5.0f), "spawnedPyramid");
+                spawnedActor = new Actor(Mesh::CreatePyramid(5.0f), "spawnedPyramid " + std::to_string(amount));
                 spawnedActor->mMesh->mUseTex = true;
                 spawnedActor->mMesh->mEnableCollision = true;
                 break;
@@ -383,6 +348,7 @@ void Actor::Spawner(const int& spawnAmount, const float& distributionX, const fl
             std::uniform_real_distribution<float> radiusXZ(distributionX, distributionZ);
             glm::vec3 spawnPos{ radiusXZ(gen),0.f,radiusXZ(gen) };
             spawnedActor->mMesh->SetLocalPosition(spawnPos);
+            spawnedActor->rigidB.pos = spawnedActor->mMesh->GetLocalPosition();
             Actor::spawnVector.emplace_back(spawnedActor);
         }
         else
@@ -396,14 +362,38 @@ void Actor::Spawner(const int& spawnAmount, const float& distributionX, const fl
 ///Update Actors
 void Actor::UpdateActors(float dt)
 {
-    mMesh->mCenter = mMesh->GetLocalPosition();
-    if (mSurfaceMesh)
+    auto& getMesh = mMesh;
+    //Updating the rigid body
+    if (getMesh) 
     {
-        BarycentricCoordinates(dt);
+        rigidB.Update(dt);
+        //Updaing the center value
+        mMesh->mCenter = mMesh->GetLocalPosition();
+
+        if (EnablePhysics)
+        {
+            mMesh->SetLocalPosition(rigidB.pos);   
+        }
+        //Bind shaders to Model-uniform
+        mMesh->mShader->setMat4("model", mMesh->GetLocalTransformMatrix()); 
+        mMesh->UseTexture(mMesh->GetTexBool());
+        mMesh->UseLight(mMesh->GetLightBool());
+        mMesh->drawActor(mMesh->mShader);
+
+        //Confirms if any calculation bools  are enabled
+        if (mSurfaceMesh)
+        {
+            BarycentricCoordinates(dt);
+        }
+        if (mLerpMesh)
+        {
+            AI_Path(dt);
+        }
     }
-    if (mLerpMesh)
-    {
-        AI_Path(dt);
+    else 
+    { 
+        assert(mMesh && "No Mesh found"); 
+        return; 
     }
 }
 

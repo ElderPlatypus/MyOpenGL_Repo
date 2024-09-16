@@ -1,12 +1,21 @@
 #pragma once
-//Includes std
+
+//External
 #include <iostream>
 #include <string>
 #include <map>
 #include <unordered_map>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include "glm/glm.hpp"
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
-//Other includes
+//Classes
 #include "SceneFolder/Scene.h"
+#include "Shaders/ShaderFileLoader.h"
+#include "Shaders/Shader.h"
+
 class Application
 {
 public:

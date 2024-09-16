@@ -1,18 +1,11 @@
 #include "Mesh.h"
 
-//Includes
-#include <random>
-#include <string>
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
 ///Constructor and Destructor
-Mesh::Mesh(const std::string& name, std::vector<Vertex>& vertices, std::vector<Index>& indices, const bool& useTex, const bool& drawLine)
+Mesh::Mesh(const std::string& type, std::vector<Vertex>& vertices, std::vector<Index>& indices, const bool& useTex, const bool& drawLine)
 {
     mVertices = vertices;
     mIndices = indices;
-    mName = name;
+    mType = type;
     mUseTex = useTex;
     mDrawLine = drawLine;
     configureMesh();

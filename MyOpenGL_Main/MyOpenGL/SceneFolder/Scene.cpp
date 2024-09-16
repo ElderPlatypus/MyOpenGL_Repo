@@ -1,6 +1,4 @@
 #include "Scene.h"
-#include <random>
-
 
 Scene::Scene(std::string name)
 {
@@ -11,44 +9,40 @@ Scene::Scene(std::string name)
 void Scene::LoadActors()
 {
 	///Player
-	uActorMap["player"] = new Actor(Mesh::CreateCube(2.0f),"player");
-	uActorMap["player"]->mMesh->mUseTex = false;
-	uActorMap["player"]->mRelativeCameraPosition = true; 
-	//uActorMap["player"]->ExtrudeMesh(Extrude::increase, 1.0f);
-
+	//uActorMap["player"] = new Actor(Mesh::CreateCube(2.0f),"player"); 
+	//uActorMap["player"]->mMesh->mUseTex = false;
+	//uActorMap["player"]->EnablePhysics = false;
+	//uActorMap["player"]->ExtrudeMesh(Extrude::increase, 2.0f);
+	//uActorMap["player"]->mMesh->SetLocalPosition(glm::vec3(0, 10.f, 0.f));
 
 	///Curve
-	uActorMap["Icurve"] = new Actor(Mesh::CreatePlaneXZ(-5, -5, 5, 5, 0.5),"Icurve");
+	uActorMap["icurve"] = new Actor(Mesh::CreatePlaneXZ(-5, -5, 5, 5, 0.5),"Icurve");
 	/*uActorMap["Icurve"]->mMesh->mUseTex = true;  
 	uActorMap["player"]->SetBarySurfaceMesh(uActorMap["Icurve"]->mMesh);  */
 
 
 	///Test cube
 	uActorMap["testCube"] = new Actor(Mesh::CreateCube(2.0f),"TestCube"); 
-	uActorMap["testCube"]->mMesh->mDrawLine = true;
-	uActorMap["testCube"]->ExtrudeMesh(Extrude::increase, 10.0f);
-	
-
+	//uActorMap["testCube"]->mMesh->mDrawLine = true;
+	uActorMap["testCube"]->ExtrudeMesh(Extrude::increase, 30.0f);
+	uActorMap["testCube"]->EnablePhysics = false;
 	
 	///Spawning vectors
-	Actor::ActorType = 1;
-	Actor::Spawner(10,-20.f,20.f);
+	Actor::ActorType = 2;
+	Actor::Spawner(100,-10.f,10.f);
 
-	for (int i = 0; i < Actor::spawnVector.size(); i++) 
+	for (auto &object : Actor::spawnVector) 
 	{
-	  uActorMap["spawnedObjects" + std::to_string(i)] = Actor::spawnVector[i]; 
+	  uActorMap.emplace(object->mName,object);
 	}
 
-	//for (auto& objects : uActorMap)
-	//{
-	//	if (objects.second->mName == "spawnedObjects")
-	//	{
-	//		objects.second->SetBarySurfaceMesh(uActorMap["Icurve"]->mMesh);
-	//	}
-	//}
 	///Create camera object
-    mSceneCamera = new Camera("SceneCamera"); 
+    mSceneCamera = new Camera("SceneCamera");
 
+	/*for (auto& [name, it] : uActorMap)
+	{
+		it->EnablePhysics = false;
+	}*/
 }
 
 void Scene::LoadContent()
@@ -95,7 +89,7 @@ void Scene::UpdateScene(float dt)
 
 	//Actor Update for Bary coords
 	for (auto &actor : uActorMap) { actor.second->UpdateActors(dt); }
-	for (auto &object : Actor::spawnVector) { object->UpdateActors(dt); }
+	for (auto &object : Actor::spawnVector) { object->UpdateActors(dt); }  
 
 	//Collison Update
 	CollisionHandling(dt);
@@ -108,16 +102,6 @@ void Scene::UpdateScene(float dt)
 void Scene::RenderScene(float dt, Transform globaltransform)
 { 
 	UpdateScene(dt);  
-
-	for (auto &actor : uActorMap) 
-	{
-		globaltransform.SetTransformMatrix(actor.second->mMesh->GetLocalTransformMatrix());
-		mShader->setMat4("model", globaltransform.GetTransformMatrix());   
-		actor.second->mMesh->UseTexture(actor.second->mMesh->GetTexBool());    
-		actor.second->mMesh->UseLight(actor.second->mMesh->GetLightBool());
-		actor.second->mMesh->drawActor(mShader); 
-	}
-	
 }
 
 ///Tranformations
@@ -145,24 +129,22 @@ void Scene::CollisionHandling(float dt)
 	
 	for (auto &object : Actor::spawnVector) 
 	{ 
-		if (Collision::Intersect(uActorMap["player"], object)) 
+		if (Collision::InvertIntersect(object, uActorMap["testCube"]))  
 		{
-			score++;
-			object->mMesh->~Mesh();
-			object->mMesh->mEnableCollision = false;
-		    std::cout << "Points earned: " << score << " off " << max_i << std:: endl;
-
-			if (score == max_i)
-			{
-				std::cout << "Maximum points earned!!!: " << std::endl;
-			}
+			/*std::cout << "Inverse Collision \n";*/
 		}
 	}
 
-	if (Collision::InvertIntersect(uActorMap["player"], uActorMap["testCube"],dt))
-	{
-		//std::cout << "Inverse Collision" << std::endl;
-	}
+	//for (auto& object : Actor::spawnVector)
+	//{
+	//	if (Collision::Intersect(uActorMap["player"], object))
+	//	{
+	//		std::cout << " Collision \n";
+
+	//		object->mMesh->~Mesh();
+	//		object->mMesh->mEnableCollision = false;
+	//	}
+	//}
 }
 
 

@@ -1,17 +1,6 @@
 #include "Application.h"
 
-//Includes
-#include "Shaders/ShaderFileLoader.h"
-#include "Shaders/Shader.h"
 
-//GLad/GLM etc
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include "glm/glm.hpp"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 
 
 std::string vs = ShaderLoader::LoadShaderFromFile("Shaders/Triangle.vs");
@@ -49,7 +38,8 @@ void Application::GLFW_Init()
 
 void Application::Window_Init()
 {   ///Creating the actual window
-    mWindow = glfwCreateWindow(mWidth, mHeight, "Test Win", NULL, nullptr);
+    mWindow = glfwCreateWindow(mWidth, mHeight, "Test Win", NULL, NULL);
+
     if (mWindow == NULL)
     {
         /*std::cout << "Failed to create GLFW window" << std::endl;*/
@@ -289,32 +279,41 @@ void Application::UpdateCameraController(float dt)
 }
  
 void Application::UpdateActorMovement(float dt) 
-{
-       auto getPlayer =  mScene->uActorMap["player"]; 
-        
-       if (mScene->mSceneCamera->mUseCameraMovement) return; 
-       //Movement Keys
-       if (mKeyState[GLFW_KEY_W]) getPlayer->ActorMovement(Forward, mScene->mSceneCamera,dt);
-       if (mKeyState[GLFW_KEY_A]) getPlayer->ActorMovement(Left, mScene->mSceneCamera, dt);
-       if (mKeyState[GLFW_KEY_S]) getPlayer->ActorMovement(Backwards, mScene->mSceneCamera, dt);
-       if (mKeyState[GLFW_KEY_D]) getPlayer->ActorMovement(Right, mScene->mSceneCamera, dt);
-       if (mKeyState[GLFW_KEY_SPACE]) getPlayer->ActorMovement(Up, mScene->mSceneCamera, dt);
-       if (mKeyState[GLFW_KEY_LEFT_ALT]) getPlayer->ActorMovement(Down, mScene->mSceneCamera, dt);
+{    
+    for (auto& [name, actor] : mScene->uActorMap)
+    {
+        if (actor->mName == "player")
+        {
+            //Movement Keys
+            if (mKeyState[GLFW_KEY_W]) actor->ActorMovement(Forward, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_A]) actor->ActorMovement(Left, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_S]) actor->ActorMovement(Backwards, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_D]) actor->ActorMovement(Right, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_SPACE]) actor->ActorMovement(Up, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_LEFT_ALT]) actor->ActorMovement(Down, mScene->mSceneCamera, dt);
 
-       //Increase Speed
-       if (mKeyState[GLFW_KEY_LEFT_SHIFT] && getPlayer->mVelocity != glm::vec3(0.f,0.f,0.f)) getPlayer->ActorMovement(IncreaseSpeed, mScene->mSceneCamera, dt), std::cout << "mIsMoving \n";
-    
+            //Increase Speed
+            if (mKeyState[GLFW_KEY_LEFT_SHIFT]) actor->ActorMovement(IncreaseSpeed, mScene->mSceneCamera, dt);
+        }
+    }
 }
 
 void Application::UpdateCameraPlacement(float dt)
-{
-    auto getPlayer = mScene->uActorMap["player"];
+{ 
 
-    if (getPlayer == nullptr) return;
-
-    if (mKeyState[GLFW_KEY_1]) getPlayer->CameraControll(CameraFreeMovment_1,mScene->mSceneCamera, dt);
-    if (mKeyState[GLFW_KEY_2]) getPlayer->CameraControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
-    if (mKeyState[GLFW_KEY_3]) getPlayer->CameraControll(CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt);
+    for (auto& [name, actor] : mScene->uActorMap)
+    {
+        if (actor->mName == "player")
+        {
+            if (mKeyState[GLFW_KEY_1]) actor->CameraControll(CameraFreeMovment_1, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_2]) actor->CameraControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_3]) actor->CameraControll(CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt);
+        }
+        else
+        {
+            if(mKeyState[GLFW_KEY_1]) actor->CameraControll(CameraFreeMovment_1, mScene->mSceneCamera, dt); 
+        }
+    }
 }
 
 

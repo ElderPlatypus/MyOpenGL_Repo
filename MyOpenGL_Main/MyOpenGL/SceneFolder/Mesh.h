@@ -1,11 +1,16 @@
 #pragma once
-//Includes std
+
+//External
 #include <iostream>
 #include <vector>
 #include <string>
+#include <random>
+#include <string>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
-
-//Includes glm
+//Classes
 #include "Vertex.h"
 #include "../Definitions.h"
 #include "../Shaders/Shader.h"
@@ -16,7 +21,7 @@
 class Mesh
 {
 public:
-	Mesh(const std::string& name, std::vector<Vertex>& vertices,
+	Mesh(const std::string& type, std::vector<Vertex>& vertices,
 		std::vector<Index>& indices, const bool& useTex,
 		const bool& drawLine = false
 	);
@@ -48,7 +53,7 @@ public:
 	//---------------------------------Members------------------------------------------ 
 	std::vector<Vertex> mVertices{};
 	std::vector<Index> mIndices{};
-	std::string mName{};
+	std::string mType{};
 	VAO mVAO{ 0U };
 	VBO mVBO{ 0U };
 	EBO mEBO{ 0U };

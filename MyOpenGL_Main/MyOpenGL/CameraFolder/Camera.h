@@ -1,12 +1,15 @@
 #pragma once
 
-//Includes
+//External
+#include <iostream>
 #include <string>
 #include <map>
-#include "../Utility/Transform.h"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
+//Classes
+#include "../Utility/Transform.h"
 
 //Enum
 enum Direction
@@ -37,7 +40,7 @@ public:
 		glm::quat rotation = glm::quat(glm::identity<glm::quat>()),
 		float aspectRatio = 1280.f / 720.f,
 		float nearPlane = 0.1f,
-		float farPlane = 100.f,
+		float farPlane = 200.f,
 		float FOV = 45.f,
 		float maxMovementSpeed = 40.f,
 		float accelerationSpeed = 50.f,
