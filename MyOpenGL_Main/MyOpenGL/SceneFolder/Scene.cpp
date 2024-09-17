@@ -9,21 +9,25 @@ Scene::Scene(std::string name)
 void Scene::LoadActors()
 {
 	///Player
-	//uActorMap["player"] = new Actor(Mesh::CreateCube(2.0f),"player"); 
-	//uActorMap["player"]->mMesh->mUseTex = false;
-	//uActorMap["player"]->EnablePhysics = false;
-	//uActorMap["player"]->ExtrudeMesh(Extrude::increase, 2.0f);
-	//uActorMap["player"]->mMesh->SetLocalPosition(glm::vec3(0, 10.f, 0.f));
+	/*uActorMap["player"] = new Actor(Mesh::CreateCube(2.0f),"player"); 
+	uActorMap["player"]->mMesh->mUseTex = false;
+	uActorMap["player"]->EnablePhysics = false;
+	uActorMap["player"]->ExtrudeMesh(Extrude::increase, 2.0f); 
+	uActorMap["player"]->mMesh->SetLocalPosition(glm::vec3(0, 10.f, 0.f));
+
+	uActorMap["testCube1"] = new Actor(Mesh::CreateCube(2.0f), "TestCube");
+	uActorMap["testCube1"]->EnablePhysics = false;*/
+
 
 	///Curve
-	uActorMap["icurve"] = new Actor(Mesh::CreatePlaneXZ(-5, -5, 5, 5, 0.5),"Icurve");
+	//uActorMap["icurve"] = new Actor(Mesh::CreatePlaneXZ(-5, -5, 5, 5, 0.5),"Icurve");
 	/*uActorMap["Icurve"]->mMesh->mUseTex = true;  
 	uActorMap["player"]->SetBarySurfaceMesh(uActorMap["Icurve"]->mMesh);  */
 
 
 	///Test cube
 	uActorMap["testCube"] = new Actor(Mesh::CreateCube(2.0f),"TestCube"); 
-	//uActorMap["testCube"]->mMesh->mDrawLine = true;
+	uActorMap["testCube"]->mMesh->mDrawLine = true;
 	uActorMap["testCube"]->ExtrudeMesh(Extrude::increase, 30.0f);
 	uActorMap["testCube"]->EnablePhysics = false;
 	
@@ -129,22 +133,16 @@ void Scene::CollisionHandling(float dt)
 	
 	for (auto &object : Actor::spawnVector) 
 	{ 
-		if (Collision::InvertIntersect(object, uActorMap["testCube"]))  
+		Collision::InvertIntersect(object, uActorMap["testCube"], dt);
+		/*for (auto& another : Actor::spawnVector)
 		{
-			/*std::cout << "Inverse Collision \n";*/
-		}
+			if (object != another)
+			{
+			  Collision::Intersect(object, another);
+			}
+		}*/
+		
 	}
-
-	//for (auto& object : Actor::spawnVector)
-	//{
-	//	if (Collision::Intersect(uActorMap["player"], object))
-	//	{
-	//		std::cout << " Collision \n";
-
-	//		object->mMesh->~Mesh();
-	//		object->mMesh->mEnableCollision = false;
-	//	}
-	//}
 }
 
 

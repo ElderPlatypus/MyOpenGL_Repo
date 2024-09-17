@@ -18,6 +18,8 @@
 #include "../CameraFolder/Camera.h"
 #include "../Physics/RigidBody.h"
 #include "../Physics/Environment.h" 
+#include <glm/gtc/random.hpp>
+
 
 enum Extrude
 {
@@ -50,7 +52,10 @@ public:
     //---------------------------------Methods------------------------------------------------
     RigidBody rigidB;
     bool EnablePhysics = true;
-
+    glm::vec3 mVelocity = { 0.f,0.f,0.f };
+    glm::vec3 mAcceleration = { 0.f,0.f,0.f };
+    float mMaxSpeed = 20.f;
+    void UpdateVelocity(float dt);
     ///Barycentric Coordinates
     //---------------------------------Members------------------------------------------------
     Mesh* mSurfaceMesh = nullptr;
@@ -81,7 +86,6 @@ public:
     ///Camera
     //---------------------------------Members------------------------------------------ 
     float mMovementSpeed = 15.0f;
-    float mMaxSpeed = 20.f;
     bool mIncreasingSpeed = false;
     inline static bool mAttachCamera;
     //---------------------------------Methods------------------------------------------ 

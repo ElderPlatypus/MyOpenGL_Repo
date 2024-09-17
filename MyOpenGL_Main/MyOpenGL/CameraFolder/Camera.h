@@ -42,7 +42,7 @@ public:
 		float nearPlane = 0.1f,
 		float farPlane = 200.f,
 		float FOV = 45.f,
-		float maxMovementSpeed = 40.f,
+		float maxMovementSpeed = 100.f,
 		float accelerationSpeed = 50.f,
 		float dampeningFactor = 5.f
 		 );

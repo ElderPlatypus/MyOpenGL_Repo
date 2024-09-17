@@ -57,6 +57,20 @@ void Actor::ExtrudeMesh(Extrude increase_or_decrease, const float &extrude)
     }
 }
 
+void Actor::UpdateVelocity(float dt)
+{
+    //Updating the velocity 
+    mVelocity += mAcceleration * dt;
+
+    //If the velocity exceeds the maximum speed, it is normalized: (unity vector) with
+    //size of 1 and the multiplied with the max speed until criteria is not true.
+    if (glm::length(mVelocity) > mMaxSpeed)
+    {
+        mVelocity = glm::normalize(mVelocity) * mMaxSpeed;
+    }
+
+    mAcceleration = glm::vec3(0.f);
+}
 
 ///Barycentric Coordinates
 void Actor::SetBarySurfaceMesh(Mesh* selectSurface)
@@ -162,27 +176,27 @@ void Actor::ActorMovement(Direction direction, Camera* camera, float dt)
     if (!getCamera->mUseCameraMovement && !mAttachCamera)
     {
         glm::vec3 currentPosition = mMesh->GetLocalPosition();
-        glm::vec3 movement(0.f);
+       /* glm::vec3 movement(0.f);*/
 
         switch (direction)
         {
             //Forward & Backwards
         case Forward:
-            movement.z -= mMovementSpeed * dt; break;
+            mAcceleration.z -= mMovementSpeed * dt; break;
         case Backwards:
-            movement.z += mMovementSpeed * dt; break;
+            mAcceleration.z += mMovementSpeed * dt; break;
 
             //Left & Right
         case Left:
-            movement.x -= mMovementSpeed * dt; break;
+            mAcceleration.x -= mMovementSpeed * dt; break;
         case Right:
-            movement.x += mMovementSpeed * dt; break;
+            mAcceleration.x += mMovementSpeed * dt; break;
 
             //Up & Down
         case Up:
-            movement.y += mMovementSpeed * dt; break;
+            mAcceleration.y += mMovementSpeed * dt; break;
         case Down:
-            movement.y -= mMovementSpeed * dt; break;
+            mAcceleration.y -= mMovementSpeed * dt; break;
 
             //Increase Speed
         case IncreaseSpeed:
@@ -192,44 +206,44 @@ void Actor::ActorMovement(Direction direction, Camera* camera, float dt)
             mMovementSpeed = 15.0f;
             break;
         }
-        mMesh->SetLocalPosition(currentPosition + movement);
+        mMesh->SetLocalPosition(currentPosition + mAcceleration);
     }
-    if (!getCamera->mUseCameraMovement && mAttachCamera)
-    {
-        glm::vec3 currentPosition = mMesh->GetLocalPosition();
-        glm::vec3 movement(0.f);
+    //if (!getCamera->mUseCameraMovement && mAttachCamera)
+    //{
+    //    glm::vec3 currentPosition = mMesh->GetLocalPosition();
+    //    glm::vec3 movement(0.f);
 
-        switch (direction)
-        {
-            //Forward & Backwards
-        case Forward:
-            movement.z -= mMovementSpeed * dt; break;
-        case Backwards:
-            movement.z += mMovementSpeed * dt; break;
+    //    switch (direction)
+    //    {
+    //        //Forward & Backwards
+    //    case Forward:
+    //        movement.z -= mMovementSpeed * dt; break;
+    //    case Backwards:
+    //        movement.z += mMovementSpeed * dt; break;
 
-            //Left & Right
-        case Left:
-            movement.x -= mMovementSpeed * dt; break;
-        case Right:
-            movement.x += mMovementSpeed * dt; break;
+    //        //Left & Right
+    //    case Left:
+    //        movement.x -= mMovementSpeed * dt; break;
+    //    case Right:
+    //        movement.x += mMovementSpeed * dt; break;
 
-            //Up & Down
-        case Up:
-            movement.y += mMovementSpeed * dt; break;
-        case Down:
-            movement.y -= mMovementSpeed * dt; break;
+    //        //Up & Down
+    //    case Up:
+    //        movement.y += mMovementSpeed * dt; break;
+    //    case Down:
+    //        movement.y -= mMovementSpeed * dt; break;
 
-            //Increase Speed
-        case IncreaseSpeed:
-            break;
+    //        //Increase Speed
+    //    case IncreaseSpeed:
+    //        break;
 
-        default:
-            mMovementSpeed = 15.0f;
-            break;
-        }
-        mMesh->SetLocalPosition(currentPosition + movement);
-        camera->SetLocalPosition(currentPosition + glm::vec3(0.f, mMesh->mExtent.y, mMesh->mExtent.z + 20.f));
-    }
+    //    default:
+    //        mMovementSpeed = 15.0f;
+    //        break;
+    //    }
+    //    mMesh->SetLocalPosition(currentPosition + movement);
+    //    camera->SetLocalPosition(currentPosition + glm::vec3(0.f, mMesh->mExtent.y, mMesh->mExtent.z + 20.f));
+    //}
 }
 
 void Actor::CameraControll(Direction placement, Camera* camera, float dt) const
@@ -343,10 +357,7 @@ void Actor::Spawner(const int& spawnAmount, const float& distributionX, const fl
                 spawnedActor->mMesh->mEnableCollision = true;
                 break;
             }
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::uniform_real_distribution<float> radiusXZ(distributionX, distributionZ);
-            glm::vec3 spawnPos{ radiusXZ(gen),0.f,radiusXZ(gen) };
+            glm::vec3 spawnPos = glm::linearRand(glm::vec3(distributionX), glm::vec3(distributionZ));
             spawnedActor->mMesh->SetLocalPosition(spawnPos);
             spawnedActor->rigidB.pos = spawnedActor->mMesh->GetLocalPosition();
             Actor::spawnVector.emplace_back(spawnedActor);
@@ -362,10 +373,10 @@ void Actor::Spawner(const int& spawnAmount, const float& distributionX, const fl
 ///Update Actors
 void Actor::UpdateActors(float dt)
 {
-    auto& getMesh = mMesh;
     //Updating the rigid body
-    if (getMesh) 
+    if (mMesh) 
     {
+        UpdateVelocity(dt);
         rigidB.Update(dt);
         //Updaing the center value
         mMesh->mCenter = mMesh->GetLocalPosition();
