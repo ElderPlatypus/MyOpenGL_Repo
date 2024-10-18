@@ -110,40 +110,11 @@ struct PlayerComponent : public IComponent
 {
 	void displayComponent() override
 	{
-		std::cout << "[LOG:]ActorComponent Created";
+		std::cout << "[LOG:]PlayerComponent Created";
 	}
 
 private:
 	std::vector<std::shared_ptr<Actor>> actors;
-
-public:
-	void AddActor(const std::shared_ptr<Actor>& actor)
-	{
-		if (!actor)
-		{
-			std::cout << "[WARNING]:No actor found \n";
-			return;
-		}
-
-		if (actor->isActor == true)
-		{
-			std::cout << "[LOG]:Actor added \n";
-			actors.emplace_back(actor);
-		}
-	}
-
-	std::vector<std::shared_ptr<Actor>> GetActor()
-	{
-		for (const auto& it : actors)
-		{
-			if (!it)
-			{
-				std::cout << "[WARNING:]Actor no found";
-			}
-		}
-		return actors;
-	} 
-
 };
 
 struct TransformComponent : public IComponent
@@ -160,7 +131,7 @@ struct TransformComponent : public IComponent
 	std::vector<float> X;
 	std::vector<float> Y;
 	std::vector<float> Z;
-	inline static std::vector<glm::vec3> m_pos; 
+	std::vector<glm::vec3> m_pos; 
 	glm::quat m_Rotation = { 0,0,0,0 };
 	int _Size = 0;
 };

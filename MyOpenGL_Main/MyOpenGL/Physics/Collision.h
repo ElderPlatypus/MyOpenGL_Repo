@@ -9,11 +9,11 @@ public:
 	static bool AABB(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor>& b)
 	{
 		//Check if actors have collision enables
-		if (!a->mMesh->mEnableAABBCollision || !b->mMesh->mEnableAABBCollision) return false;
+		if (!a->mEnableAABBCollision || !b->mEnableAABBCollision) return false;
 		
 		//Calculate the center difference and sum of the boundg boxes
-		glm::vec3 centerDiff =  a->mMesh->mCenter - b->mMesh->mCenter; 
-		glm::vec3 sumOfExtent = a->mMesh->mExtent + b->mMesh->mExtent;
+		glm::vec3 centerDiff =  a->GetCenter() - b->GetCenter();
+		glm::vec3 sumOfExtent = a->GetExtent() + b->GetExtent();
 	
 		for (int i = 0; i < 3; i++)
 		{
@@ -40,13 +40,13 @@ public:
 		return false;
 	}
 
-	static bool AABBInverse(Actor* a, Actor* b,float dt)
+	static bool AABBInverse(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor>& b) 
 	{
-		if (!a->mMesh->mEnableInverseAABB || !b->mMesh->mEnableInverseAABB) return false;
+		if (!a->mEnableInverseAABB || !b->mEnableInverseAABB) return false;
 
 		//Calculate the center difference and sum of the bounding boxes
-		const glm::vec3& centerDiff = glm::abs(b->mMesh->mCenter - (a->mMesh->mCenter + a->mMesh->mExtent));
-		const glm::vec3& boxExtent = glm::abs(b->mMesh->mCenter - b->mMesh->mExtent);  //center to mesh 
+		const glm::vec3& centerDiff = glm::abs(b->GetCenter() - (a->GetCenter() + a->GetExtent()));
+		const glm::vec3& boxExtent = glm::abs(b->GetCenter() - b->GetExtent());  //center to mesh  
 
 		glm::vec3 newDir1 = glm::linearRand(glm::vec3(-10.f), glm::vec3(10.f));
 		a->rigidB->acceleration = glm::vec3{newDir1.x,Environment::gravitationalAcceleraton.y,newDir1.z};  
@@ -92,13 +92,14 @@ public:
 			return;
 		}
 
-		glm::vec3 path = (_target->mMesh->GetLocalPosition() - _seeker->mMesh->GetLocalPosition());
+		glm::vec3 path = (_target->GetLocalPosition() - _seeker->GetLocalPosition());
+		_seeker->SetLocalPosition(_seeker->GetLocalPosition() + path);
 		
 		//_seeker->mMesh->SetLocalPosition(path);
 
 		if (AABB(_target, _seeker))
 		{
-			//std::cout << "[LOG]:" << _seeker->mName << " Destroyed \n";
+			std::cout << "[LOG]:" << _seeker->mName << " Destroyed \n"; 
 			
 		}
 	}

@@ -42,7 +42,12 @@ public:
         glm::quat yawRotation = glm::angleAxis(angleToRadians, glm::vec3(0.0f, 1.0f, 0.0f));
         AddRotation(yawRotation);
     }
-
+    void AddRoll(float angle_Degress) //Rotation along X-axis
+    {
+        float angleToRadians = glm::radians(angle_Degress);
+        glm::quat rollRotation = glm::angleAxis(angleToRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+        AddRotation(rollRotation);
+    }
     ///Setters
     void SetRotation(const glm::quat& rot){ mOrientation = rot;} //Set rotation in form of glm::quat(angle,x,y,z)
     void SetPosition(const glm::vec3& pos){mPosition = pos;} //Set position glm::vec3(x,y,z)
@@ -91,8 +96,6 @@ public:
     const glm::quat& GetOrientation() const { return mOrientation; } //Returns orientation as correct datatype
     const glm::vec3& GetPosition() const { return mPosition; } //Returns position as correct datatype
     const glm::vec3& GetPosition(bool notConst) const { return mPosition; } //Returns position as correct datatype
-
-
 
     //---------------------------------Vector Components------------------------------------------------
     const glm::vec3& GetRightVector() const { return glm::rotate(mOrientation, glm::vec3(1.f, 0.f, 0.f));} // Returns right vector: invert axis to get oposite direction

@@ -65,7 +65,7 @@ void Camera::UpdateDampening(float dt)
 	}
 }
 
-void Camera::UpdatePosition(float dt)
+void Camera::UpdatePosition(float dt) const
 {
 	
 	glm::vec3 front = GetForwardVector();
@@ -81,19 +81,7 @@ void Camera::UpdateProjectionMatrix()
 	mProjectionMatrix = glm::perspective(glm::radians(mFOV), mAspectRatio, mNearPlane, mFarplane);
 }
 
-glm::vec3 Camera::GetForwardVector() const
-{
-	//Returns Forward vector
-	return glm::rotate(GetLocalRotation(),glm::vec3(0.f,0.f,-1.f));
-}
 
-glm::vec3 Camera::GetUpVector() const
-{
-	//Return Up vector
-	glm::vec3 front = GetForwardVector();
-	glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0.f, 1.f, 0.f)));
-	return glm::rotate(GetLocalRotation(), glm::vec3(0.f, 1.f, 0.f));
-}
 
 glm::mat4 Camera::GetViewMatrix() const
 {
@@ -142,7 +130,7 @@ void Camera::CameraMouseButton(double xPos, double yPos)
 	}
 }
 
-void Camera::CameraMouseMovement(double xPos, double yPos) 
+void Camera::CameraMouseMovement(double xPos, double yPos) const 
 {
 	if (!mRightMouseButtonPressed) return;
 

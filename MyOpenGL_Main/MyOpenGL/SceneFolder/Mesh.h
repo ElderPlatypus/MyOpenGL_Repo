@@ -41,6 +41,8 @@ public:
 	static std::shared_ptr<Mesh> Create2DTriangle(float size);
 	static std::shared_ptr<Mesh> CreatePyramid(float size);
 	static std::shared_ptr<Mesh> CreateCube(float size);
+	static void CreateCube2(std::shared_ptr<Mesh>& mesh, float size); 
+	
 	static std::shared_ptr<Mesh> CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
 		                                        const float& startVal, const float& endingVal, const float& resolution);
 	static std::shared_ptr<Mesh> CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution);
@@ -51,14 +53,18 @@ public:
 	void configureMesh(); //Binds VAO,VB & EBO to respective mesh
 	void drawActor(const std::shared_ptr<Shader>& shader) const; 
 
+
 	///Transformation
 	//---------------------------------Members------------------------------------------ 
 	std::vector<Vertex> mVertices{};
 	std::vector<Index> mIndices{};
+	std::string mName{};
 	std::string mType{};
+
 	VAO mVAO{ 0U };
 	VBO mVBO{ 0U };
 	EBO mEBO{ 0U };
+
 	std::shared_ptr<Transform> mTransform = std::make_shared<Transform>(); 
 
 	//Bounding Box extent
@@ -66,28 +72,25 @@ public:
 	glm::vec3 mExtent{ 0.0f,0.0f,0.0f };
 	glm::vec3 minExtent{ 0.0f, 0.0f, 0.0f };
 	glm::vec3 maxExtent{ 0.0f, 0.0f, 0.0f };
-	bool mEnableAABBCollision = false;
-	bool mEnableInverseAABB = false;
 
     //---------------------------------Methods Setters------------------------------------------------
-	void SetTransformation(const std::shared_ptr<Transform>& transform) { mTransform = transform; }  
+	void SetTransformation(const std::shared_ptr<Transform>& transform)  { mTransform = transform; }  
 	void SetLocalPosition(const glm::vec3& position) const { mTransform->SetPosition(position); }
 	void SetLocalRotation(const glm::quat& rotation) const { mTransform->SetRotation(rotation); }
 	void SetLocalScale(const glm::vec3& scale) const { mTransform->SetScale(scale); }
 	void SetLocalTransformMatrix(const glm::mat4& transformMatrix) const { mTransform->SetTransformMatrix(transformMatrix); }
 	//---------------------------------Methods Getters------------------------------------------
 	std::shared_ptr<Transform> GetTransform() const { return mTransform; }  
-	const glm::vec3& GetLocalPosition()  { return mTransform->GetPosition(); }
+	const glm::vec3& GetLocalPosition() const { return mTransform->GetPosition(); }
 	const glm::quat& GetLocalRotation() const { return mTransform->GetOrientation(); } 
 	const glm::vec3& GetLocalScale() const { return mTransform->GetScale(); } 
 
 	glm::mat4 GetLocalTransformMatrix() const { return mTransform->GetTransformMatrix(); } 
 	const glm::vec3& GetForwardVector() const { return mTransform->GetForwardVector(); }
 	const glm::vec3& GetRightVector() const { return mTransform->GetRightVector(); }
-	const glm::vec3& GetUpctor() const { return mTransform->GetUpVector(); }
+	const glm::vec3& GetUpVector() const { return mTransform->GetUpVector(); }
 	float GetPitch() const { return mTransform->GetPitch(); }
 	float GetYaw() const { return mTransform->GetYaw(); } 
-
 
 
 	///Textures
@@ -97,13 +100,13 @@ public:
 	std::shared_ptr<Shader> mShader{ nullptr }; 
 	//---------------------------------Methods------------------------------------------
 	void SetShader(const std::shared_ptr<Shader>& shader) { mShader = shader; }
-	void UseTexture(const bool& useBool)
+
+	void UseTexture(const bool& useBool) 
 	{
 		mUseTex = useBool;
-		mShader->setBool("useTex", useBool);
+		mShader->setBool("useTex", useBool); 
 	}
-	const bool& GetTexBool() const { return mUseTex; }
-
+	
 	///Lighting
 	//---------------------------------Members------------------------------------------
 	float mAmbientStrength = 1.0f;
@@ -139,6 +142,19 @@ public:
 	bool isPlayer = false;
 	bool isActor = false;
 
-
+	private:
+		static void localUpdate(std::shared_ptr<Mesh>& mesh,const std::string& name, const std::vector<Vertex>& vertices, const std::vector<Index>& indices)
+		{
+			mesh->mType = name;
+			mesh->mVertices = vertices;
+			mesh->mIndices = indices;
+			mesh->mUseTex = true;
+			mesh->mDrawLine = false;
+			mesh->configureMesh();
+		}
+		static std::shared_ptr<Mesh> localUpdate(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const bool& useTex, const bool& drawLine)
+		{
+			return std::make_shared<Mesh>(name, vertices, indices, false, false);
+		}
 };
 

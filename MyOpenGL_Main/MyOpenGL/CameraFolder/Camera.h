@@ -42,14 +42,12 @@ public:
 	//______________Updates all speed function_____________
 	void UpdateVelocity(float dt);
 	void UpdateDampening(float dt);
-	void UpdatePosition(float dt);
+	void UpdatePosition(float dt) const;
 	//______________Updates all martixes_____________
 	void UpdateProjectionMatrix();
 	
 	///Getters
-	//---------------------------------Vector Methods Getters--------------------------------------------
-	glm::vec3 GetForwardVector() const;
-	glm::vec3 GetUpVector() const;
+	
 	//---------------------------------Matrix Methods Getters--------------------------------------------
 	glm::mat4 GetViewMatrix() const;
 	const glm::mat4& GetProjectionMatrix() const;
@@ -63,24 +61,35 @@ public:
 	float GetAspectRatio() const { return mAspectRatio; }
 	
 
-   ///Transformation
-   //---------------------------------Methods Setters--------------------------------------------
-	void SetTransformation(const Transform& transform) { mTransform = transform; }
-	void SetLocalPosition(const glm::vec3& position) { mTransform.SetPosition(position); }
-	void SetLocalRotation(const glm::quat& rotation) { mTransform.SetRotation(rotation); }
-	void SetLocalScale(const glm::vec3& scale) { mTransform.SetScale(scale); }
-	void SetLocalTransformMatrix(const glm::mat4& transformMatrix) { mTransform.SetTransformMatrix(transformMatrix); }
+    ///Transformation
+    //---------------------------------Methods Setters------------------------------------------------
+	void SetTransformation(const std::shared_ptr<Transform>& transform) { mTransform = transform; }
+	void SetLocalPosition(const glm::vec3& position) const { mTransform->SetPosition(position); }
+	void SetLocalRotation(const glm::quat& rotation) const { mTransform->SetRotation(rotation); }
+	void SetLocalScale(const glm::vec3& scale) const { mTransform->SetScale(scale); }
+	void SetLocalTransformMatrix(const glm::mat4& transformMatrix) const { mTransform->SetTransformMatrix(transformMatrix); }
 	//---------------------------------Methods Getters------------------------------------------
-	const Transform& GetTransform() const { return mTransform; }
-	const glm::vec3& GetLocalPosition() const { return mTransform.GetPosition(); }
-	const glm::quat& GetLocalRotation() const { return mTransform.GetOrientation(); }
-	const glm::vec3& GetLocalScale() const { return mTransform.GetScale(); }
-	const glm::mat4 GetLocalTransformMatrix() const { return mTransform.GetTransformMatrix(); }
-	glm::vec3 GetRightVector() const { return mTransform.GetRightVector(); }
+	std::shared_ptr<Transform> GetTransform() const { return mTransform; }
+	const glm::vec3& GetLocalPosition() const { return mTransform->GetPosition(); }
+	const glm::quat& GetLocalRotation() const { return mTransform->GetOrientation(); }
+	const glm::vec3& GetLocalScale() const { return mTransform->GetScale(); }
+
+	glm::mat4 GetLocalTransformMatrix() const { return mTransform->GetTransformMatrix(); }
+	const glm::vec3& GetForwardVector() const { return mTransform->GetForwardVector(); }
+	const glm::vec3& GetRightVector() const { return mTransform->GetRightVector(); }
+	const glm::vec3& GetUpVector() const 
+	{ 
+		//Return Up vector
+		glm::vec3 front = GetForwardVector();
+		glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0.f, 1.f, 0.f)));
+		return glm::rotate(GetLocalRotation(), glm::vec3(0.f, 1.f, 0.f));
+	}
+	float GetPitch() const { return mTransform->GetPitch(); }
+	float GetYaw() const { return mTransform->GetYaw(); }
 
 	///Members
 	//---------------------------------Members------------------------------------------
-	Transform mTransform{};
+	std::shared_ptr<Transform> mTransform = std::make_shared<Transform>();
 	std::string mName;
 	glm::vec3 mVelocity{ 0.f,0.f,0.f };
 	glm::vec3 mAcceleration{ 0.f,0.f,0.f };
@@ -106,5 +115,5 @@ public:
 	//---------------------------------Methods------------------------------------------
 	void CameraMovement(Direction direction,float dt);
 	void CameraMouseButton(double xPos, double yPos);
-	void CameraMouseMovement(double xPos, double yPos);
+	void CameraMouseMovement(double xPos, double yPos) const;
 };

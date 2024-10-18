@@ -18,7 +18,7 @@ void Scene::LoadActors()
 		mEntities.emplace_back(entity);
 
 		std::shared_ptr<TransformComponent> transformComponent_1 = std::make_shared<TransformComponent>(); 
-		transformComponent_1->m_pos.emplace_back(glm::vec3{ 5, 3, 1 });
+		transformComponent_1->m_pos.emplace_back(glm::vec3(5, 3, 1 ));
 		transformComponent_1->_Size = 2;
 		   
 		std::shared_ptr<HealthComponent> healthComponent_1 = std::make_shared<HealthComponent>();
@@ -29,7 +29,7 @@ void Scene::LoadActors()
 
 		std::shared_ptr<ActorComponent> actorComponent = std::make_shared<ActorComponent>();
 		actorComponent->actors.emplace_back(std::make_shared<Actor>(Mesh::CreateCube(2.0f), "player"));
-		actorComponent->actors.emplace_back(std::make_shared<Actor>(Mesh::CreateCube(2.0f), "testCube"));
+		//actorComponent->actors.emplace_back(std::make_shared<Actor>(Mesh::CreateCube(2.0f), "testCube"));
 
 		actorManager->AddComponent(entity->GetId(), actorComponent); 
 		AABBManager->AddComponent(entity->GetId(), boxCollisionComponent_1);  
@@ -43,7 +43,7 @@ void Scene::LoadActors()
 	actorSystem->Update(mEntities);
 
 	
-	/*for (const auto& [id,component] : transformManager.GetAllComponents()) 
+	for (const auto& [id,component] : transformManager->GetAllComponents()) 
 	{
 		for(const auto& it : component)
 		{
@@ -51,7 +51,7 @@ void Scene::LoadActors()
 			std::cout << " ID:" + std::to_string(id) << "";
 			std::cout << "\n";
 		}
-	}*/
+	}
 
 	std::cout << "\n";
 
@@ -60,11 +60,16 @@ void Scene::LoadActors()
 		for (const auto& it : component)
 		{
 			it->displayComponent();
+			for (int i = 0; i < it->actors.size(); i++)
+			{
+				it->actors[i]->SetTexBool(true);
+			}
 			std::cout << " ID:" + std::to_string(id) << "";
 			std::cout << "\n"; 
 		}
 	}
 
+	actorSystem->AttachToCamera(mEntities, 0);
 
 	Actor::Spawner(100, -20, 20, 2);
 	/*for (const auto& actors : Actor::spawnVector)
@@ -74,17 +79,18 @@ void Scene::LoadActors()
 
 	///Player
 	uActorMap["player"] = std::make_shared<Actor>(Mesh::CreateCube(2.0f),"player"); 
-	uActorMap["player"]->mMesh->mUseTex = true;
+	uActorMap["player"]->SetTexBool(true);
 	uActorMap["player"]->EnablePhysics = false;
 	uActorMap["player"]->ExtrudeMesh(decrease, 2.0f); 
-	uActorMap["player"]->mMesh->SetLocalPosition(glm::vec3(0, 0, 5));
-	uActorMap["player"]->mMesh->mEnableAABBCollision = true; 
+	uActorMap["player"]->SetLocalPosition(glm::vec3(0, 0, 5));
+	uActorMap["player"]->mEnableAABBCollision = true; 
+	uActorMap["player"]->isPlayer = true;
 
-	///Test cube
-	uActorMap["testCube"] = std::make_shared<Actor>(Mesh::CreateCube(2.0f),"TestCube"); 
-	//uActorMap["testCube"]->ExtrudeMesh(Extrude::increase, 10.0f);
-	uActorMap["testCube"]->EnablePhysics = false; 
-	uActorMap["testCube"]->mMesh->mEnableAABBCollision = true; 
+	/////Test cube
+	//uActorMap["testCube"] = std::make_shared<Actor>(Mesh::CreateCube(2.0f),"TestCube"); 
+	////uActorMap["testCube"]->ExtrudeMesh(Extrude::increase, 10.0f);
+	//uActorMap["testCube"]->EnablePhysics = false; 
+	//uActorMap["testCube"]->mEnableAABBCollision = true; 
 
 	
 	///Create camera object
@@ -102,11 +108,10 @@ void Scene::LoadContent()
 	mShader = std::make_shared<Shader>("Shaders/Triangle.vs", "Shaders/Triangle.fs");
 	mTexture = std::make_shared<Texture>("Shaders/wall.jpg",mShader);     
 	
-	for (const std::pair<std::string,std::shared_ptr<Actor>> &actor : uActorMap) { actor.second->mMesh->SetShader(mShader); }       
-	for (const auto& actor : Actor::spawnVector) { actor->mMesh->SetShader(mShader); }
+	for (const std::pair<std::string,std::shared_ptr<Actor>> &actor : uActorMap) { actor.second->SetShader(mShader); }
+	for (const auto& actor : Actor::spawnVector) { actor->SetShader(mShader); }
 	actorSystem->SetShader(mEntities,mShader);
 	
-
 }
 
 void Scene::UnloadContent()
@@ -140,8 +145,9 @@ void Scene::UpdateScene(float dt)
 
 	//Actor Update for Bary coords
 	for (const std::pair<std::string, std::shared_ptr<Actor>> actor : uActorMap) { actor.second->UpdateActors(dt); }
+
 	for (const auto& actor : Actor::spawnVector) { actor->UpdateActors(dt); }
-	actorSystem->DrawUpdate(mEntities, dt);
+	actorSystem->UpdateActorEntity(mEntities, dt); 
 
 	//Collison Update
 	CollisionHandling(dt);
@@ -157,13 +163,14 @@ void Scene::RenderScene(float dt, Transform globaltransform)
 }
 
 ///Tranformations
-void Scene::SpaceManipulation() //Only rotation can be manipulated before call in Render. Offset needs to be set in LoacActors.
+void Scene::SpaceManipulation() const //Only rotation can be manipulated before call in Render. Offset needs to be set in LoacActors.
 {
 	///Spawn objects
 	/*for (auto &object : Actor::spawnVector)
 	{
 		 object->mMesh->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
 	}*/
+
 } 
 
 ///Shader Binder
@@ -174,17 +181,18 @@ void Scene::BindCamera() const
 	mShader->setVec3("viewPos", mSceneCamera->GetLocalPosition());   
 }
 
-void Scene::CollisionHandling(float dt)
+void Scene::CollisionHandling(float dt) const
 {
 	//Player & spawned objects
 	auto max_i = Actor::spawnVector.size();
 	
 	for (const auto &object : Actor::spawnVector) 
 	{ 
-		Collision::TrackPlayer(uActorMap["player"], object,dt); 
+		//Collision::TrackPlayer(uActorMap["player"], object,dt); 
+		Collision::AABB(actorSystem->GetActor(mEntities), object);  
 	}
+	
 
-	/*Collision::TrackPlayer(uActorMap["player"], uActorMap["testCube"],dt); */
 }
 
 

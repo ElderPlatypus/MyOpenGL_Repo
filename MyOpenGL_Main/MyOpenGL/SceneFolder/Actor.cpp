@@ -168,8 +168,7 @@ glm::vec3 Actor::CalculateBarycentricCoordinates(glm::vec3 _p1, glm::vec3 _p2, g
 ///Actor movement
 void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& camera, float dt)
 {
-    auto &getCamera = camera;
-    if (!getCamera->mUseCameraMovement && !mAttachCamera)
+    if (!camera->mUseCameraMovement && !mAttachCamera && isActor || isPlayer)  
     {
         glm::vec3 currentPosition = mMesh->GetLocalPosition();
         glm::vec3 movement(0.f);
@@ -209,47 +208,50 @@ void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& ca
         mMesh->SetLocalPosition(currentPosition + movement);
     }
 
-    if (getCamera->mUseCameraMovement && mAttachCamera)
+    if (camera->mUseCameraMovement && mAttachCamera && isPlayer) 
     {
-        glm::vec3 currentPosition = mMesh->GetLocalPosition();
-        glm::vec3 movement(0.f);
+        //glm::vec3 movement{0,0,0};
+        //const auto& horizontal = glm::cos(camera->GetPitch()) * camera->GetForwardVector();
+        //switch (direction)
+        //{
+        //    //Forward & Backwards
+        //case Forward:
+        //    movement.x +=  glm::cos(GetYaw()) * horizontal.z; 
+        //    movement.z -=  glm::sin(GetYaw()) * horizontal.x;  
+        //    movement.y +=  glm::sin(GetPitch()) * horizontal.y; 
+        //    break;
+        //    //glm::angleAxis(angleToRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+        //case Backwards:
+        //    //movement.z += mMovementSpeed * dt * glm::sin(camera->GetYaw()) * horizontal; break;
 
-        switch (direction)
-        {
-            //Forward & Backwards
-        case Forward:
-            movement.z -= mMovementSpeed * dt; break; 
-        case Backwards:
-            movement.z += mMovementSpeed * dt; break;
+        //    //Left & Right
+        //case Left:
+        //    movement.x -= mMovementSpeed * dt * glm::sin(camera->GetYaw()); break;
+        //case Right:
+        //    movement.z += mMovementSpeed * dt * glm::cos(camera->GetYaw()); break;
 
-            //Left & Right
-        case Left:
-            movement.x -= mMovementSpeed * dt; break;
-        case Right:
-            movement.x += mMovementSpeed * dt; break;
+        //    //Up & Down
+        //case Up:
+        //    movement.y += mMovementSpeed * dt * glm::sin(camera->GetPitch()) * camera->GetAccelerationSpeed(); break;
+        //case Down:
+        //    movement.y -= mMovementSpeed * dt * glm::sin(camera->GetPitch()) * camera->GetAccelerationSpeed(); break;
 
-            //Up & Down
-        case Up:
-            movement.y += mMovementSpeed * dt; break;
-        case Down:
-            movement.y -= mMovementSpeed * dt; break;
+        //    //Increase Speed
+        //case IncreaseSpeed:
+        //    mMovementSpeed = 50.0f;
+        //    break;
+        //case NormalSpeed:
+        //    mMovementSpeed = 15.0f;
+        //    break;
 
-            //Increase Speed
-        case IncreaseSpeed:
-            mMovementSpeed = 50.0f;
-            break;
-        case NormalSpeed:
-            mMovementSpeed = 15.0f;
-            break;
-
-        default:
-            mMovementSpeed = 15.0f;
-            break;
-        }
-     
-        mMesh->SetLocalPosition((currentPosition + movement));    
-        mMesh->SetLocalRotation(camera->GetLocalRotation());  
-        camera->SetLocalPosition(currentPosition + glm::abs(glm::vec3(0.f, mMesh->mExtent.y - 2.0f, mMesh->mExtent.z)));
+        //default:
+        //    mMovementSpeed = 15.0f;
+        //    break;
+        //}
+        //
+        //SetLocalPosition((GetLocalPosition() + movement));
+        SetLocalRotation(camera->GetLocalRotation());    
+        camera->SetLocalPosition(GetLocalPosition() - (camera->GetForwardVector() * 10.f));
     }
 }
 
@@ -274,6 +276,7 @@ void Actor::CameraStateControll(CameraState state, const std::shared_ptr<Camera>
             break;
 
       case CameraStatic_FollowPlayer_3:  
+            if (!isPlayer || !mAttachToActor) return; 
             AttachCamera(); 
             getCamera->mUseCameraMovement = true;
             break;
@@ -350,34 +353,28 @@ void Actor::Spawner(const int& _spawnAmount, const float& _distributionX, const 
 {
     for (int amount = 0; amount < _spawnAmount; amount++)
     {
-        if (_spawnAmount > 0)
+        if (_spawnAmount <= 0) { std::cout << "Amount is less or equal to 0" << std::endl; return; }
+
+        Actor::spawnVector.reserve(_spawnAmount);
+        switch (_actorType)
         {
-            Actor::spawnVector.reserve(_spawnAmount);
-            switch (_actorType)
-            {
-            case 1:
-                spawnedActor = std::make_shared<Actor>(Mesh::CreateCube(1.0f),"spawnedCube " + std::to_string(amount));
-                spawnedActor->mMesh->mUseTex = true;
-                break;
-            case 2:
-                spawnedActor = std::make_shared<Actor>(Mesh::CreateSphere(16, 16, 1), "spawnedSphere " + std::to_string(amount));
-                spawnedActor->mMesh->mUseTex = true;
-                break;
-            case 3:
-                spawnedActor = std::make_shared<Actor>(Mesh::CreatePyramid(5.0f), "spawnedPyramid " + std::to_string(amount));
-                spawnedActor->mMesh->mUseTex = true;
-                break;
-            }
-            const glm::vec3& spawnPos = glm::linearRand(glm::vec3(_distributionX), glm::vec3(_distributionZ));
-            spawnedActor->mMesh->SetLocalPosition(spawnPos); 
-            spawnedActor->rigidB->pos = spawnedActor->GetLocalPosition();
-            Actor::spawnVector.emplace_back(spawnedActor);
+        case 1:
+            spawnedActor = std::make_shared<Actor>(Mesh::CreateCube(1.0f), "spawnedCube " + std::to_string(amount));
+            spawnedActor->mMesh->mUseTex = true;
+            break;
+        case 2:
+            spawnedActor = std::make_shared<Actor>(Mesh::CreateSphere(16, 16, 1), "spawnedSphere " + std::to_string(amount));
+            spawnedActor->mMesh->mUseTex = true;
+            break;
+        case 3:
+            spawnedActor = std::make_shared<Actor>(Mesh::CreatePyramid(5.0f), "spawnedPyramid " + std::to_string(amount));
+            spawnedActor->mMesh->mUseTex = true;
+            break;
         }
-        else
-        {
-            std::cout << "Amount is less or equal to 0" << std::endl;
-            return;
-        }
+        const glm::vec3& spawnPos = glm::linearRand(glm::vec3(_distributionX), glm::vec3(_distributionZ));
+        spawnedActor->mMesh->SetLocalPosition(spawnPos);
+        spawnedActor->rigidB->pos = spawnedActor->GetLocalPosition();
+        Actor::spawnVector.emplace_back(spawnedActor);
     }
 }
 
@@ -398,8 +395,8 @@ void Actor::UpdateActors(float dt)
         }
         //Bind shaders to Model-uniform
         mMesh->mShader->setMat4("model", mMesh->GetLocalTransformMatrix()); 
-        mMesh->UseTexture(mMesh->GetTexBool());
-        mMesh->UseLight(mMesh->GetLightBool());
+        mMesh->UseTexture(GetTexBool());  
+        mMesh->UseLight(mMesh->GetLightBool()); 
         mMesh->drawActor(mMesh->mShader);
 
         //Confirms if any calculation bools  are enabled

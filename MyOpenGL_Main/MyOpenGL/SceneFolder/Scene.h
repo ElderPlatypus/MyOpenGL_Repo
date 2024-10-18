@@ -27,6 +27,7 @@ class Scene
 
 public:
 	std::unordered_map<std::string,std::shared_ptr<Actor>> uActorMap;
+
 	std::shared_ptr<Shader> mShader;
 	std::shared_ptr<Camera> mSceneCamera; 
 	std::shared_ptr<Texture> mTexture;
@@ -47,14 +48,14 @@ public:
 	Transform mTransform;
 
 	//Actor space manipulation
-	void SpaceManipulation();
+	void SpaceManipulation() const;
 
 	//Camera Binding
 	void BindCamera() const;
 
 	//Collision control
 	Collision* mCollision{ nullptr };
-	void CollisionHandling(float dt); 
+	void CollisionHandling(float dt) const; 
 
 	int score = 0;
 
@@ -72,7 +73,5 @@ public:
 	std::shared_ptr<ComponentArchive<HealthComponent>> healthManager = std::make_shared<ComponentArchive<HealthComponent>>();
 	std::shared_ptr<ComponentArchive<BoxCollisionComponent>> AABBManager = std::make_shared<ComponentArchive<BoxCollisionComponent>>();
 	std::shared_ptr<ComponentArchive<ActorComponent>> actorManager = std::make_shared<ComponentArchive<ActorComponent>>();
-
-
 };
 

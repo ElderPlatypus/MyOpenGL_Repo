@@ -79,6 +79,7 @@ void Application::Run_App()
     
     ///Creating the deltaTime variable
     float lastFrame = static_cast<float>(glfwGetTime());
+    float timer = 0;
   
     // render loop
     // -----------
@@ -88,7 +89,13 @@ void Application::Run_App()
         float currentFrame = static_cast<float>(glfwGetTime());
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        std::cout << 1 / deltaTime << "\n";
+        timer += deltaTime;
+
+        if (timer > 1)
+        {
+            timer = 0;
+            std::cout << 1 / deltaTime << "\n";
+        }
 
         UpdateCameraController(deltaTime); 
         UpdateActorMovement(deltaTime);   
@@ -282,7 +289,7 @@ void Application::UpdateActorMovement(float dt)
 {    
     for (auto& [name, actor] : mScene->uActorMap)
     {
-        if (actor->mName == "player")
+        if (actor->isPlayer)
         {
             //Movement Keys
             if (mKeyState[GLFW_KEY_W]) actor->ActorMovement(Forward, mScene->mSceneCamera, dt);
@@ -304,7 +311,7 @@ void Application::UpdateCameraPlacement(float dt)
 
     for (auto& [name, actor] : mScene->uActorMap)
     {
-        if (actor->mName == "player")
+        if (actor->isPlayer || actor->isActor)
         {
             if (mKeyState[GLFW_KEY_1]) actor->CameraStateControll(CameraFreeMovement_1, mScene->mSceneCamera, dt);
             if (mKeyState[GLFW_KEY_2]) actor->CameraStateControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);

@@ -23,10 +23,11 @@
 
 class Actor : public Mesh
 {
+private:
+    std::shared_ptr<Mesh> mMesh; 
 public:
     ///Constructor & Destructor
     //---------------------------------Members------------------------------------------------
-    std::shared_ptr<Mesh> mMesh;
     std::string mName;
     //---------------------------------Methods------------------------------------------------
     Actor(const std::shared_ptr<Mesh>& mesh, const std::string &name);
@@ -55,7 +56,7 @@ public:
 
     ///Barycentric Coordinates
     //---------------------------------Members------------------------------------------------
-    std::shared_ptr<Mesh> mSurfaceMesh{ nullptr };
+    std::shared_ptr<Mesh> mSurfaceMesh;
     //---------------------------------Methods------------------------------------------------
     void SetBarySurfaceMesh(const std::shared_ptr<Mesh>& _selectSurface);
     std::shared_ptr<Actor> BarycentricCoordinates(float _dt);
@@ -63,7 +64,7 @@ public:
     
     ///Lerp
     //---------------------------------Members------------------------------------------------
-    std::shared_ptr<Mesh> mLerpMesh = nullptr;
+    std::shared_ptr<Mesh> mLerpMesh;
     float deltaTime = 0.0f;
     float movementDir = 0.5f;
     float index = 0.0f;
@@ -75,7 +76,7 @@ public:
 
     ///Actor movement 
     //---------------------------------Members------------------------------------------ 
-    std::shared_ptr<Camera> mCamera{ nullptr };
+    std::shared_ptr<Camera> mCamera;
     bool mRelativeCameraPosition = false;  
     //---------------------------------Methods------------------------------------------ 
     void ActorMovement(Direction direction, const std::shared_ptr<Camera>& camera, float dt);
@@ -85,6 +86,7 @@ public:
     float mMovementSpeed = 15.0f;
     bool mIncreasingSpeed = false;
     inline static bool mAttachCamera;
+    bool mAttachToActor = false;
     void SetCamera(const std::shared_ptr<Camera>& selectCamera);
     inline static bool AttachCamera() { return mAttachCamera = true; }
     inline static bool DetachCamera() { return mAttachCamera = false; }
@@ -106,6 +108,36 @@ public:
     static void Spawner(const int& _spawnAmount, const float& _distributionX, const float& _distributionZ, const int& _actorType);
 
 
+    ///Transform Getter & Setters
+    
+    //---------------------------------Methods Setters------------------------------------------------ 
+    void SetLocalPosition(const glm::vec3& position) const { mMesh->SetLocalPosition(position); } 
+    void SetLocalRotation(const glm::quat& rotation) const { mMesh->SetLocalRotation(rotation); } 
+    void SetLocalScale(const glm::vec3& scale) const { mMesh->SetLocalScale(scale); }
+    void SetLocalTransformMatrix(const glm::mat4& transformMatrix) const { mMesh->SetLocalTransformMatrix(transformMatrix); }
+    void SetShader(const std::shared_ptr<Shader>& shader) const { mMesh->SetShader(shader); }
+    const bool SetTexBool(const bool& useTex) const { return mMesh->mUseTex = useTex; } 
+
+    //---------------------------------Methods Getters------------------------------------------
+    const std::shared_ptr<Transform> GetTransform() const { return mMesh->mTransform; }
+    const glm::vec3& GetLocalPosition() const { return mMesh->GetLocalPosition(); }
+    const glm::quat& GetLocalRotation() const { return mMesh->GetLocalRotation(); }
+    const glm::vec3& GetLocalScale() const { return mMesh->GetLocalScale(); }
+
+    glm::mat4 GetLocalTransformMatrix() const { return mMesh->GetLocalTransformMatrix(); }
+    const glm::vec3& GetForwardVector() const { return mMesh->GetForwardVector(); }
+    const glm::vec3& GetRightVector() const { return mMesh->GetRightVector(); }
+    const glm::vec3& GetUpVector() const { return mMesh->GetUpVector(); }
+    float GetPitch() const { return mMesh->GetPitch(); }
+    float GetYaw() const { return mMesh->GetYaw(); }
+    void  GetdrawActor(const std::shared_ptr<Shader>& shader) const { return mMesh->drawActor(shader); }
+    const bool GetTexBool() const { return mMesh->mUseTex; }
 
 
+    const glm::vec3& GetExtent() const { return mMesh->mExtent; }
+    const glm::vec3& GetCenter() const { return mMesh->mCenter; }
+
+    ///Collision
+    bool mEnableAABBCollision = false;
+	bool mEnableInverseAABB = false;
 };

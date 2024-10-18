@@ -127,8 +127,16 @@ public:
 		{
 			if (m_actorManager->HasComponent(entity->GetId()))
 			{
+		
 				const std::shared_ptr<ActorComponent>& actor = m_actorManager->GetComponent(entity->GetId());
+				for (const auto& actor : actor->actors)
+				{
+					//m_actorManager->GetComponent(entity->GetId())->actors[entity->GetId()]->isPlayer = true;
+					actor->isPlayer = true;
+					actor->isActor = true;
+				}
 				m_actorManager->AddComponent(entity->GetId(), actor); 
+				
 			}
 			else
 			{
@@ -147,7 +155,7 @@ public:
 				const std::shared_ptr<ActorComponent>& actor = m_actorManager->GetComponent(entity->GetId());
 				for (const std::shared_ptr<Actor>& it : actor->actors)
 				{
-					it->mMesh->SetShader(shader);
+					it->SetShader(shader);
 				}
 			}
 			else
@@ -167,7 +175,7 @@ public:
 				const auto& actor = m_actorManager->GetComponent(entity->GetId());
 				for (const std::shared_ptr<Actor>& it : actor->actors)
 				{
-					it->mMesh->drawActor(shader);
+					it->GetdrawActor(shader); 
 				}
 				//m_actorManager.AddComponent(entity->GetId(), actor);
 			}
@@ -179,7 +187,7 @@ public:
 		std::cout << "\n\n";
 	}
 
-	void DrawUpdate(const std::vector<std::shared_ptr<Entity>>& _entities, float dt) const
+	void UpdateActorEntity(const std::vector<std::shared_ptr<Entity>>& _entities, float dt) const
 	{
 		for (const auto& entity : _entities)
 		{
@@ -196,5 +204,39 @@ public:
 				std::cout << "[WARNING]:Entity Id or TransformComponent not found \n";
 			}
 		}
+	}
+
+	std::shared_ptr<Actor> GetActor(const std::vector<std::shared_ptr<Entity>>& _entities)
+	{
+		for (const std::shared_ptr<Entity>& entity : _entities)
+		{
+			if (m_actorManager->HasComponent(entity->GetId()))
+			{
+				  return m_actorManager->GetComponent(entity->GetId())->actors[entity->GetId()];
+			}
+			else
+			{
+				std::cout << "[WARNING]:Entity Id or Component not found \n";
+				return nullptr;
+			}
+		}
+		return nullptr;
+	}
+
+	bool AttachToCamera(const std::vector<std::shared_ptr<Entity>>& _entities, const int& id)
+	{
+		for (const std::shared_ptr<Entity>& entity : _entities)
+		{
+			if (m_actorManager->HasComponent(id)) 
+			{
+				return m_actorManager->GetComponent(entity->GetId())->actors[entity->GetId()]->mAttachToActor = true;
+			}
+			else
+			{
+				std::cout << "[WARNING]:Entity Id or Component not found \n";
+				return false;
+			}
+		}
+		return false;
 	}
 };

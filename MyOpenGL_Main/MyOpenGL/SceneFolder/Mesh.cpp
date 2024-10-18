@@ -16,6 +16,7 @@ Mesh::Mesh(const std::string& type, const std::vector<Vertex>& vertices,
     mExtent = maxExtent - minExtent;
 }
 
+
 Mesh::~Mesh()
 {
     glDeleteVertexArrays(1, &mVAO);
@@ -39,7 +40,7 @@ std::shared_ptr<Mesh> Mesh::Create2DTriangle(float size)
         0,1,2
     };
 
-    return std::make_shared<Mesh>("2DTriangle", vertices, indices, false, false);
+    return localUpdate("2DTriangle", vertices, indices, false, false);
 }
 
 std::shared_ptr<Mesh> Mesh::CreatePyramid(float size)
@@ -144,7 +145,60 @@ std::shared_ptr<Mesh> Mesh::CreateCube(float size)
         20, 21, 22, 20, 22, 23
     };
 
-    return std::make_shared<Mesh>("cube", vertices, indices, true, false);
+    return localUpdate("cube", vertices, indices, true, false);
+}
+
+void Mesh::CreateCube2(std::shared_ptr<Mesh>& mesh, float size)
+{
+    std::vector<Vertex> vertices = {
+        // Front face
+        {{-size, -size,  size}, {0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}}, // Bottom-left 
+        {{ size, -size,  size}, {0.0f,  0.0f,  1.0f}, {1.0f, 0.0f}}, // Bottom-right
+        {{ size,  size,  size}, {0.0f,  0.0f,  1.0f}, {1.0f, 1.0f}}, // Top-right
+        {{-size,  size,  size}, {0.0f,  0.0f,  1.0f}, {0.0f, 1.0f}}, // Top-left
+        // Back face
+        {{-size, -size, -size}, {0.0f,  0.0f, -1.0f}, {1.0f, 0.0f}},
+        {{ size, -size, -size}, {0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}},
+        {{ size,  size, -size}, {0.0f,  0.0f, -1.0f}, {0.0f, 1.0f}},
+        {{-size,  size, -size}, {0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}},
+        // Left face
+        {{-size, -size, -size}, {-1.0f,  0.0f, 0.0f}, {0.0f, 0.0f}},
+        {{-size, -size,  size}, {-1.0f,  0.0f, 0.0f}, {1.0f, 0.0f}},
+        {{-size,  size,  size}, {-1.0f,  0.0f, 0.0f}, {1.0f, 1.0f}},
+        {{-size,  size, -size}, {-1.0f,  0.0f, 0.0f}, {0.0f, 1.0f}},
+        // Right face
+        {{ size, -size, -size}, {1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}},
+        {{ size, -size,  size}, {1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}},
+        {{ size,  size,  size}, {1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}},
+        {{ size,  size, -size}, {1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}},
+        // Top face
+        {{-size,  size, -size}, {0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}},
+        {{-size,  size,  size}, {0.0f,  1.0f,  0.0f}, {0.0f, 0.0f}},
+        {{ size,  size,  size}, {0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}},
+        {{ size,  size, -size}, {0.0f,  1.0f,  0.0f}, {1.0f, 1.0f}},
+        // Bottom face
+        {{-size, -size, -size}, {0.0f, -1.0f,  0.0f}, {1.0f, 1.0f}},
+        {{-size, -size,  size}, {0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}},
+        {{ size, -size,  size}, {0.0f, -1.0f,  0.0f}, {0.0f, 0.0f}},
+        {{ size, -size, -size}, {0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}}
+    };
+
+    std::vector<Index> indices = {
+        // Front face
+        0, 1, 2, 0, 2, 3,
+        // Back face
+        4, 5, 6, 4, 6, 7,
+        // Left face
+        8, 9, 10, 8, 10, 11,
+        // Right face
+        12, 13, 14, 12, 14, 15,
+        // Top face
+        16, 17, 18, 16, 18, 19,
+        // Bottom face
+        20, 21, 22, 20, 22, 23
+    };
+
+    localUpdate(mesh, "test", vertices, indices);
 }
 
 std::shared_ptr<Mesh> Mesh::CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
@@ -199,7 +253,7 @@ std::shared_ptr<Mesh> Mesh::CreateInterpolationCurve3Points(const glm::vec2& p1,
         indices.emplace_back(i);
     }
 
-    return std::make_shared<Mesh>("InterpolationCurve", vertices, indices, true, false);
+    return localUpdate("InterpolationCurve", vertices, indices, true, false);
 }
 
 std::shared_ptr<Mesh> Mesh::CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution)
@@ -239,7 +293,7 @@ std::shared_ptr<Mesh> Mesh::CreatePlaneXZ(const float& xMin, const float& zMin, 
             i += 4; //Inrementing by 4 to get newt square
         }
     }
-    return std::make_shared<Mesh>("planeXZ", vertices, indices, true, false);
+    return localUpdate("planeXZ", vertices, indices, true, false);
 }
 
 std::shared_ptr<Mesh> Mesh::CreatePlaneXY(const float& xMin, const float& yMin, const float& xMax, const float& yMax, const float& resolution)
@@ -278,7 +332,7 @@ std::shared_ptr<Mesh> Mesh::CreatePlaneXY(const float& xMin, const float& yMin, 
             i += 4; //Incrementing to next square
         }
     }
-    return std::make_shared<Mesh>("planeXY", vertices, indices, true, false);
+    return localUpdate("planeXY", vertices, indices, true, false);
 }
 
 std::shared_ptr<Mesh> Mesh::CreateSphere(const int& stackCount, const int& sectorCount, const int& radius)
@@ -372,6 +426,8 @@ void Mesh::configureMesh()
 ///Drawing the mesh
 void Mesh::drawActor(const std::shared_ptr<Shader>& shader) const 
 {
+    if (!shader) return;
+
     glBindVertexArray(mVAO);
     if (shader && mDrawLine == false)
     {
@@ -385,6 +441,6 @@ void Mesh::drawActor(const std::shared_ptr<Shader>& shader) const
     {
         assert(shader && "No shader found");
     }
-    glBindVertexArray(0);
+    //glBindVertexArray(0);
 }
 
