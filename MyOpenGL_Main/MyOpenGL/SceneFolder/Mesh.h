@@ -6,6 +6,9 @@
 #include <string>
 #include <random>
 #include <string>
+#include <memory>
+#include <glm/gtc/matrix_transform.hpp>
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -21,9 +24,9 @@
 class Mesh
 {
 public:
-	Mesh(const std::string& type, std::vector<Vertex>& vertices,
-		std::vector<Index>& indices, const bool& useTex,
-		const bool& drawLine = false
+	Mesh(const std::string& type, const std::vector<Vertex>& vertices,
+		 const std::vector<Index>& indices, const bool& useTex,
+		 const bool& drawLine
 	);
 	
 	Mesh(const Mesh&) = delete;
@@ -35,19 +38,18 @@ public:
 	~Mesh();
 
 	///Actor vertex data
-	static Mesh* Create2DTriangle(float size);
-	static Mesh* CreatePyramid(float size);
-	static Mesh* CreateCube(float size);
-	inline static float getSize;
-	static Mesh* CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
-		                                         const float& startVal, const float& endingVal, const float& resolution);
-	static Mesh* CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution);
-	static Mesh* CreatePlaneXY(const float& xMin, const float& yMin, const float& xMax, const float& yMax, const float& resolution);
-	static Mesh* CreateSphere(const int& stackCount, const int& sectorCount, const int& radius);
+	static std::shared_ptr<Mesh> Create2DTriangle(float size);
+	static std::shared_ptr<Mesh> CreatePyramid(float size);
+	static std::shared_ptr<Mesh> CreateCube(float size);
+	static std::shared_ptr<Mesh> CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
+		                                        const float& startVal, const float& endingVal, const float& resolution);
+	static std::shared_ptr<Mesh> CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution);
+	static std::shared_ptr<Mesh> CreatePlaneXY(const float& xMin, const float& yMin, const float& xMax, const float& yMax, const float& resolution);
+	static std::shared_ptr<Mesh> CreateSphere(const int& stackCount, const int& sectorCount, const int& radius);
 
 	///Configure and Draw
 	void configureMesh(); //Binds VAO,VB & EBO to respective mesh
-	void drawActor(const Shader* shader)const;
+	void drawActor(const std::shared_ptr<Shader>& shader) const; 
 
 	///Transformation
 	//---------------------------------Members------------------------------------------ 
@@ -57,35 +59,44 @@ public:
 	VAO mVAO{ 0U };
 	VBO mVBO{ 0U };
 	EBO mEBO{ 0U };
-	Transform mTransform{};
+	std::shared_ptr<Transform> mTransform = std::make_shared<Transform>(); 
 
 	//Bounding Box extent
 	glm::vec3 mCenter{ 0.0f,0.0f,0.0f };
 	glm::vec3 mExtent{ 0.0f,0.0f,0.0f };
 	glm::vec3 minExtent{ 0.0f, 0.0f, 0.0f };
 	glm::vec3 maxExtent{ 0.0f, 0.0f, 0.0f };
-	bool mEnableCollision = true;
+	bool mEnableAABBCollision = false;
+	bool mEnableInverseAABB = false;
+
     //---------------------------------Methods Setters------------------------------------------------
-	void SetTransformation(const Transform& transform) { mTransform = transform; }
-	void SetLocalPosition(const glm::vec3& position) { mTransform.SetPosition(position); }
-	void SetLocalRotation(const glm::quat& rotation) { mTransform.SetRotation(rotation); }
-	void SetLocalScale(const glm::vec3& scale) { mTransform.SetScale(scale); }
-	void SetLocalTransformMatrix(const glm::mat4& transformMatrix) { mTransform.SetTransformMatrix(transformMatrix); }
+	void SetTransformation(const std::shared_ptr<Transform>& transform) { mTransform = transform; }  
+	void SetLocalPosition(const glm::vec3& position) const { mTransform->SetPosition(position); }
+	void SetLocalRotation(const glm::quat& rotation) const { mTransform->SetRotation(rotation); }
+	void SetLocalScale(const glm::vec3& scale) const { mTransform->SetScale(scale); }
+	void SetLocalTransformMatrix(const glm::mat4& transformMatrix) const { mTransform->SetTransformMatrix(transformMatrix); }
 	//---------------------------------Methods Getters------------------------------------------
-	const Transform& GetTransform() const { return mTransform; }
-	const glm::vec3& GetLocalPosition() const { return mTransform.GetPosition(); }
-	const glm::quat& GetLocalRotation() const { return mTransform.GetOrientation(); }
-	const glm::vec3& GetLocalScale() const { return mTransform.GetScale(); }
-	const glm::mat4 GetLocalTransformMatrix() const { return mTransform.GetTransformMatrix(); }
-	glm::vec3 GetRightVector() const { return mTransform.GetRightVector(); }
+	std::shared_ptr<Transform> GetTransform() const { return mTransform; }  
+	const glm::vec3& GetLocalPosition()  { return mTransform->GetPosition(); }
+	const glm::quat& GetLocalRotation() const { return mTransform->GetOrientation(); } 
+	const glm::vec3& GetLocalScale() const { return mTransform->GetScale(); } 
+
+	glm::mat4 GetLocalTransformMatrix() const { return mTransform->GetTransformMatrix(); } 
+	const glm::vec3& GetForwardVector() const { return mTransform->GetForwardVector(); }
+	const glm::vec3& GetRightVector() const { return mTransform->GetRightVector(); }
+	const glm::vec3& GetUpctor() const { return mTransform->GetUpVector(); }
+	float GetPitch() const { return mTransform->GetPitch(); }
+	float GetYaw() const { return mTransform->GetYaw(); } 
+
+
 
 	///Textures
 	//---------------------------------Members------------------------------------------
 	bool mUseTex = false;
 	bool mDrawLine = false;
-	Shader* mShader{ nullptr };
+	std::shared_ptr<Shader> mShader{ nullptr }; 
 	//---------------------------------Methods------------------------------------------
-	void SetShader(Shader* shader) { mShader = shader; }
+	void SetShader(const std::shared_ptr<Shader>& shader) { mShader = shader; }
 	void UseTexture(const bool& useBool)
 	{
 		mUseTex = useBool;
@@ -96,13 +107,15 @@ public:
 	///Lighting
 	//---------------------------------Members------------------------------------------
 	float mAmbientStrength = 1.0f;
-	glm::vec3 mLightColor{ 1.f, 1.f, 1.f };
-	glm::vec3 mLightPos{ 0.f,0.f,0.f };
-	glm::vec3 mObjectColor{ 1.f,0.7f,0.2f };
-	bool mUseLight = true;
+	const glm::vec3& mLightColor{ 1.f, 1.f, 1.f };
+	const glm::vec3& mLightPos{ 0.f,0.f,0.f };
+	const glm::vec3& mObjectColor{ 1.f,0.7f,0.2f };
+	static inline bool mUseLight;
 	//---------------------------------Methods------------------------------------------
-	void UseLight(const bool& useBool)
+	inline void UseLight(const bool& useBool)
 	{
+		/*if (!this) return;*/
+		
 		mUseLight = useBool;
 		if (mUseLight == true)
 		{
@@ -121,6 +134,10 @@ public:
 	}
 	const bool& GetLightBool() const { return mUseLight; }
 
+	///ESC
+	//---------------------------------Members------------------------------------------
+	bool isPlayer = false;
+	bool isActor = false;
 
 
 };

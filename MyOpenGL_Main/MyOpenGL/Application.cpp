@@ -1,8 +1,5 @@
 #include "Application.h"
 
-
-
-
 std::string vs = ShaderLoader::LoadShaderFromFile("Shaders/Triangle.vs");
 std::string fs = ShaderLoader::LoadShaderFromFile("Shaders/Triangle.fs");
 
@@ -23,10 +20,13 @@ Application* Application::GetAPP()
 void Application::GLFW_Init()
 {
     ///Initializing the GLFWWindow
-    std::cout << "Vertex Shader:\n\n " << vs.c_str() << std::endl;
+    std::cout << "Program Running\n";
+    std::cout << "------------------------------------------------------------------------------------" << "\n\n";
+
+ /*   std::cout << "Vertex Shader:\n\n " << vs.c_str() << std::endl;
     std::cout << "\n\n" << "------------------------------------------------------------------------------------" << "\n\n";
     std::cout << "Fragment Shader:\n\n " << fs.c_str() << std::endl;  
-    std::cout << "\n\n" << "------------------------------------------------------------------------------------" << "\n\n";
+    std::cout << "\n\n" << "------------------------------------------------------------------------------------" << "\n\n";*/
 
     // glfw: initialize and configure
     // ------------------------------
@@ -88,6 +88,7 @@ void Application::Run_App()
         float currentFrame = static_cast<float>(glfwGetTime());
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+        std::cout << 1 / deltaTime << "\n";
 
         UpdateCameraController(deltaTime); 
         UpdateActorMovement(deltaTime);   
@@ -172,7 +173,7 @@ void Application::RegisterWindowCallbacks()
     glfwSetWindowUserPointer(mWindow,this);  
 }
 
-void Application::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+void Application::FramebufferSizeCallback(GLFWwindow* window, int width, int height) const
 {
     glViewport(0, 0, width, height);
     mScene->mSceneCamera->SetAspectRatio(static_cast<float>(width) / static_cast<float>(height)); //set Framebuffer according to aspect ratio
@@ -208,7 +209,6 @@ void Application::MouseButtonCallback(GLFWwindow* window, int button, int action
         mButtonState[button] = false; 
     }
 }
-
 
 void Application::CursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 {
@@ -259,19 +259,19 @@ void Application::UpdateCameraController(float dt)
     //Forward and Backwards
     if (!mScene->mSceneCamera->mUseCameraMovement) return;
 
-    if (mKeyState[GLFW_KEY_W]) mScene->mSceneCamera->CameraMovement(Forward,dt)/*, std::cout << "W pressed\n" << std::endl*/;
-    if (mKeyState[GLFW_KEY_S]) mScene->mSceneCamera->CameraMovement(Backwards, dt)/*, std::cout << "S pressed\n" << std::endl*/;
+    if (mKeyState[GLFW_KEY_W]) mScene->mSceneCamera->CameraMovement(Direction::Forward,dt)/*, std::cout << "W pressed\n" << std::endl*/;
+    if (mKeyState[GLFW_KEY_S]) mScene->mSceneCamera->CameraMovement(Direction::Backwards, dt)/*, std::cout << "S pressed\n" << std::endl*/;
 
     //Left and right
-    if (mKeyState[GLFW_KEY_D]) mScene->mSceneCamera->CameraMovement(Right, dt)/*, std::cout << "D pressed\n" << std::endl*/;
-    if (mKeyState[GLFW_KEY_A]) mScene->mSceneCamera->CameraMovement(Left, dt)/*, std::cout << "A pressed\n" << std::endl*/;
+    if (mKeyState[GLFW_KEY_D]) mScene->mSceneCamera->CameraMovement(Direction::Right, dt)/*, std::cout << "D pressed\n" << std::endl*/;
+    if (mKeyState[GLFW_KEY_A]) mScene->mSceneCamera->CameraMovement(Direction::Left, dt)/*, std::cout << "A pressed\n" << std::endl*/;
 
     //Up and Down
-    if (mKeyState[GLFW_KEY_SPACE]) mScene->mSceneCamera->CameraMovement(Up, dt)/*, std::cout << "Space pressed\n" << std::endl*/;
-    if (mKeyState[GLFW_KEY_LEFT_ALT]) mScene->mSceneCamera->CameraMovement(Down, dt)/*, std::cout << "Alt pressed\n" << std::endl*/;
+    if (mKeyState[GLFW_KEY_SPACE]) mScene->mSceneCamera->CameraMovement(Direction::Up, dt)/*, std::cout << "Space pressed\n" << std::endl*/;
+    if (mKeyState[GLFW_KEY_LEFT_ALT]) mScene->mSceneCamera->CameraMovement(Direction::Down, dt)/*, std::cout << "Alt pressed\n" << std::endl*/;
 
     //Increase of Speed
-    if (mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->mSceneCamera->CameraMovement(IncreaseSpeed, dt)/*, std::cout << "Shift pressed\n" << std::endl*/;
+    if (mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->mSceneCamera->CameraMovement(Direction::IncreaseSpeed, dt)/*, std::cout << "Shift pressed\n" << std::endl*/;
    
     /*glm::vec3 getPos = mScene->mSceneCamera->mTransform.GetPosition();
     std::cout << "getcameraPos:" << getPos.x << " " << getPos.y << " " << getPos.z << std::endl;*/
@@ -286,14 +286,15 @@ void Application::UpdateActorMovement(float dt)
         {
             //Movement Keys
             if (mKeyState[GLFW_KEY_W]) actor->ActorMovement(Forward, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_A]) actor->ActorMovement(Left, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_S]) actor->ActorMovement(Backwards, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_A]) actor->ActorMovement(Left, mScene->mSceneCamera, dt); 
+            if (mKeyState[GLFW_KEY_S]) actor->ActorMovement(Backwards, mScene->mSceneCamera, dt); 
             if (mKeyState[GLFW_KEY_D]) actor->ActorMovement(Right, mScene->mSceneCamera, dt);
             if (mKeyState[GLFW_KEY_SPACE]) actor->ActorMovement(Up, mScene->mSceneCamera, dt);
             if (mKeyState[GLFW_KEY_LEFT_ALT]) actor->ActorMovement(Down, mScene->mSceneCamera, dt);
 
             //Increase Speed
             if (mKeyState[GLFW_KEY_LEFT_SHIFT]) actor->ActorMovement(IncreaseSpeed, mScene->mSceneCamera, dt);
+            if(!mKeyState[GLFW_KEY_LEFT_SHIFT]) actor->ActorMovement(NormalSpeed, mScene->mSceneCamera, dt);
         }
     }
 }
@@ -305,15 +306,29 @@ void Application::UpdateCameraPlacement(float dt)
     {
         if (actor->mName == "player")
         {
-            if (mKeyState[GLFW_KEY_1]) actor->CameraControll(CameraFreeMovment_1, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_2]) actor->CameraControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_3]) actor->CameraControll(CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_1]) actor->CameraStateControll(CameraFreeMovement_1, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_2]) actor->CameraStateControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_3]) actor->CameraStateControll(CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt);
         }
         else
         {
-            if(mKeyState[GLFW_KEY_1]) actor->CameraControll(CameraFreeMovment_1, mScene->mSceneCamera, dt); 
+            if(mKeyState[GLFW_KEY_1]) actor->CameraStateControll(CameraFreeMovement_1, mScene->mSceneCamera, dt);
         }
     }
+
+    /*for (auto & [name, actor] : mScene->men)
+    {
+        if (actor->mName == "player")
+        {
+            if (mKeyState[GLFW_KEY_1]) actor->CameraStateControll(CameraFreeMovement_1, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_2]) actor->CameraStateControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_3]) actor->CameraStateControll(CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt);
+        }
+        else
+        {
+            if (mKeyState[GLFW_KEY_1]) actor->CameraStateControll(CameraFreeMovement_1, mScene->mSceneCamera, dt);
+        }
+    }*/
 }
 
 

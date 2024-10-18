@@ -10,25 +10,7 @@
 
 //Classes
 #include "../Utility/Transform.h"
-
-//Enum
-enum Direction
-{
-	//Directions
-	Forward, Backwards,
-	Right, Left,
-	Up, Down,
-	IncreaseSpeed,
-
-	//Mouse buttons
-	RightMouseButton,
-	MouseMotionX, MouseMotionY,
-
-	//Other buttons
-	CameraFreeMovment_1,
-	CameraStatic_CharacterMovement_2,
-	CameraStatic_FollowPlayer_3
-};
+#include "../Utility/EnumArchive.h"
 
 
 class Camera
@@ -126,4 +108,3 @@ public:
 	void CameraMouseButton(double xPos, double yPos);
 	void CameraMouseMovement(double xPos, double yPos);
 };
-

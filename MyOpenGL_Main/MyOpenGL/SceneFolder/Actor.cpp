@@ -1,16 +1,13 @@
 #include "Actor.h"
 
-
 ///Acor constructor/destructor
-Actor::Actor(Mesh* mesh, const std::string& name)
+Actor::Actor(const std::shared_ptr<Mesh>& mesh, const std::string& name): mMesh(mesh), mName(name)
 {
-    mMesh = mesh;
-    mName = name;
-    EnablePhysics = true;
-    rigidB.pos = mMesh->GetLocalPosition(); 
-    rigidB.acceleration = Environment::gravitationalAcceleraton; 
+    Id++;
+    EnablePhysics = false;
+    rigidB->pos = mMesh->GetLocalPosition(); 
+    rigidB->acceleration = Environment::gravitationalAcceleraton; 
 }
-
 
 Actor::~Actor()
 {
@@ -19,25 +16,24 @@ Actor::~Actor()
 
     for (auto& getMeshVector : spawnVector)
     {
-        getMeshVector->mMesh->~Mesh();
-        delete getMeshVector; 
+        getMeshVector->mMesh->~Mesh(); 
     }
     spawnVector.clear();
 }
 
-void Actor::ExtrudeMesh(Extrude increase_or_decrease, const float &extrude)
+void Actor::ExtrudeMesh(Extrude _increase_or_decrease, const float& _extrude) const
 {
-    if (extrude == 1.0f)
+    if (_extrude == 1.0f)
     {
         std::cout << "Value has no influence. Try a value < or > than 1.0f \n";
     }
-    switch (increase_or_decrease)
+    switch (_increase_or_decrease)
     {
     case increase:
         {
          for (auto& getVert : mMesh->mVertices)
          {
-             getVert.mPos *= extrude; 
+             getVert.mPos *= _extrude;
              mMesh->minExtent = glm::min(mMesh->minExtent, getVert.mPos); 
              mMesh->maxExtent = glm::max(mMesh->maxExtent, getVert.mPos);
          }
@@ -49,7 +45,7 @@ void Actor::ExtrudeMesh(Extrude increase_or_decrease, const float &extrude)
        {
         for (auto& getVert: mMesh->mVertices)
         {
-            getVert.mPos /= extrude; 
+            getVert.mPos /= _extrude;
         }
         mMesh->configureMesh();
         break;
@@ -73,44 +69,44 @@ void Actor::UpdateVelocity(float dt)
 }
 
 ///Barycentric Coordinates
-void Actor::SetBarySurfaceMesh(Mesh* selectSurface)
+void Actor::SetBarySurfaceMesh(const std::shared_ptr<Mesh>& _selectSurface)
 {
-    if (selectSurface != nullptr)
+    if (_selectSurface != nullptr)
     {
-      mSurfaceMesh = selectSurface; 
+      mSurfaceMesh = _selectSurface;
     }
     else
     {
-        assert(selectSurface && "Illegal surface detected or not set correctly");
+        assert(_selectSurface && "Illegal surface detected or not set correctly");
         return;
     }
 }
 
-Actor* Actor::BarycentricCoordinates(float dt)
+std::shared_ptr<Actor> Actor::BarycentricCoordinates(float _dt)
 {
     
     //vector of vertices and indices
-    for (auto i = 0; i < mSurfaceMesh->mIndices.size(); i += 3)
+    for (size_t i = 0; i < mSurfaceMesh->mIndices.size(); i += 3)
     {
         //Collect indices which creates each triangle in the plane
-        unsigned int index1;
-        unsigned int index2;
-        unsigned int index3;
+        /* std::shared_ptr<unsigned int> index1;
+         std::shared_ptr<unsigned int> index2;
+         std::shared_ptr<unsigned int> index3; */
 
         //Assigning the values
-        index1 = mSurfaceMesh->mIndices[i];
-        index2 = mSurfaceMesh->mIndices[static_cast<std::vector<std::seed_seq::result_type, std::allocator<std::seed_seq::result_type>>::size_type>(i) + 1];
-        index3 = mSurfaceMesh->mIndices[static_cast<std::vector<std::seed_seq::result_type, std::allocator<std::seed_seq::result_type>>::size_type>(i) + 2];
+        const unsigned int index1 = mSurfaceMesh->mIndices[i];
+        const unsigned int index2 = mSurfaceMesh->mIndices[i + 1];
+        const unsigned int index3 = mSurfaceMesh->mIndices[i + 2];
 
         //Collecting the postions of the indices 
-        glm::vec3 point1{ mSurfaceMesh->mVertices[index1].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale() };
-        glm::vec3 point2{ mSurfaceMesh->mVertices[index2].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale() };
-        glm::vec3 point3{ mSurfaceMesh->mVertices[index3].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale() };
+        glm::vec3 point1 = mSurfaceMesh->mVertices[index1].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale();
+        glm::vec3 point2 = mSurfaceMesh->mVertices[index2].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale();
+        glm::vec3 point3 = mSurfaceMesh->mVertices[index3].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale();
 
         //Initialising variable which calculates bary-coords using the CalcBary-coords method
-        glm::vec3 baryCoords = CalculateBarycentricCoordinates(point1,point2,point3, mMesh->GetLocalPosition());  
+        glm::vec3 baryCoords = CalculateBarycentricCoordinates(point1,point2,point3, mMesh->GetLocalPosition());
 
-        //Creating a variable which utilizes the calc-bary method.
+        //Creating a variable which utilizes the calc-bary method
         float baryHeight = ((baryCoords.x * point1.y) + (baryCoords.y * point2.y + (mMesh->mExtent.y / 2)) + (baryCoords.z * point3.y));
 
         //If-checks if certain criterias are met folowing the rules for bary-coords behaviour
@@ -133,25 +129,25 @@ Actor* Actor::BarycentricCoordinates(float dt)
     return nullptr;
 }
 
-glm::vec3 Actor::CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,  glm::vec3 playerPos) 
+glm::vec3 Actor::CalculateBarycentricCoordinates(glm::vec3 _p1, glm::vec3 _p2, glm::vec3 _p3, glm::vec3 _playerPos)
 {
     ///Setting default values to zero
-    p1.y = 0.f;
-    p2.y = 0.f;
-    p3.y = 0.f;
-    playerPos.y = 0.f;
+    _p1.y = 0.f;
+    _p2.y = 0.f;
+    _p3.y = 0.f;
+    _playerPos.y = 0.f;
     glm::vec3 baryCoords{0.f,0.f,0.f};
   
     ///Calculating triangle surface area
-    glm::vec3 u = { p2 - p1}; //sw
-    glm::vec3 v = { p3 - p1 }; //sw
+    glm::vec3 u = { _p2 - _p1}; //sw
+    glm::vec3 v = { _p3 - _p1 }; //sw
     glm::vec3 n = glm::cross(u, v); 
     float triangleSurfaceArea = n.y;  
 
     ///Sub Triangle vectors
-    glm::vec3 newU = { glm::cross(p2 - playerPos, p3 - playerPos) };
-    glm::vec3 newV = { glm::cross(p3 - playerPos, p1 - playerPos) };
-    glm::vec3 newW = { glm::cross(p1 - playerPos, p2 - playerPos) };
+    glm::vec3 newU = { glm::cross(_p2 - _playerPos, _p3 - _playerPos) };
+    glm::vec3 newV = { glm::cross(_p3 - _playerPos, _p1 - _playerPos) };
+    glm::vec3 newW = { glm::cross(_p1 - _playerPos, _p2 - _playerPos) };
 
     ///Calculate area with respect to reverse clockwise direction
     //Sub Triangle 1 baryCoords X
@@ -170,109 +166,126 @@ glm::vec3 Actor::CalculateBarycentricCoordinates(glm::vec3 p1, glm::vec3 p2, glm
 }
 
 ///Actor movement
-void Actor::ActorMovement(Direction direction, Camera* camera, float dt)
+void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& camera, float dt)
 {
     auto &getCamera = camera;
     if (!getCamera->mUseCameraMovement && !mAttachCamera)
     {
         glm::vec3 currentPosition = mMesh->GetLocalPosition();
-       /* glm::vec3 movement(0.f);*/
+        glm::vec3 movement(0.f);
 
         switch (direction)
         {
             //Forward & Backwards
         case Forward:
-            mAcceleration.z -= mMovementSpeed * dt; break;
+            movement.z -= mMovementSpeed * dt; break;
         case Backwards:
-            mAcceleration.z += mMovementSpeed * dt; break;
+            movement.z += mMovementSpeed * dt; break;
 
             //Left & Right
         case Left:
-            mAcceleration.x -= mMovementSpeed * dt; break;
+            movement.x -= mMovementSpeed * dt; break;
         case Right:
-            mAcceleration.x += mMovementSpeed * dt; break;
+            movement.x += mMovementSpeed * dt; break;
 
             //Up & Down
         case Up:
-            mAcceleration.y += mMovementSpeed * dt; break;
+            movement.y += mMovementSpeed * dt; break;
         case Down:
-            mAcceleration.y -= mMovementSpeed * dt; break;
+            movement.y -= mMovementSpeed * dt; break;
 
             //Increase Speed
         case IncreaseSpeed:
+            mMovementSpeed = 50.f;
+            break;
+        case NormalSpeed:
+            mMovementSpeed = 15.0f;
             break;
 
         default:
             mMovementSpeed = 15.0f;
             break;
         }
-        mMesh->SetLocalPosition(currentPosition + mAcceleration);
+        mMesh->SetLocalPosition(currentPosition + movement);
     }
-    //if (!getCamera->mUseCameraMovement && mAttachCamera)
-    //{
-    //    glm::vec3 currentPosition = mMesh->GetLocalPosition();
-    //    glm::vec3 movement(0.f);
 
-    //    switch (direction)
-    //    {
-    //        //Forward & Backwards
-    //    case Forward:
-    //        movement.z -= mMovementSpeed * dt; break;
-    //    case Backwards:
-    //        movement.z += mMovementSpeed * dt; break;
+    if (getCamera->mUseCameraMovement && mAttachCamera)
+    {
+        glm::vec3 currentPosition = mMesh->GetLocalPosition();
+        glm::vec3 movement(0.f);
 
-    //        //Left & Right
-    //    case Left:
-    //        movement.x -= mMovementSpeed * dt; break;
-    //    case Right:
-    //        movement.x += mMovementSpeed * dt; break;
+        switch (direction)
+        {
+            //Forward & Backwards
+        case Forward:
+            movement.z -= mMovementSpeed * dt; break; 
+        case Backwards:
+            movement.z += mMovementSpeed * dt; break;
 
-    //        //Up & Down
-    //    case Up:
-    //        movement.y += mMovementSpeed * dt; break;
-    //    case Down:
-    //        movement.y -= mMovementSpeed * dt; break;
+            //Left & Right
+        case Left:
+            movement.x -= mMovementSpeed * dt; break;
+        case Right:
+            movement.x += mMovementSpeed * dt; break;
 
-    //        //Increase Speed
-    //    case IncreaseSpeed:
-    //        break;
+            //Up & Down
+        case Up:
+            movement.y += mMovementSpeed * dt; break;
+        case Down:
+            movement.y -= mMovementSpeed * dt; break;
 
-    //    default:
-    //        mMovementSpeed = 15.0f;
-    //        break;
-    //    }
-    //    mMesh->SetLocalPosition(currentPosition + movement);
-    //    camera->SetLocalPosition(currentPosition + glm::vec3(0.f, mMesh->mExtent.y, mMesh->mExtent.z + 20.f));
-    //}
+            //Increase Speed
+        case IncreaseSpeed:
+            mMovementSpeed = 50.0f;
+            break;
+        case NormalSpeed:
+            mMovementSpeed = 15.0f;
+            break;
+
+        default:
+            mMovementSpeed = 15.0f;
+            break;
+        }
+     
+        mMesh->SetLocalPosition((currentPosition + movement));    
+        mMesh->SetLocalRotation(camera->GetLocalRotation());  
+        camera->SetLocalPosition(currentPosition + glm::abs(glm::vec3(0.f, mMesh->mExtent.y - 2.0f, mMesh->mExtent.z)));
+    }
 }
 
-void Actor::CameraControll(Direction placement, Camera* camera, float dt) const
+inline void Actor::SetCamera(const std::shared_ptr<Camera>& selectCamera)
+{
+    this->mCamera = selectCamera;
+}
+
+void Actor::CameraStateControll(CameraState state, const std::shared_ptr<Camera>& camera, float dt) const
 {
     auto &getCamera = camera; 
-    switch (placement)
+    switch (state)
     {
-      case CameraFreeMovment_1:
-            mAttachCamera = false;
+      case CameraFreeMovement_1:
+            DetachCamera(); 
             getCamera->mUseCameraMovement = true;
             break;
 
       case CameraStatic_CharacterMovement_2:
-            mAttachCamera = false;
+            DetachCamera();
             getCamera->mUseCameraMovement = false;
             break;
 
       case CameraStatic_FollowPlayer_3:  
-            mAttachCamera = true; 
-            getCamera->mUseCameraMovement = false;
+            AttachCamera(); 
+            getCamera->mUseCameraMovement = true;
             break;
+
       default:
-          mAttachCamera = false;
+          DetachCamera();
           getCamera->mUseCameraMovement = true;
     }
 }
 
 ///Lerp and Lerp along interpolation curve
-void Actor::SetLerpMesh(Mesh* selectLerpMesh)
+void Actor::SetLerpMesh(const std::shared_ptr<Mesh>& selectLerpMesh)
 {
     mLerpMesh = selectLerpMesh;
 }
@@ -303,12 +316,12 @@ void Actor::AI_Path(float dt)
         }
     }
     //update local variable with use of lerp-function
-    getPos = Lerp(mMesh->mVertices[(unsigned __int64)index].mPos + mMesh->GetLocalPosition(), mMesh->mVertices[(unsigned __int64)index + (unsigned __int64)movementDir].mPos + mMesh->GetLocalPosition(), deltaTime);
+    getPos = Lerp(mMesh->mVertices[(unsigned int)index].mPos + mMesh->GetLocalPosition(), mMesh->mVertices[(unsigned __int64)index + (unsigned __int64)movementDir].mPos + mMesh->GetLocalPosition(), deltaTime);
     this->mMesh->SetLocalPosition(getPos);
 }
 
 ///Camera Support
-void Actor::cameraTracker(Camera* camera, float dt) const
+void Actor::cameraTracker(const std::shared_ptr<Camera>& camera, float dt) const
 {
     //if (!camera->mUseCameraMovement && !camera->mRightMouseButtonPressed)
     //{
@@ -333,38 +346,36 @@ void Actor::cameraTracker(Camera* camera, float dt) const
 }
 
 ///Spawner
-void Actor::Spawner(const int& spawnAmount, const float& distributionX, const float& distributionZ)
+void Actor::Spawner(const int& _spawnAmount, const float& _distributionX, const float& _distributionZ, const int& _actorType)
 {
-    for (int amount = 0; amount < spawnAmount; amount++)
+    for (int amount = 0; amount < _spawnAmount; amount++)
     {
-        if (spawnAmount > 0)
+        if (_spawnAmount > 0)
         {
-            switch (ActorType)
+            Actor::spawnVector.reserve(_spawnAmount);
+            switch (_actorType)
             {
             case 1:
-                spawnedActor = new Actor(Mesh::CreateCube(1.0f),"spawnedCube " + std::to_string(amount));
+                spawnedActor = std::make_shared<Actor>(Mesh::CreateCube(1.0f),"spawnedCube " + std::to_string(amount));
                 spawnedActor->mMesh->mUseTex = true;
-                spawnedActor->mMesh->mEnableCollision = true;
                 break;
             case 2:
-                spawnedActor = new Actor(Mesh::CreateSphere(16, 16, 1), "spawnedSphere " + std::to_string(amount));
+                spawnedActor = std::make_shared<Actor>(Mesh::CreateSphere(16, 16, 1), "spawnedSphere " + std::to_string(amount));
                 spawnedActor->mMesh->mUseTex = true;
-                spawnedActor->mMesh->mEnableCollision = true;
                 break;
             case 3:
-                spawnedActor = new Actor(Mesh::CreatePyramid(5.0f), "spawnedPyramid " + std::to_string(amount));
+                spawnedActor = std::make_shared<Actor>(Mesh::CreatePyramid(5.0f), "spawnedPyramid " + std::to_string(amount));
                 spawnedActor->mMesh->mUseTex = true;
-                spawnedActor->mMesh->mEnableCollision = true;
                 break;
             }
-            glm::vec3 spawnPos = glm::linearRand(glm::vec3(distributionX), glm::vec3(distributionZ));
-            spawnedActor->mMesh->SetLocalPosition(spawnPos);
-            spawnedActor->rigidB.pos = spawnedActor->mMesh->GetLocalPosition();
+            const glm::vec3& spawnPos = glm::linearRand(glm::vec3(_distributionX), glm::vec3(_distributionZ));
+            spawnedActor->mMesh->SetLocalPosition(spawnPos); 
+            spawnedActor->rigidB->pos = spawnedActor->GetLocalPosition();
             Actor::spawnVector.emplace_back(spawnedActor);
         }
         else
         {
-            std::cout << "Amount is 0" << std::endl;
+            std::cout << "Amount is less or equal to 0" << std::endl;
             return;
         }
     }
@@ -377,13 +388,13 @@ void Actor::UpdateActors(float dt)
     if (mMesh) 
     {
         UpdateVelocity(dt);
-        rigidB.Update(dt);
+        rigidB->Update(dt);
         //Updaing the center value
         mMesh->mCenter = mMesh->GetLocalPosition();
 
         if (EnablePhysics)
         {
-            mMesh->SetLocalPosition(rigidB.pos);   
+            mMesh->SetLocalPosition(rigidB->pos);   
         }
         //Bind shaders to Model-uniform
         mMesh->mShader->setMat4("model", mMesh->GetLocalTransformMatrix()); 

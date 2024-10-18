@@ -112,14 +112,14 @@ glm::mat4 Camera::GetFrustumMatrix() const
 }
 
 ///Camera movement
-void Camera::CameraMovement(Direction direction, float dt)
+void Camera::CameraMovement(Direction direction, float dt) 
 {
 	if (!mUseCameraMovement) return;
 
     switch (direction)
     {
     	//Forward and Backwards
-        case Forward: mAcceleration.z += GetAccelerationSpeed(); break;
+	    case Forward: mAcceleration.z += GetAccelerationSpeed(); break;
         case Backwards:mAcceleration.z -= GetAccelerationSpeed(); break;;
         case Right:mAcceleration.x += GetAccelerationSpeed(); break;
         case Left:mAcceleration.x -= GetAccelerationSpeed(); break;
@@ -148,9 +148,6 @@ void Camera::CameraMouseMovement(double xPos, double yPos)
 
 	else
 	{
-
-		/*std::cout << "Mouse Button Pressed \n" << std::endl;*/
-
 		float xOffset = mLastX - static_cast<float>(xPos);
 		float yOffset = mLastY - static_cast<float>(yPos);
 

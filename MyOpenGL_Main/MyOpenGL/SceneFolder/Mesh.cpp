@@ -1,13 +1,10 @@
 #include "Mesh.h"
 
 ///Constructor and Destructor
-Mesh::Mesh(const std::string& type, std::vector<Vertex>& vertices, std::vector<Index>& indices, const bool& useTex, const bool& drawLine)
+Mesh::Mesh(const std::string& type, const std::vector<Vertex>& vertices,
+           const std::vector<Index>& indices, const bool& useTex,
+           const bool& drawLine) : mVertices(vertices),mIndices(indices), mType(type)
 {
-    mVertices = vertices;
-    mIndices = indices;
-    mType = type;
-    mUseTex = useTex;
-    mDrawLine = drawLine;
     configureMesh();
 
     for (auto& it : vertices)
@@ -27,7 +24,7 @@ Mesh::~Mesh()
 }
 
 ///Create Meshes
-Mesh* Mesh::Create2DTriangle(float size)
+std::shared_ptr<Mesh> Mesh::Create2DTriangle(float size)
 {
     std::vector<Vertex> vertices =
     {
@@ -42,10 +39,10 @@ Mesh* Mesh::Create2DTriangle(float size)
         0,1,2
     };
 
-    return new Mesh("2DTriangle", vertices, indices, false, false);
+    return std::make_shared<Mesh>("2DTriangle", vertices, indices, false, false);
 }
 
-Mesh* Mesh::CreatePyramid(float size)
+std::shared_ptr<Mesh> Mesh::CreatePyramid(float size)
 {
     std::vector<Vertex> vertices =
     {
@@ -94,10 +91,10 @@ Mesh* Mesh::CreatePyramid(float size)
         13,14,15
     };
 
-    return new Mesh("pyramid", vertices, indices, true);
+    return std::make_shared<Mesh>("pyramid", vertices, indices, true, false);
 }
 
-Mesh* Mesh::CreateCube(float size)
+std::shared_ptr<Mesh> Mesh::CreateCube(float size)
 {
     std::vector<Vertex> vertices = {
         // Front face
@@ -147,13 +144,13 @@ Mesh* Mesh::CreateCube(float size)
         20, 21, 22, 20, 22, 23
     };
 
-    return new Mesh("cube", vertices, indices, true, false);
+    return std::make_shared<Mesh>("cube", vertices, indices, true, false);
 }
 
-Mesh* Mesh::CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
+std::shared_ptr<Mesh> Mesh::CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
     const float& startVal, const float& endingVal, const float& resolution)
 {
-    std::vector<Vertex> Vertices;
+    std::vector<Vertex> vertices;
     ///Creating random numbers
     srand((unsigned)time(NULL));
 
@@ -189,23 +186,23 @@ Mesh* Mesh::CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2
     auto getX = getInverse * b;
 
     //Crating an array of Vertices
-    std::vector<unsigned int> Indices;
+    std::vector<unsigned int> indices;
 
     for (float x = startVal; x <= endingVal; x += resolution)
     {
         float calcF = (getX.x * (float)pow(x, 2)) + (getX.y * x) + (getX.z);
-        Vertices.emplace_back(x, 0.0f, calcF);
+        vertices.emplace_back(x, 0.0f, calcF);
     }
 
-    for (int i = 0; i < Vertices.size(); i++)
+    for (int i = 0; i < vertices.size(); i++)
     {
-        Indices.emplace_back(i);
+        indices.emplace_back(i);
     }
 
-    return new Mesh("InterpolationCurve", Vertices, Indices, false, true);
+    return std::make_shared<Mesh>("InterpolationCurve", vertices, indices, true, false);
 }
 
-Mesh* Mesh::CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution)
+std::shared_ptr<Mesh> Mesh::CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution)
 {
     std::vector<Vertex> vertices;
     std::vector<Index> indices;
@@ -242,10 +239,10 @@ Mesh* Mesh::CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMa
             i += 4; //Inrementing by 4 to get newt square
         }
     }
-    return new Mesh("planeXZ", vertices, indices, false, false);
+    return std::make_shared<Mesh>("planeXZ", vertices, indices, true, false);
 }
 
-Mesh* Mesh::CreatePlaneXY(const float& xMin, const float& yMin, const float& xMax, const float& yMax, const float& resolution)
+std::shared_ptr<Mesh> Mesh::CreatePlaneXY(const float& xMin, const float& yMin, const float& xMax, const float& yMax, const float& resolution)
 {
     std::vector<Vertex> vertices;
     std::vector<Index> indices;
@@ -281,10 +278,10 @@ Mesh* Mesh::CreatePlaneXY(const float& xMin, const float& yMin, const float& xMa
             i += 4; //Incrementing to next square
         }
     }
-    return new Mesh("planeXY", vertices, indices, false, false);
+    return std::make_shared<Mesh>("planeXY", vertices, indices, true, false);
 }
 
-Mesh* Mesh::CreateSphere(const int& stackCount, const int& sectorCount, const int& radius)
+std::shared_ptr<Mesh> Mesh::CreateSphere(const int& stackCount, const int& sectorCount, const int& radius)
 {
     std::vector<Vertex> vertices;
     std::vector<Index> indices;
@@ -350,7 +347,7 @@ Mesh* Mesh::CreateSphere(const int& stackCount, const int& sectorCount, const in
             }
         }
     }
-    return new Mesh("Sphere", vertices, indices, true, false);
+    return std::make_shared<Mesh>("Sphere", vertices, indices, true, false);
 }
 
 ///Configuring the mesh
@@ -373,7 +370,7 @@ void Mesh::configureMesh()
 }
 
 ///Drawing the mesh
-void Mesh::drawActor(const Shader* shader) const
+void Mesh::drawActor(const std::shared_ptr<Shader>& shader) const 
 {
     glBindVertexArray(mVAO);
     if (shader && mDrawLine == false)

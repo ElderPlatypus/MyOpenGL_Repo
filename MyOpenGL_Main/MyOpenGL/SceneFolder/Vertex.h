@@ -26,7 +26,7 @@ public:
     }
 
 
-    Vertex(const glm::vec3& position, const glm::vec3& normals, const glm::vec2 textCoords)
+    Vertex(const glm::vec3& position, const glm::vec3& normals, const glm::vec2& textCoords)
     {
         mPos = position;
         mNormals = normals;

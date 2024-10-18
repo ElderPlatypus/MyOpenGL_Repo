@@ -16,6 +16,7 @@
 #include "Shaders/ShaderFileLoader.h"
 #include "Shaders/Shader.h"
 
+
 class Application
 {
 public:
@@ -35,7 +36,7 @@ public:
 
 	///Window Callbacks
 	void RegisterWindowCallbacks();
-	void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
+	void FramebufferSizeCallback(GLFWwindow* window, int width, int height) const;
 	void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 	void CursorPosCallback(GLFWwindow* window, double xPos, double yPos);

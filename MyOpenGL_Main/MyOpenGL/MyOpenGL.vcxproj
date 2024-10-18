@@ -148,11 +148,15 @@
     <ClCompile Include="Shaders\Shader.cpp" />
     <ClCompile Include="Shaders\ShaderFileLoader.cpp" />
     <ClCompile Include="Shaders\Texture.cpp" />
+    <ClCompile Include="Utility\EnumArchive.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="CameraFolder\Camera.h" />
     <ClInclude Include="Dependency\includes\stb\stb_image.h" />
+    <ClInclude Include="ECS\Components.h" />
+    <ClInclude Include="ECS\Entity.h" />
+    <ClInclude Include="ECS\Systems.h" />
     <ClInclude Include="includes\assimp\Bitmap.h" />
     <ClInclude Include="includes\GLFW\glfw3.h" />
     <ClInclude Include="includes\GLFW\glfw3native.h" />
@@ -160,6 +164,7 @@
     <ClInclude Include="includes\KHR\khrplatform.h" />
     <ClInclude Include="Physics\Environment.h" />
     <ClInclude Include="Physics\RigidBody.h" />
+    <ClInclude Include="SceneFolder\ActorMovement.h" />
     <ClInclude Include="SceneFolder\Mesh.h" />
     <ClInclude Include="Shaders\Texture.h" />
     <ClInclude Include="Physics\Collision.h" />

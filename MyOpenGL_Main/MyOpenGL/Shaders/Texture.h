@@ -10,9 +10,9 @@ class Texture
 {
 public:
 	///Constructor and destructor
-	Texture(const std::string& path, Shader* shader);
+	Texture(const std::string& path,const std::shared_ptr<Shader>& shader);
 	~Texture();
-	Texture(const Texture&) = delete;
+	Texture(const std::shared_ptr<Texture>&) = delete;
 
 	///Load texture
 	void LoadTexture();
@@ -20,6 +20,6 @@ public:
 	///Members
 	TexID mId{ 0u };  
 	std::string mPath;
-	Shader* mShader{ nullptr };
+	std::shared_ptr<Shader> mShader;
 
 };

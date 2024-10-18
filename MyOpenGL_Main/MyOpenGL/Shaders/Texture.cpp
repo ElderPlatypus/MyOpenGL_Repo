@@ -4,7 +4,7 @@
 #include <stb/stb_image.h>
 
 
-Texture::Texture(const std::string& path, Shader* shader) : mId(0), mPath(path), mShader(shader)
+Texture::Texture(const std::string& path, const std::shared_ptr<Shader>& shader) : mId(0), mPath(path), mShader(shader)
 {
     LoadTexture();
 }
