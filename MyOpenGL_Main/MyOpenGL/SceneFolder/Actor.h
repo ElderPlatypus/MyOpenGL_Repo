@@ -77,7 +77,7 @@ public:
     ///Actor movement 
     //---------------------------------Members------------------------------------------ 
     std::shared_ptr<Camera> mCamera;
-    bool mRelativeCameraPosition = false;  
+    bool mCanMove = false;
     //---------------------------------Methods------------------------------------------ 
     void ActorMovement(Direction direction, const std::shared_ptr<Camera>& camera, float dt);
 
@@ -103,10 +103,12 @@ public:
     //---------------------------------Members------------------------------------------ 
     inline static std::vector<std::shared_ptr<Actor>> spawnVector;
     inline static std::shared_ptr<Actor> spawnedActor;
+    void DeleteSpawnvector_single(const std::shared_ptr<Actor>& actor);
+    void DeleteSpawnvector_all();
     //inline static int ActorType; //1 = cube, 2 = Sphere, 3 = Pyramid
     //---------------------------------Methods------------------------------------------ 
     static void Spawner(const int& _spawnAmount, const float& _distributionX, const float& _distributionZ, const int& _actorType);
-
+    inline static int numSpawn;
 
     ///Transform Getter & Setters
     

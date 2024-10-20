@@ -11,14 +11,29 @@ Actor::Actor(const std::shared_ptr<Mesh>& mesh, const std::string& name): mMesh(
 
 Actor::~Actor()
 {
-    mMesh->~Mesh();
-    delete this;
+    if (!mMesh) return;  
 
-    for (auto& getMeshVector : spawnVector)
+    mMesh->~Mesh();
+    mMesh = nullptr; 
+}
+
+void Actor::DeleteSpawnvector_single(const std::shared_ptr<Actor>& actor)
+{
+    if (spawnVector.empty() || !actor) return;
+    actor->mMesh->~Mesh();     
+    numSpawn--;  
+    return;
+}
+void Actor::DeleteSpawnvector_all()
+{
+    if (spawnVector.empty()) return; 
+
+    for (const auto& spawn : spawnVector)
     {
-        getMeshVector->mMesh->~Mesh(); 
+        spawn->~Actor();
     }
     spawnVector.clear();
+
 }
 
 void Actor::ExtrudeMesh(Extrude _increase_or_decrease, const float& _extrude) const
@@ -166,36 +181,39 @@ glm::vec3 Actor::CalculateBarycentricCoordinates(glm::vec3 _p1, glm::vec3 _p2, g
 }
 
 ///Actor movement
-void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& camera, float dt)
+void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& camera, float dt) 
 {
-    if (!camera->mUseCameraMovement && !mAttachCamera && isActor || isPlayer)  
+    if (!camera->mUseCameraMovement && !mAttachCamera)  
     {
-        glm::vec3 currentPosition = mMesh->GetLocalPosition();
-        glm::vec3 movement(0.f);
+        glm::vec3 movement{ 0,0,0 };
+        const glm::vec3& front = GetForwardVector();
+        const glm::vec3& right = glm::normalize(glm::cross(front, glm::vec3(0.f, 1.f, 0.f)));
+        const glm::vec3& up = glm::cross(right, front);
 
+        //Directions are inverted
         switch (direction)
         {
             //Forward & Backwards
         case Forward:
-            movement.z -= mMovementSpeed * dt; break;
+            movement += mMovementSpeed * dt * front; break;
         case Backwards:
-            movement.z += mMovementSpeed * dt; break;
+            movement -= mMovementSpeed * dt * front; break;
 
             //Left & Right
         case Left:
-            movement.x -= mMovementSpeed * dt; break;
+            movement -= mMovementSpeed * dt * right; break;
         case Right:
-            movement.x += mMovementSpeed * dt; break;
+            movement += mMovementSpeed * dt * right; break;
 
             //Up & Down
         case Up:
-            movement.y += mMovementSpeed * dt; break;
+            movement += mMovementSpeed * dt * up; break;
         case Down:
-            movement.y -= mMovementSpeed * dt; break;
+            movement -= mMovementSpeed * dt * up; break;
 
             //Increase Speed
         case IncreaseSpeed:
-            mMovementSpeed = 50.f;
+            mMovementSpeed = 50.0f;
             break;
         case NormalSpeed:
             mMovementSpeed = 15.0f;
@@ -205,53 +223,55 @@ void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& ca
             mMovementSpeed = 15.0f;
             break;
         }
-        mMesh->SetLocalPosition(currentPosition + movement);
+        SetLocalRotation(glm::vec3(0,0,0));
+        SetLocalPosition(GetLocalPosition() + movement);
+        //camera->SetLocalPosition(GetLocalPosition() - (camera->GetForwardVector() * 10.f));
     }
 
-    if (camera->mUseCameraMovement && mAttachCamera && isPlayer) 
+    if (camera->mUseCameraMovement && mAttachCamera)
     {
-        //glm::vec3 movement{0,0,0};
-        //const auto& horizontal = glm::cos(camera->GetPitch()) * camera->GetForwardVector();
-        //switch (direction)
-        //{
-        //    //Forward & Backwards
-        //case Forward:
-        //    movement.x +=  glm::cos(GetYaw()) * horizontal.z; 
-        //    movement.z -=  glm::sin(GetYaw()) * horizontal.x;  
-        //    movement.y +=  glm::sin(GetPitch()) * horizontal.y; 
-        //    break;
-        //    //glm::angleAxis(angleToRadians, glm::vec3(0.0f, 0.0f, 1.0f));
-        //case Backwards:
-        //    //movement.z += mMovementSpeed * dt * glm::sin(camera->GetYaw()) * horizontal; break;
+        glm::vec3 movement{0,0,0};
+        const glm::vec3& front = GetForwardVector();
+        const glm::vec3& right = glm::normalize(glm::cross(front, glm::vec3(0.f, 1.f, 0.f)));
+        const glm::vec3& up = glm::cross(right, front);
 
-        //    //Left & Right
-        //case Left:
-        //    movement.x -= mMovementSpeed * dt * glm::sin(camera->GetYaw()); break;
-        //case Right:
-        //    movement.z += mMovementSpeed * dt * glm::cos(camera->GetYaw()); break;
+        //Directions are inverted
+        switch (direction)
+        {
+            //Forward & Backwards
+        case Forward: 
+            movement += mMovementSpeed * dt * front; break; 
+        case Backwards:
+            movement -= mMovementSpeed * dt * front; break;
 
-        //    //Up & Down
-        //case Up:
-        //    movement.y += mMovementSpeed * dt * glm::sin(camera->GetPitch()) * camera->GetAccelerationSpeed(); break;
-        //case Down:
-        //    movement.y -= mMovementSpeed * dt * glm::sin(camera->GetPitch()) * camera->GetAccelerationSpeed(); break;
+            //Left & Right
+        case Left:
+            movement -= mMovementSpeed * dt * right; break;
+        case Right:                                   
+            movement += mMovementSpeed * dt * right; break; 
 
-        //    //Increase Speed
-        //case IncreaseSpeed:
-        //    mMovementSpeed = 50.0f;
-        //    break;
-        //case NormalSpeed:
-        //    mMovementSpeed = 15.0f;
-        //    break;
+            //Up & Down
+        case Up:
+            movement += mMovementSpeed * dt * up; break;
+        case Down:
+            movement -= mMovementSpeed * dt * up; break;
 
-        //default:
-        //    mMovementSpeed = 15.0f;
-        //    break;
-        //}
-        //
-        //SetLocalPosition((GetLocalPosition() + movement));
+            //Increase Speed
+        case IncreaseSpeed:
+            mMovementSpeed = 50.0f;
+            break;
+        case NormalSpeed:
+            mMovementSpeed = 15.0f;
+            break;
+
+        default:
+            mMovementSpeed = 15.0f;
+            break;
+        }
+        
         SetLocalRotation(camera->GetLocalRotation());    
-        camera->SetLocalPosition(GetLocalPosition() - (camera->GetForwardVector() * 10.f));
+        SetLocalPosition(GetLocalPosition() + movement);
+        camera->SetLocalPosition(GetLocalPosition() - (camera->GetForwardVector() * 10.f)); 
     }
 }
 
@@ -262,28 +282,30 @@ inline void Actor::SetCamera(const std::shared_ptr<Camera>& selectCamera)
 
 void Actor::CameraStateControll(CameraState state, const std::shared_ptr<Camera>& camera, float dt) const
 {
-    auto &getCamera = camera; 
     switch (state)
     {
       case CameraFreeMovement_1:
             DetachCamera(); 
-            getCamera->mUseCameraMovement = true;
+            camera->mUseCameraMovement = true; 
             break;
 
       case CameraStatic_CharacterMovement_2:
             DetachCamera();
-            getCamera->mUseCameraMovement = false;
+            camera->mUseCameraMovement = false; 
             break;
 
       case CameraStatic_FollowPlayer_3:  
-            if (!isPlayer || !mAttachToActor) return; 
-            AttachCamera(); 
-            getCamera->mUseCameraMovement = true;
-            break;
+          if (mAttachToActor)
+          {
+              AttachCamera();
+              camera->mUseCameraMovement = true;
+              return;
+          }
+          return;
 
       default:
           DetachCamera();
-          getCamera->mUseCameraMovement = true;
+          camera->mUseCameraMovement = true;
     }
 }
 
@@ -351,6 +373,7 @@ void Actor::cameraTracker(const std::shared_ptr<Camera>& camera, float dt) const
 ///Spawner
 void Actor::Spawner(const int& _spawnAmount, const float& _distributionX, const float& _distributionZ, const int& _actorType)
 {
+    numSpawn = _spawnAmount;
     for (int amount = 0; amount < _spawnAmount; amount++)
     {
         if (_spawnAmount <= 0) { std::cout << "Amount is less or equal to 0" << std::endl; return; }
@@ -381,6 +404,9 @@ void Actor::Spawner(const int& _spawnAmount, const float& _distributionX, const 
 ///Update Actors
 void Actor::UpdateActors(float dt)
 {
+    if (!mMesh) return; 
+
+
     //Updating the rigid body
     if (mMesh) 
     {

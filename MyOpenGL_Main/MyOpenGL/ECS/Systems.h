@@ -132,8 +132,8 @@ public:
 				for (const auto& actor : actor->actors)
 				{
 					//m_actorManager->GetComponent(entity->GetId())->actors[entity->GetId()]->isPlayer = true;
-					actor->isPlayer = true;
-					actor->isActor = true;
+					/*actor->isPlayer = true;
+					actor->isActor = true;*/
 				}
 				m_actorManager->AddComponent(entity->GetId(), actor); 
 				

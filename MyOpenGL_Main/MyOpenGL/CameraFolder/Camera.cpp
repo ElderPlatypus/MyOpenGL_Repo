@@ -81,8 +81,6 @@ void Camera::UpdateProjectionMatrix()
 	mProjectionMatrix = glm::perspective(glm::radians(mFOV), mAspectRatio, mNearPlane, mFarplane);
 }
 
-
-
 glm::mat4 Camera::GetViewMatrix() const
 {
 	//Returns the viewMatrix

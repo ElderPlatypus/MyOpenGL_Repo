@@ -84,23 +84,22 @@ public:
 		return false;
 	}
 
-	static void TrackPlayer(const std::shared_ptr<Actor>& _target, const std::shared_ptr<Actor>& _seeker, float dt)
+	static void TrackPlayer(const std::shared_ptr<Actor>& _target, const std::shared_ptr<Actor>& _seeker, float dt, float homingSpeed)
 	{
-		if (!_target || !_seeker || _target == _seeker)
+		if (!_target || !_seeker)
 		{
 			throw std::runtime_error("[WARNING]: _target or _seeker is nullpointer");
 			return;
 		}
 
-		glm::vec3 path = (_target->GetLocalPosition() - _seeker->GetLocalPosition());
-		_seeker->SetLocalPosition(_seeker->GetLocalPosition() + path);
+		const glm::vec3& path =  (dt/homingSpeed) * (_target->GetLocalPosition() - _seeker->GetLocalPosition());
+		_seeker->SetLocalPosition(_seeker->GetLocalPosition() + path); 
 		
-		//_seeker->mMesh->SetLocalPosition(path);
 
 		if (AABB(_target, _seeker))
 		{
 			std::cout << "[LOG]:" << _seeker->mName << " Destroyed \n"; 
-			
+			_seeker->DeleteSpawnvector_single(_seeker);
 		}
 	}
 };

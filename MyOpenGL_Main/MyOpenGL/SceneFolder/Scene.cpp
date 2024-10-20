@@ -28,8 +28,7 @@ void Scene::LoadActors()
 		boxCollisionComponent_1->EnableAABB.emplace_back(true); 
 
 		std::shared_ptr<ActorComponent> actorComponent = std::make_shared<ActorComponent>();
-		actorComponent->actors.emplace_back(std::make_shared<Actor>(Mesh::CreateCube(2.0f), "player"));
-		//actorComponent->actors.emplace_back(std::make_shared<Actor>(Mesh::CreateCube(2.0f), "testCube"));
+		actorComponent->actors.emplace_back(std::make_shared<Actor>(Mesh::CreateCube(2.0f), "Gætt"));
 
 		actorManager->AddComponent(entity->GetId(), actorComponent); 
 		AABBManager->AddComponent(entity->GetId(), boxCollisionComponent_1);  
@@ -70,21 +69,27 @@ void Scene::LoadActors()
 	}
 
 	actorSystem->AttachToCamera(mEntities, 0);
+	actorSystem->GetActor(mEntities)->isPlayer = true;
+	actorSystem->GetActor(mEntities)->mEnableAABBCollision = true;
 
-	Actor::Spawner(100, -20, 20, 2);
-	/*for (const auto& actors : Actor::spawnVector)
+	Actor::Spawner(10, -20, 20, 2);
+    for (const auto& actors : Actor::spawnVector)
 	{
 		actors->mEnableAABBCollision = true;
-	}*/
+	}
 
-	///Player
-	uActorMap["player"] = std::make_shared<Actor>(Mesh::CreateCube(2.0f),"player"); 
-	uActorMap["player"]->SetTexBool(true);
-	uActorMap["player"]->EnablePhysics = false;
-	uActorMap["player"]->ExtrudeMesh(decrease, 2.0f); 
-	uActorMap["player"]->SetLocalPosition(glm::vec3(0, 0, 5));
-	uActorMap["player"]->mEnableAABBCollision = true; 
-	uActorMap["player"]->isPlayer = true;
+	/////Player
+	//uActorMap["player"] = std::make_shared<Actor>(Mesh::CreateCube(2.0f),"player"); 
+	//uActorMap["player"]->SetTexBool(true);
+	//uActorMap["player"]->EnablePhysics = false;
+	//uActorMap["player"]->ExtrudeMesh(decrease, 2.0f); 
+	//uActorMap["player"]->SetLocalPosition(glm::vec3(0, 0, 5));
+	//uActorMap["player"]->mEnableAABBCollision = true; 
+	//uActorMap["player"]->isPlayer = false;
+	//uActorMap["player"]->mAttachToActor = false; 
+	//uActorMap["player"]->mCanMove = true; 
+
+
 
 	/////Test cube
 	//uActorMap["testCube"] = std::make_shared<Actor>(Mesh::CreateCube(2.0f),"TestCube"); 
@@ -116,14 +121,15 @@ void Scene::LoadContent()
 
 void Scene::UnloadContent()
 {
-	for (const std::pair<std::string, std::shared_ptr<Actor>> actor : uActorMap)
-	{
-		if (actor.second != nullptr)
-		{
-			actor.second->~Actor();
-			/*actor.second = nullptr;*/
-		}
-	}
+	//for (const std::pair<std::string, std::shared_ptr<Actor>> actor : uActorMap)
+	//{
+	//	if (actor.second != nullptr)
+	//	{
+	//		actor.second->~Actor();
+	//	}
+	//}
+
+	actorSystem->GetActor(mEntities)->~Actor();
 
 	mSceneCamera = nullptr;
 
@@ -144,14 +150,21 @@ void Scene::UpdateScene(float dt)
 	BindCamera();
 
 	//Actor Update for Bary coords
-	for (const std::pair<std::string, std::shared_ptr<Actor>> actor : uActorMap) { actor.second->UpdateActors(dt); }
+	
+	if (!uActorMap.empty())
+	{
+		for (const std::pair<std::string, std::shared_ptr<Actor>> actor : uActorMap) { actor.second->UpdateActors(dt); }
 
-	for (const auto& actor : Actor::spawnVector) { actor->UpdateActors(dt); }
+	}
+	if (!Actor::spawnVector.empty())
+	{
+	  for (const auto& actor : Actor::spawnVector) { actor->UpdateActors(dt); }
+	}
+
 	actorSystem->UpdateActorEntity(mEntities, dt); 
 
 	//Collison Update
 	CollisionHandling(dt);
-
 	SpaceManipulation();
 	
 }
@@ -186,13 +199,16 @@ void Scene::CollisionHandling(float dt) const
 	//Player & spawned objects
 	auto max_i = Actor::spawnVector.size();
 	
-	for (const auto &object : Actor::spawnVector) 
-	{ 
-		//Collision::TrackPlayer(uActorMap["player"], object,dt); 
-		Collision::AABB(actorSystem->GetActor(mEntities), object);  
+	if (!Actor::spawnVector.empty())
+	{
+		for (const auto& object : Actor::spawnVector)
+		{
+			if (actorSystem->GetActor(mEntities)->isPlayer)
+			{
+				Collision::TrackPlayer(actorSystem->GetActor(mEntities), object, dt, 5);
+			}
+		}
 	}
-	
-
 }
 
 
