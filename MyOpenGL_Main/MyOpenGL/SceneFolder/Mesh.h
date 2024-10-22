@@ -7,7 +7,9 @@
 #include <random>
 #include <string>
 #include <memory>
+#include <unordered_map>
 #include <glm/gtc/matrix_transform.hpp>
+//#include <LASzip/dll/laszip_api.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -17,16 +19,17 @@
 #include "Vertex.h"
 #include "../Definitions.h"
 #include "../Shaders/Shader.h"
-#include "../Utility/Transform.h"
+#include "../MathLib/Transform.h"
 #include "../Shaders/Shader.h"
 #include "../CameraFolder/Camera.h"
+#include "../MathLib/Formulas.h"
 
 class Mesh
 {
 public:
 	Mesh(const std::string& type, const std::vector<Vertex>& vertices,
 		 const std::vector<Index>& indices, const bool& useTex,
-		 const bool& drawLine
+		 const int& GLdrawType 
 	);
 	
 	Mesh(const Mesh&) = delete;
@@ -48,8 +51,10 @@ public:
 	static std::shared_ptr<Mesh> CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution);
 	static std::shared_ptr<Mesh> CreatePlaneXY(const float& xMin, const float& yMin, const float& xMax, const float& yMax, const float& resolution);
 	static std::shared_ptr<Mesh> CreateSphere(const int& stackCount, const int& sectorCount, const int& radius);
+	static std::shared_ptr<Mesh> CreateSplineSurface(int resU, int resV, int du, int dv,
+		                                             const std::vector<float>& uKnot, const std::vector<float>& vKnot,
+		                                             const std::vector<std::vector<glm::vec3>>& controlPoints, const float& size);
 
-	///Configure and Draw
 	void configureMesh(); //Binds VAO,VB & EBO to respective mesh
 	void drawActor(const std::shared_ptr<Shader>& shader) const; 
 
@@ -96,12 +101,12 @@ public:
 	///Textures
 	//---------------------------------Members------------------------------------------
 	bool mUseTex = false;
-	bool mDrawLine = false;
+	int drawType = 0;
 	std::shared_ptr<Shader> mShader{ nullptr }; 
 	//---------------------------------Methods------------------------------------------
 	void SetShader(const std::shared_ptr<Shader>& shader) { mShader = shader; }
 
-	void UseTexture(const bool& useBool) 
+	void TexBool(const bool& useBool) 
 	{
 		mUseTex = useBool;
 		mShader->setBool("useTex", useBool); 
@@ -149,12 +154,21 @@ public:
 			mesh->mVertices = vertices;
 			mesh->mIndices = indices;
 			mesh->mUseTex = true;
-			mesh->mDrawLine = false;
 			mesh->configureMesh();
 		}
-		static std::shared_ptr<Mesh> localUpdate(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const bool& useTex, const bool& drawLine)
+		static std::shared_ptr<Mesh> localUpdate(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const bool& useTex, const int& drawType)
 		{
-			return std::make_shared<Mesh>(name, vertices, indices, false, false);
+			return std::make_shared<Mesh>(name, vertices, indices, useTex, drawType);   
 		}
+
+	public:
+		//static std::shared_ptr<Mesh> CreatePointCloudFromLASFileSurface(const char* _fileDirectory, float _scaleFactor);
+	
+
+
+
+
+
+
 };
 

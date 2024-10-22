@@ -3,7 +3,7 @@
 ///Constructor and Destructor
 Mesh::Mesh(const std::string& type, const std::vector<Vertex>& vertices,
            const std::vector<Index>& indices, const bool& useTex,
-           const bool& drawLine) : mVertices(vertices),mIndices(indices), mType(type)
+           const int& GLdrawType) : mVertices(vertices), mIndices(indices), mType(type), drawType(GLdrawType)
 {
     configureMesh();
 
@@ -40,7 +40,7 @@ std::shared_ptr<Mesh> Mesh::Create2DTriangle(float size)
         0,1,2
     };
 
-    return localUpdate("2DTriangle", vertices, indices, false, false);
+    return localUpdate("2DTriangle", vertices, indices, false, 0); 
 }
 
 std::shared_ptr<Mesh> Mesh::CreatePyramid(float size)
@@ -92,7 +92,7 @@ std::shared_ptr<Mesh> Mesh::CreatePyramid(float size)
         13,14,15
     };
 
-    return std::make_shared<Mesh>("pyramid", vertices, indices, true, false);
+    return localUpdate("pyramid", vertices, indices, true, 0);
 }
 
 std::shared_ptr<Mesh> Mesh::CreateCube(float size)
@@ -145,7 +145,7 @@ std::shared_ptr<Mesh> Mesh::CreateCube(float size)
         20, 21, 22, 20, 22, 23
     };
 
-    return localUpdate("cube", vertices, indices, true, false);
+    return localUpdate("cube", vertices, indices, true, 0);
 }
 
 void Mesh::CreateCube2(std::shared_ptr<Mesh>& mesh, float size)
@@ -253,7 +253,7 @@ std::shared_ptr<Mesh> Mesh::CreateInterpolationCurve3Points(const glm::vec2& p1,
         indices.emplace_back(i);
     }
 
-    return localUpdate("InterpolationCurve", vertices, indices, true, false);
+    return localUpdate("InterpolationCurve", vertices, indices, true, 0);
 }
 
 std::shared_ptr<Mesh> Mesh::CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution)
@@ -293,7 +293,8 @@ std::shared_ptr<Mesh> Mesh::CreatePlaneXZ(const float& xMin, const float& zMin, 
             i += 4; //Inrementing by 4 to get newt square
         }
     }
-    return localUpdate("planeXZ", vertices, indices, true, false);
+
+    return localUpdate("planeXZ", vertices, indices, true, 0); 
 }
 
 std::shared_ptr<Mesh> Mesh::CreatePlaneXY(const float& xMin, const float& yMin, const float& xMax, const float& yMax, const float& resolution)
@@ -332,7 +333,7 @@ std::shared_ptr<Mesh> Mesh::CreatePlaneXY(const float& xMin, const float& yMin, 
             i += 4; //Incrementing to next square
         }
     }
-    return localUpdate("planeXY", vertices, indices, true, false);
+    return localUpdate("planeXY", vertices, indices, true, 0);
 }
 
 std::shared_ptr<Mesh> Mesh::CreateSphere(const int& stackCount, const int& sectorCount, const int& radius)
@@ -401,8 +402,63 @@ std::shared_ptr<Mesh> Mesh::CreateSphere(const int& stackCount, const int& secto
             }
         }
     }
-    return std::make_shared<Mesh>("Sphere", vertices, indices, true, false);
+    return std::make_shared<Mesh>("Sphere", vertices, indices, true, 0);
 }
+
+std::shared_ptr<Mesh> Mesh::CreateSplineSurface(int resU, int resV, int du, int dv, 
+                                         const std::vector<float>& uKnot, const std::vector<float>& vKnot,
+                                         const std::vector<std::vector<glm::vec3>>& controlPoints, const float& size)
+{
+    //Creating fundament
+    std::vector<Vertex> vertices;
+    std::vector<Index> indices;
+
+    size_t numPoints_U = uKnot.size();
+    size_t numPoints_V = vKnot.size(); 
+
+    for (float i = 0; i < resU; i++)
+    {
+         auto u = i / (resU - 1);
+
+        for (float j = 0; j < resV; j++) 
+        {
+             auto v = j / (resV - 1);
+
+            //Evaluate the surface in both direction U & V
+            glm::vec3 surfacePoint = EvaluateBSplineSurface(u, v, du, dv, uKnot, vKnot, controlPoints);
+            glm::vec3 surfaceNormal = EvaluateBSplineSurfaceNormal(u, v, du, dv, resU, resV, uKnot, vKnot, controlPoints);
+            glm::vec2 texCoords = glm::vec2(u, v);
+
+            vertices.emplace_back(Vertex(surfacePoint*size, surfaceNormal*size, texCoords*size));
+        }
+    }
+
+    for (int i = 0; i < resU - 1; i++)
+    {
+        for (int j = 0; j < resV - 1; j++)
+        {
+            //Iterate over the resolution for both vectors and add them to corresponding vector
+            int topLeft = i * resV + j;
+            int topRight = topLeft + 1;
+            int bottomLeft = (i + 1) * resV + j;
+            int bottomRight = bottomLeft + 1;
+
+            //Emplacing back indices to form the triangle, effectively creating half of a square shape
+            indices.push_back(topLeft);
+            indices.push_back(bottomLeft);
+            indices.push_back(topRight);
+
+            //Emplacing back the missing indices to shape the upper triangle, effectively creating a square
+            indices.push_back(topRight);
+            indices.push_back(bottomLeft);
+            indices.push_back(bottomRight);
+        }
+    }
+
+    return std::make_shared<Mesh>("BSplineSurface", vertices, indices, true, 0); 
+}
+
+
 
 ///Configuring the mesh
 void Mesh::configureMesh()
@@ -426,21 +482,94 @@ void Mesh::configureMesh()
 ///Drawing the mesh
 void Mesh::drawActor(const std::shared_ptr<Shader>& shader) const 
 {
-    if (!shader) return;
+    if (!shader) { assert(shader && "No shader found"); return; }
+    if (shader)
+    {
+        glBindVertexArray(mVAO);
+        switch (drawType)
+        {
+        case 0:
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); break;
+        case 1:
+            glDrawElements(GL_LINE_STRIP, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); break;
+        case 2:
+            glDrawElements(GL_POINT, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); break;
+        default:
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); break;
 
-    glBindVertexArray(mVAO);
-    if (shader && mDrawLine == false)
-    {
-        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0);
+        }
     }
-    else if (shader && mDrawLine == true)
-    {
-        glDrawElements(GL_LINE_STRIP, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0);
-    }
-    else
-    {
-        assert(shader && "No shader found");
-    }
-    //glBindVertexArray(0);
+   
+    //glBindVertexArray(mVAO);
+    //if (shader)
+    //{
+    //    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0);
+    //}
+    //else if (shader && mDrawLine)
+    //{
+    //    glDrawElements(GL_LINE_STRIP, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0);
+    //}
+    //else if (shader && mDrawPoints)
+    //{
+    //    glDrawElements(GL_POINT, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0);
+    //}
+    //else
+    //{
+    //    assert(shader && "No shader found");
+    //}
+    ////glBindVertexArray(0);
 }
+
+//std::shared_ptr<Mesh> Mesh::CreatePointCloudFromLASFileSurface(const char* _fileDirectory, float _scaleFactor)
+//{
+//    // create the reader
+//    laszip_POINTER laszip_reader; 
+//    if (laszip_create(&laszip_reader)) 
+//
+//    // open the reader
+//    laszip_BOOL is_compressed;
+//    if (laszip_open_reader(laszip_reader, _fileDirectory, &is_compressed))  
+//
+//    // get a pointer to the header of the reader that was just populated
+//    laszip_header* header = nullptr;
+//    if (laszip_get_header_pointer(laszip_reader, &header))
+//
+//    // get a pointer to the points that will be read
+//    laszip_point* point;
+//    if (laszip_get_point_pointer(laszip_reader, &point))
+//
+//    // how many points does the file have
+//    laszip_I64 numTotalPoints = (header->number_of_point_records ? header->number_of_point_records : header->extended_number_of_point_records); 
+//
+//    // report how many points the file has
+//    //LOG("Calculating %i points for TerrainSector", numTotalPoints);
+//
+//    std::vector<Vertex> vertices;
+//    std::vector<Index> indices;
+//
+//    for (int i = 0; i < numTotalPoints; i++)
+//    {
+//        if (laszip_read_point(laszip_reader))
+//
+//        // Apply scaling when reading point coordinates
+//        float x = (float)(point->X * header->x_scale_factor + header->x_offset) * _scaleFactor;
+//        float y = (float)(point->Y * header->y_scale_factor + header->y_offset) * _scaleFactor;
+//        float z = (float)(point->Z * header->z_scale_factor + header->z_offset) * _scaleFactor;
+//
+//        glm::vec3 colorf = glm::vec3(0);
+//        glm::vec3 vertPos = glm::vec3(x, z, y);
+//
+//        vertices.emplace_back(PointCloudVertex(vertPos, colorf));
+//        indices.emplace_back(i);
+//    }
+//
+//    // Clean up the LASzip reader
+//    if (laszip_close_reader(laszip_reader))
+//  
+//    if (laszip_destroy(laszip_reader))
+//       
+//
+//    std::shared_ptr<Mesh> surface = std::make_shared<Mesh>("TerrainSector", std::move(vertices), std::move(indices));
+//    return surface;
+//}
 

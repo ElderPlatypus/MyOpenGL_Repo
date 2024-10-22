@@ -19,9 +19,11 @@ Actor::~Actor()
 
 void Actor::DeleteSpawnvector_single(const std::shared_ptr<Actor>& actor)
 {
-    if (spawnVector.empty() || !actor) return;
+    if (spawnVector.empty() || !actor)
+    {
+        return;
+    }
     actor->mMesh->~Mesh();     
-    numSpawn--;  
     return;
 }
 void Actor::DeleteSpawnvector_all()
@@ -271,7 +273,8 @@ void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& ca
         
         SetLocalRotation(camera->GetLocalRotation());    
         SetLocalPosition(GetLocalPosition() + movement);
-        camera->SetLocalPosition(GetLocalPosition() - (camera->GetForwardVector() * 10.f)); 
+        camera->SetLocalPosition(GetLocalPosition() - (camera->GetForwardVector() * 10.f));
+
     }
 }
 
@@ -370,6 +373,35 @@ void Actor::cameraTracker(const std::shared_ptr<Camera>& camera, float dt) const
     //}
 }
 
+void Actor::Shoot(Mouse shoot, const std::shared_ptr<Actor>& actor, float dt, const std::shared_ptr<Shader>& shader) const
+{
+    static bool isShooting = false;
+    if (!actor->isPlayer && !shoot) 
+    {
+        return;
+    }
+
+
+    static float timer = 0.0f;
+    timer += dt;
+    if (dt > 0)
+    {
+        isShooting = true;
+        std::cout << timer << "\n";
+        //std::cout << "[LOG]:Shot Fired \n";
+        projectileActor = std::make_shared<Actor>(Mesh::CreateSphere(20, 10, 1), "projectile");
+        projectileActor->UseTexBool(true);
+        projectileActor->mEnableAABBCollision = true;
+        projectileActor->mUseLight = true;
+        //projectileActor->SetLocalRotation(actor->GetLocalRotation());
+        //projectileActor->SetLocalPosition(actor->GetLocalPosition() + glm::vec3(0, 10, 0) * dt);
+        Actor::projectileVector.emplace_back(projectileActor);
+    }
+    
+    timer = 0.f;
+    return;
+}
+
 ///Spawner
 void Actor::Spawner(const int& _spawnAmount, const float& _distributionX, const float& _distributionZ, const int& _actorType)
 {
@@ -383,19 +415,23 @@ void Actor::Spawner(const int& _spawnAmount, const float& _distributionX, const 
         {
         case 1:
             spawnedActor = std::make_shared<Actor>(Mesh::CreateCube(1.0f), "spawnedCube " + std::to_string(amount));
-            spawnedActor->mMesh->mUseTex = true;
+            spawnedActor->UseTexBool(true);
             break;
         case 2:
             spawnedActor = std::make_shared<Actor>(Mesh::CreateSphere(16, 16, 1), "spawnedSphere " + std::to_string(amount));
-            spawnedActor->mMesh->mUseTex = true;
+            spawnedActor->UseTexBool(true);
             break;
         case 3:
             spawnedActor = std::make_shared<Actor>(Mesh::CreatePyramid(5.0f), "spawnedPyramid " + std::to_string(amount));
-            spawnedActor->mMesh->mUseTex = true;
+            spawnedActor->UseTexBool(true);
             break;
         }
-        const glm::vec3& spawnPos = glm::linearRand(glm::vec3(_distributionX), glm::vec3(_distributionZ));
-        spawnedActor->mMesh->SetLocalPosition(spawnPos);
+
+        std::random_device rd;  // Obtain a random number from hardware
+        std::mt19937 eng(rd()); // Seed the generator
+        std::uniform_real_distribution<float> distr(_distributionX, _distributionZ); // Define the range
+
+        spawnedActor->SetLocalPosition(glm::vec3(distr(eng), distr(eng), distr(eng))); 
         spawnedActor->rigidB->pos = spawnedActor->GetLocalPosition();
         Actor::spawnVector.emplace_back(spawnedActor);
     }
@@ -421,7 +457,7 @@ void Actor::UpdateActors(float dt)
         }
         //Bind shaders to Model-uniform
         mMesh->mShader->setMat4("model", mMesh->GetLocalTransformMatrix()); 
-        mMesh->UseTexture(GetTexBool());  
+        mMesh->TexBool(GetTexBool());  
         mMesh->UseLight(mMesh->GetLightBool()); 
         mMesh->drawActor(mMesh->mShader);
 

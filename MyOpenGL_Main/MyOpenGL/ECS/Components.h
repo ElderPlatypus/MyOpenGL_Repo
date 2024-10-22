@@ -19,6 +19,8 @@
 //classes
 
 #include "../SceneFolder/Actor.h"
+#include "Entity.h" 
+ 
 ///Components
 class IComponent
 {
@@ -39,7 +41,7 @@ class ComponentArchive : IComponent
 public:
 	void displayComponent() override
 	{
-		std::cout << "[LOG]:ComponentArchive Created";
+		std::cout << "[LOG]:ComponentArchive Type: " <<  typeid(T).name() << "\n";
 	}
 	/*~ComponentArchive() override
 	{
@@ -91,6 +93,8 @@ public:
 	{
 		return m_componentArchive;
 	}
+
+
 };
 
 
@@ -99,35 +103,28 @@ struct ActorComponent : public IComponent
 {
 	void displayComponent() override
 	{
-		std::cout << "[LOG:]ActorComponent Created";
+		std::cout << "ActorComponent:";
 	}
-
-	std::vector<std::shared_ptr<Actor>> actors;
-
+    std::vector<std::shared_ptr<Actor>> actors;
+	std::vector<std::vector<std::shared_ptr<Actor>>> spawn;
 };
 
 struct PlayerComponent : public IComponent
 {
 	void displayComponent() override
 	{
-		std::cout << "[LOG:]PlayerComponent Created";
+		std::cout << "PlayerComponent";
 	}
-
-private:
 	std::vector<std::shared_ptr<Actor>> actors;
 };
+
 
 struct TransformComponent : public IComponent
 {
 	void displayComponent() override
 	{
-		std::cout << "[LOG]:TransformComponent Created";
+		std::cout << "TransformComponent";
 	}
-	/*~TransformComponent() override
-	{
-		std::cout << "[LOG:]TransformComponent Destroyed \n";
-	}*/
-
 	std::vector<float> X;
 	std::vector<float> Y;
 	std::vector<float> Z;
@@ -140,10 +137,18 @@ struct HealthComponent : public IComponent
 {
 	void displayComponent() override
 	{
-		std::cout << "[LOG]:HealthComponent Added";
+		std::cout << "HealthComponent";
 	}
-
 	std::vector<int> health;
+};
+
+struct DamageComponent : public IComponent
+{
+	void displayComponent() override
+	{
+		std::cout << "DamageComponent";
+	}
+	std::vector<int> damage;
 };
 
 struct PhysicsComponent : public IComponent
@@ -152,14 +157,6 @@ struct PhysicsComponent : public IComponent
 	{
 		std::cout << "[LOG:]PhysicsComponent Created";
 	}
-
 };
 
-struct BoxCollisionComponent : public IComponent
-{
-	void displayComponent() override
-	{
-		std::cout << "[LOG:]BoxCollisionComponent Created";
-	}
-	std::vector<bool> EnableAABB;
-};
+

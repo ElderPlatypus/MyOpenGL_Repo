@@ -1,5 +1,5 @@
 #pragma once
-#include "../Utility/Transform.h"
+#include "../MathLib/Transform.h"
 #include "../SceneFolder/Actor.h"
 #include <glm/gtc/random.hpp>
 
@@ -88,19 +88,21 @@ public:
 	{
 		if (!_target || !_seeker)
 		{
-			throw std::runtime_error("[WARNING]: _target or _seeker is nullpointer");
+			std::cout << "[WARNING]: _target or _seeker is nullpointer\n";
 			return;
 		}
 
-		const glm::vec3& path =  (dt/homingSpeed) * (_target->GetLocalPosition() - _seeker->GetLocalPosition());
-		_seeker->SetLocalPosition(_seeker->GetLocalPosition() + path); 
+		const glm::vec3& path = (dt/homingSpeed) * (_target->GetLocalPosition() - _seeker->GetLocalPosition());
+		_seeker->SetLocalPosition(_seeker->GetLocalPosition() + path);
 		
 
 		if (AABB(_target, _seeker))
 		{
 			std::cout << "[LOG]:" << _seeker->mName << " Destroyed \n"; 
 			_seeker->DeleteSpawnvector_single(_seeker);
+			return;
 		}
+		return;
 	}
 };
 

@@ -11,6 +11,7 @@ enum Mouse
     //Mouse buttons
     RightMouseButton,
     MouseMotionX, MouseMotionY,
+    LeftMouseButton
 };
 
 enum Direction

@@ -13,7 +13,7 @@
 #include "../SceneFolder/Mesh.h"
 #include "../Definitions.h"
 #include "../Shaders/Shader.h"
-#include "../Utility/Transform.h"
+#include "../MathLib/Transform.h"
 #include "../Shaders/Shader.h"
 #include "../CameraFolder/Camera.h"
 #include "../Physics/RigidBody.h"
@@ -106,19 +106,24 @@ public:
     void DeleteSpawnvector_single(const std::shared_ptr<Actor>& actor);
     void DeleteSpawnvector_all();
     //inline static int ActorType; //1 = cube, 2 = Sphere, 3 = Pyramid
+    
+
+    void Shoot(Mouse shoot, const std::shared_ptr<Actor>& actor, float dt, const std::shared_ptr<Shader>& shader) const;
+    inline static std::vector<std::shared_ptr<Actor>> projectileVector;
+    inline static std::shared_ptr<Actor> projectileActor;
+
     //---------------------------------Methods------------------------------------------ 
     static void Spawner(const int& _spawnAmount, const float& _distributionX, const float& _distributionZ, const int& _actorType);
     inline static int numSpawn;
 
     ///Transform Getter & Setters
-    
     //---------------------------------Methods Setters------------------------------------------------ 
     void SetLocalPosition(const glm::vec3& position) const { mMesh->SetLocalPosition(position); } 
     void SetLocalRotation(const glm::quat& rotation) const { mMesh->SetLocalRotation(rotation); } 
     void SetLocalScale(const glm::vec3& scale) const { mMesh->SetLocalScale(scale); }
     void SetLocalTransformMatrix(const glm::mat4& transformMatrix) const { mMesh->SetLocalTransformMatrix(transformMatrix); }
     void SetShader(const std::shared_ptr<Shader>& shader) const { mMesh->SetShader(shader); }
-    const bool SetTexBool(const bool& useTex) const { return mMesh->mUseTex = useTex; } 
+    const bool UseTexBool(const bool& useTex) const { return mMesh->mUseTex = useTex; } 
 
     //---------------------------------Methods Getters------------------------------------------
     const std::shared_ptr<Transform> GetTransform() const { return mMesh->mTransform; }
@@ -142,4 +147,6 @@ public:
     ///Collision
     bool mEnableAABBCollision = false;
 	bool mEnableInverseAABB = false;
+
+
 };
