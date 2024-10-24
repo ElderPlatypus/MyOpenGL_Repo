@@ -170,11 +170,12 @@
     <ClInclude Include="SceneFolder\Mesh.h" />
     <ClInclude Include="Shaders\Texture.h" />
     <ClInclude Include="Physics\Collision.h" />
+    <ClInclude Include="Utility\FileHandler.h" />
     <ClInclude Include="Utility\pathDefinition.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="SceneFolder\Actor.h" />
     <ClInclude Include="SceneFolder\Scene.h" />
-    <ClInclude Include="SceneFolder\Vertex.h" />
+    <ClInclude Include="MathLib\Vertex.h" />
     <ClInclude Include="Shaders\Shader.h" />
     <ClInclude Include="Shaders\ShaderFileLoader.h" />
     <ClInclude Include="MathLib\Transform.h" />

@@ -9,14 +9,16 @@
 #include <memory>
 #include <unordered_map>
 #include <glm/gtc/matrix_transform.hpp>
-//#include <LASzip/dll/laszip_api.h>
+
+//#define LASZIP_DYN_LINK 
+#include <LASzip/dll/laszip_api.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
 //Classes
-#include "Vertex.h"
+#include "../MathLib/Vertex.h"
 #include "../Definitions.h"
 #include "../Shaders/Shader.h"
 #include "../MathLib/Transform.h"
@@ -91,9 +93,9 @@ public:
 	const glm::vec3& GetLocalScale() const { return mTransform->GetScale(); } 
 
 	glm::mat4 GetLocalTransformMatrix() const { return mTransform->GetTransformMatrix(); } 
-	const glm::vec3& GetForwardVector() const { return mTransform->GetForwardVector(); }
-	const glm::vec3& GetRightVector() const { return mTransform->GetRightVector(); }
-	const glm::vec3& GetUpVector() const { return mTransform->GetUpVector(); }
+	const glm::vec3 GetForwardVector() const { return mTransform->GetForwardVector(); }
+	const glm::vec3 GetRightVector() const { return mTransform->GetRightVector(); }
+	const glm::vec3 GetUpVector() const { return mTransform->GetUpVector(); }
 	float GetPitch() const { return mTransform->GetPitch(); }
 	float GetYaw() const { return mTransform->GetYaw(); } 
 
@@ -162,7 +164,7 @@ public:
 		}
 
 	public:
-		//static std::shared_ptr<Mesh> CreatePointCloudFromLASFileSurface(const char* _fileDirectory, float _scaleFactor);
+		static std::shared_ptr<Mesh> CreatePointCloudFromLASFileSurface(const char* _fileDirectory, float _scaleFactor);
 	
 
 

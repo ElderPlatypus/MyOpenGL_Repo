@@ -10,6 +10,7 @@
 //Includes
 #include "../CameraFolder/Camera.h"
 #include "../Shaders/Shader.h"
+#include "../Shaders/ShaderFileLoader.h"
 #include "../MathLib/Transform.h"
 #include "../SceneFolder/Actor.h"
 #include "../SceneFolder/Mesh.h"
@@ -21,6 +22,7 @@
 #include "../ECS/Systems.h"
 #include "../ECS/Components.h"
 #include "../MathLib/Formulas.h"
+#include "../Utility/FileHandler.h"
 
 class Scene 
 {

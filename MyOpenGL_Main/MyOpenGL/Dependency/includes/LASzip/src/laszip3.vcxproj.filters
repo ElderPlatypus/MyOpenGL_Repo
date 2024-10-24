@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\mydefs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasmessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\arithmeticdecoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\arithmeticencoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\arithmeticmodel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\integercompressor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasindex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasinterval.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasquadtree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasreaditemcompressed_v1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasreaditemcompressed_v2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasreaditemcompressed_v3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasreaditemcompressed_v4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasreadpoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laswriteitemcompressed_v1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laswriteitemcompressed_v2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laswriteitemcompressed_v3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laswriteitemcompressed_v4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laswritepoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laszip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laszip_dll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\mydefs.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasmessage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\arithmeticdecoder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\arithmeticencoder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\arithmeticmodel.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\bytestreamin.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\bytestreamin_array.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\bytestreamin_file.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\bytestreamin_istream.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\bytestreaminout.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\bytestreaminout_file.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\bytestreamout.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\bytestreamout_array.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\bytestreamout_file.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\bytestreamout_nil.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\bytestreamout_ostream.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\endian.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\integercompressor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasattributer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasindex.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasinterval.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laspoint.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasquadtree.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasquantizer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasreaditem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasreaditemcompressed_v1.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasreaditemcompressed_v2.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasreaditemcompressed_v3.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasreaditemcompressed_v4.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasreaditemraw.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\lasreadpoint.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laswriteitem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laswriteitemcompressed_v1.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laswriteitemcompressed_v2.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laswriteitemcompressed_v3.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laswriteitemcompressed_v4.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laswriteitemraw.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laswritepoint.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laszip.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laszip_common_v1.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laszip_common_v2.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laszip_common_v3.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\laszip_decompress_selective_v3.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\include\laszip\laszip_common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{C4BC5480-30CD-3F95-96F1-6FA7DAF835CA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{1DB12D81-4EBC-3B27-9384-77B304414176}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

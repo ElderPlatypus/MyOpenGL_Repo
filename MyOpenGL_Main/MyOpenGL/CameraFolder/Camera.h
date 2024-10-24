@@ -75,9 +75,9 @@ public:
 	const glm::vec3& GetLocalScale() const { return mTransform->GetScale(); }
 
 	glm::mat4 GetLocalTransformMatrix() const { return mTransform->GetTransformMatrix(); }
-	const glm::vec3& GetForwardVector() const { return mTransform->GetForwardVector(); }
-	const glm::vec3& GetRightVector() const { return mTransform->GetRightVector(); }
-	const glm::vec3& GetUpVector() const 
+	const glm::vec3 GetForwardVector() const { return mTransform->GetForwardVector(); }
+	const glm::vec3 GetRightVector() const { return mTransform->GetRightVector(); }
+	const glm::vec3 GetUpVector() const 
 	{ 
 		//Return Up vector
 		glm::vec3 front = GetForwardVector();

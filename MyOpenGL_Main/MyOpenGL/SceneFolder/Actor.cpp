@@ -19,24 +19,49 @@ Actor::~Actor()
 
 void Actor::DeleteSpawnvector_single(const std::shared_ptr<Actor>& actor)
 {
-    if (spawnVector.empty() || !actor)
+    if (Actor::spawnVector.empty())
     {
         return;
     }
-    actor->mMesh->~Mesh();     
-    return;
-}
-void Actor::DeleteSpawnvector_all()
-{
-    if (spawnVector.empty()) return; 
 
-    for (const auto& spawn : spawnVector)
+    // Remove the actor from the spawn vector
+    auto it = std::find(Actor::spawnVector.begin(), Actor::spawnVector.end(), actor);
+    if (it != Actor::spawnVector.end())
     {
-        spawn->~Actor();
+        // Properly delete the associated mesh before erasing the actor
+        if (it->get()->mMesh)
+        {
+            it->get()->mMesh.reset(); // Use smart pointer reset for proper memory management
+        }
+        Actor::spawnVector.erase(it);
     }
-    spawnVector.clear();
-
 }
+
+void Actor::DeleteSpawnvector_all(const std::vector<std::shared_ptr<Actor>>& actorVec)
+{
+    if (actorVec.empty()) 
+    {
+        return;
+    }
+
+    for (const auto& actor : actorVec) 
+    { 
+        // Remove the actor from the spawn vector
+        auto it = std::find(Actor::projectileVector.begin(), Actor::projectileVector.end(), actor);
+        if (it != Actor::projectileVector.end())
+        {
+            // Properly delete the associated mesh before erasing the actor
+            if (it->get()->mMesh)
+            {
+                it->get()->mMesh.reset(); // Use smart pointer reset for proper memory management
+            }
+            Actor::projectileVector.erase(it);
+        }
+    }
+    Actor::projectileVector.clear();
+}
+
+
 
 void Actor::ExtrudeMesh(Extrude _increase_or_decrease, const float& _extrude) const
 {
@@ -242,7 +267,7 @@ void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& ca
         {
             //Forward & Backwards
         case Forward: 
-            movement += mMovementSpeed * dt * front; break; 
+            movement += mMovementSpeed * dt * front; break;  
         case Backwards:
             movement -= mMovementSpeed * dt * front; break;
 
@@ -260,20 +285,20 @@ void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& ca
 
             //Increase Speed
         case IncreaseSpeed:
-            mMovementSpeed = 50.0f;
+            mMovementSpeed = camera->GetAccelerationSpeed() * 1.5f;
             break;
         case NormalSpeed:
-            mMovementSpeed = 15.0f;
+            mMovementSpeed = camera->GetAccelerationSpeed(); 
             break;
 
         default:
-            mMovementSpeed = 15.0f;
+            mMovementSpeed = camera->GetAccelerationSpeed(); 
             break;
         }
         
         SetLocalRotation(camera->GetLocalRotation());    
         SetLocalPosition(GetLocalPosition() + movement);
-        camera->SetLocalPosition(GetLocalPosition() - (camera->GetForwardVector() * 10.f));
+        camera->SetLocalPosition(GetLocalPosition() - (camera->GetForwardVector() * 10.f) + (camera->GetUpVector() * 5.f)); 
 
     }
 }
@@ -349,57 +374,51 @@ void Actor::AI_Path(float dt)
 }
 
 ///Camera Support
-void Actor::cameraTracker(const std::shared_ptr<Camera>& camera, float dt) const
+void Actor::ProjectileSpawner(const std::shared_ptr<Actor>& actor,  const std::shared_ptr<Shader>& Shader, float dt) 
 {
-    //if (!camera->mUseCameraMovement && !camera->mRightMouseButtonPressed)
-    //{
-    //    float xOffset = mMesh->GetLocalPosition().x - camera->GetLocalPosition().x;
-    //    float yOffset = mMesh->GetLocalPosition().y - camera->GetLocalPosition().y;
+    float timer = dt;
+    int index = 0;
+    glm::vec3 movement = actor->GetLocalPosition();
+ 
 
+    if (isShooting) 
+    { 
+        index++; 
+        projectileActor = std::make_shared<Actor>(Mesh::CreateCube(2), "spawnedSphere " + std::to_string(index)); 
 
-    //    float yawRadians = glm::radians(xOffset);
-    //    float pitchRadians = glm::radians(yOffset);
-
-
-    //    //Creating a quaternion from angle and a normalized axis: projecting the normalized axis with the given angel whic is now the rotation domain for the quaternion.
-    //    //Can bed visualize as a  cone where the flat surface is the where the quaternions merges from.
-    //    glm::quat currentOrientation = mMesh->GetLocalRotation(); 
-    //    glm::quat yawRotation = glm::angleAxis(yawRadians, glm::vec3(0.0f, 1.0f, 0.0f)); //normal axis is not 0 for y-axis --> gets yaw
-    //    glm::quat pitchRotation = glm::angleAxis(pitchRadians, glm::vec3(1.0f, 0.0f, 0.0f));  //normal axis is not 0 for x-axis --> gets pitch
-    //    glm::quat newOrientation = glm::inverse(yawRotation) * currentOrientation * pitchRotation;
-    //    newOrientation = glm::normalize(newOrientation); 
-    //   
-    //    camera->SetLocalRotation(newOrientation);
-    //}
+        projectileActor->UseTexBool(true); 
+        projectileActor->SetLocalRotation(actor->GetForwardVector()); 
+        projectileActor->SetLocalPosition(actor->GetLocalPosition() + glm::vec3(0,0,1)* dt/100.f);
+        Actor::projectileVector.emplace_back(projectileActor);  
+    }
+    if (!Actor::projectileVector.empty())
+    {
+        if (timer > 10.f)
+        {
+            for (const auto& it : Actor::projectileVector)
+            {
+                  actor->DeleteSpawnvector_all(projectileVector); 
+            }
+        }
+       for (const auto& actor : Actor::projectileVector) { actor->SetShader(Shader); actor->UpdateActors(dt); }
+    }
+    timer = 0;
+    isShooting = false;
 }
 
-void Actor::Shoot(Mouse shoot, const std::shared_ptr<Actor>& actor, float dt, const std::shared_ptr<Shader>& shader) const
+bool Actor::Shoot(Mouse shoot, const std::shared_ptr<Actor>& actor, float dt) const
 {
-    static bool isShooting = false;
-    if (!actor->isPlayer && !shoot) 
+    if (!actor->isPlayer)  
     {
-        return;
+        return false;
     }
-
-
-    static float timer = 0.0f;
-    timer += dt;
-    if (dt > 0)
+    if (shoot)
     {
+        std::cout << "shoot\n";
         isShooting = true;
-        std::cout << timer << "\n";
-        //std::cout << "[LOG]:Shot Fired \n";
-        projectileActor = std::make_shared<Actor>(Mesh::CreateSphere(20, 10, 1), "projectile");
-        projectileActor->UseTexBool(true);
-        projectileActor->mEnableAABBCollision = true;
-        projectileActor->mUseLight = true;
-        //projectileActor->SetLocalRotation(actor->GetLocalRotation());
-        //projectileActor->SetLocalPosition(actor->GetLocalPosition() + glm::vec3(0, 10, 0) * dt);
-        Actor::projectileVector.emplace_back(projectileActor);
+        return isShooting;
     }
-    
-    timer = 0.f;
-    return;
+    return false;
 }
 
 ///Spawner

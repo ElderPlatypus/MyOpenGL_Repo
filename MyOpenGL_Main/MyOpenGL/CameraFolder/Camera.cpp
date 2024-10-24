@@ -112,6 +112,7 @@ void Camera::CameraMovement(Direction direction, float dt)
         case Up:mAcceleration.y += GetAccelerationSpeed(); break;
         case Down:mAcceleration.y -= GetAccelerationSpeed(); break;
         case IncreaseSpeed: mAcceleration *= 3.0f, mMaxMovementSpeed = 70.f; break;
+
         default: mAcceleration = glm::vec3(0.f, 0.f, 0.f), mMaxMovementSpeed = 50.f;
     }
 	

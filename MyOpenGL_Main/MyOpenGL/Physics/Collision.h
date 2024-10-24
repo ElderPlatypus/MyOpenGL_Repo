@@ -9,7 +9,7 @@ public:
 	static bool AABB(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor>& b)
 	{
 		//Check if actors have collision enables
-		if (!a->mEnableAABBCollision || !b->mEnableAABBCollision) return false;
+		if (!a || !b || !a->mEnableAABBCollision || !b->mEnableAABBCollision) return false;
 		
 		//Calculate the center difference and sum of the boundg boxes
 		glm::vec3 centerDiff =  a->GetCenter() - b->GetCenter();
@@ -88,21 +88,57 @@ public:
 	{
 		if (!_target || !_seeker)
 		{
-			std::cout << "[WARNING]: _target or _seeker is nullpointer\n";
+			//std::cout << "[WARNING]: _target or _seeker is nullpointer\n";
 			return;
 		}
 
-		const glm::vec3& path = (dt/homingSpeed) * (_target->GetLocalPosition() - _seeker->GetLocalPosition());
-		_seeker->SetLocalPosition(_seeker->GetLocalPosition() + path);
+		const glm::vec3& path = (dt/homingSpeed) * (_target->GetLocalPosition() - _seeker->GetLocalPosition()); 
+		_seeker->SetLocalPosition(_seeker->GetLocalPosition() + path); 
 		
 
 		if (AABB(_target, _seeker))
 		{
-			std::cout << "[LOG]:" << _seeker->mName << " Destroyed \n"; 
+			//std::cout << "[LOG]:" << _seeker->mName << " Destroyed \n";  
+			std::cout << "[LOG]:Damage taken:" << std::to_string(10) << " health is: " << _target->GetHealth() << " \n"; 
+			_target->Health = _target->Health - 10;   
 			_seeker->DeleteSpawnvector_single(_seeker);
+
+			if (_target->Health <= 0)
+			{
+				_target->die = true;
+				return;
+			}
+			dt = 0;
 			return;
 		}
 		return;
 	}
+
+	static void ProjectileHit(const std::shared_ptr<Actor>& _projectile, const std::shared_ptr<Actor>& _target)
+	{
+		if (!_projectile || !_target) 
+		{
+			//std::cout << "[WARNING]: _target or _seeker is nullpointer\n";
+			return;
+		}
+		if (AABB(_projectile, _target))
+		{
+			_projectile->DeleteSpawnvector_single(_projectile); 
+
+			//std::cout << "[LOG]:" << _seeker->mName << " Destroyed \n";  
+			std::cout << "[LOG]:" << std::to_string(50) << " Damage done to:" << _target->mName<< "\n";
+			_target->Health = _target->Health - 10;
+
+			if (_target->Health <= 0)
+			{
+				_target->DeleteSpawnvector_single(_target);  
+			}
+			return;
+		}
+		return;
+	}
+
+
+
 };
 

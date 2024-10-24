@@ -56,6 +56,7 @@ class DamageSystem : public ISystem
 {
 private:
 	std::shared_ptr<ComponentArchive<DamageComponent>> m_damageManager;
+
 	void DisplayAllComponents(const std::vector<std::shared_ptr<Entity>>& _entities) const
 	{
 		for (const std::shared_ptr<Entity>& entity : _entities)

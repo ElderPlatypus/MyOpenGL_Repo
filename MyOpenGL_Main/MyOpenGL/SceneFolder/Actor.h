@@ -9,7 +9,7 @@
 #endif
 
 //Class includes
-#include "Vertex.h"
+#include "../MathLib/Vertex.h"
 #include "../SceneFolder/Mesh.h"
 #include "../Definitions.h"
 #include "../Shaders/Shader.h"
@@ -93,7 +93,6 @@ public:
 
     //---------------------------------Methods------------------------------------------ 
     void CameraStateControll(CameraState state, const std::shared_ptr<Camera>& camera, float dt) const;
-    void cameraTracker(const std::shared_ptr<Camera>& camera, float dt) const ;
 
     ///Update Actors
     //---------------------------------Methods------------------------------------------ 
@@ -104,13 +103,14 @@ public:
     inline static std::vector<std::shared_ptr<Actor>> spawnVector;
     inline static std::shared_ptr<Actor> spawnedActor;
     void DeleteSpawnvector_single(const std::shared_ptr<Actor>& actor);
-    void DeleteSpawnvector_all();
+    void DeleteSpawnvector_all(const std::vector<std::shared_ptr<Actor>>& actorVec);
     //inline static int ActorType; //1 = cube, 2 = Sphere, 3 = Pyramid
     
-
-    void Shoot(Mouse shoot, const std::shared_ptr<Actor>& actor, float dt, const std::shared_ptr<Shader>& shader) const;
+    static void ProjectileSpawner(const std::shared_ptr<Actor>& actor, const std::shared_ptr<Shader>& Shader, float dt);
+    bool Shoot(Mouse shoot, const std::shared_ptr<Actor>& actor, float dt) const; 
     inline static std::vector<std::shared_ptr<Actor>> projectileVector;
     inline static std::shared_ptr<Actor> projectileActor;
+    inline static bool isShooting;
 
     //---------------------------------Methods------------------------------------------ 
     static void Spawner(const int& _spawnAmount, const float& _distributionX, const float& _distributionZ, const int& _actorType);
@@ -132,9 +132,9 @@ public:
     const glm::vec3& GetLocalScale() const { return mMesh->GetLocalScale(); }
 
     glm::mat4 GetLocalTransformMatrix() const { return mMesh->GetLocalTransformMatrix(); }
-    const glm::vec3& GetForwardVector() const { return mMesh->GetForwardVector(); }
-    const glm::vec3& GetRightVector() const { return mMesh->GetRightVector(); }
-    const glm::vec3& GetUpVector() const { return mMesh->GetUpVector(); }
+    const glm::vec3 GetForwardVector() const { return mMesh->GetForwardVector(); }
+    const glm::vec3 GetRightVector() const { return mMesh->GetRightVector(); }
+    const glm::vec3 GetUpVector() const { return mMesh->GetUpVector(); }
     float GetPitch() const { return mMesh->GetPitch(); }
     float GetYaw() const { return mMesh->GetYaw(); }
     void  GetdrawActor(const std::shared_ptr<Shader>& shader) const { return mMesh->drawActor(shader); }
@@ -147,6 +147,9 @@ public:
     ///Collision
     bool mEnableAABBCollision = false;
 	bool mEnableInverseAABB = false;
+    inline static int Health = 100; 
 
-
+    int GetHealth() const { return Health; }
+    bool die = false;
+    bool Restart() { return die; };
 };

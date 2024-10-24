@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\includes\LASzip\CMakeFiles\49113f1d5c97c4c68c38a3e3ff9be1cc\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{ADC4D178-BE8E-3F74-88CF-D733EDB7ADF5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

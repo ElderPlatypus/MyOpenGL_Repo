@@ -98,9 +98,9 @@ public:
     const glm::vec3& GetPosition(bool notConst) const { return mPosition; } //Returns position as correct datatype
 
     //---------------------------------Vector Components------------------------------------------------
-    const glm::vec3& GetRightVector() const { return glm::rotate(mOrientation, glm::vec3(1.f, 0.f, 0.f)); } // Returns right vector: invert axis to get oposite direction
-    const glm::vec3& GetForwardVector() const { return glm::rotate(mOrientation, glm::vec3(0.f, 0.f, -1.f)); } //Returns forward vector inverted to match view directio: invert axis to get oposite direction
-    const glm::vec3& GetUpVector() const { return glm::rotate(mOrientation, glm::vec3(0.f, 1.f, 0.f)); } //Returns Up vector: invert axis to get oposite direction
+    const glm::vec3 GetRightVector() const { return glm::rotate(mOrientation, glm::vec3(1.f, 0.f, 0.f)); } // Returns right vector: invert axis to get oposite direction
+    const glm::vec3 GetForwardVector() const { return glm::rotate(mOrientation, glm::vec3(0.f, 0.f, -1.f)); } //Returns forward vector inverted to match view directio: invert axis to get oposite direction
+    const glm::vec3 GetUpVector() const { return glm::rotate(mOrientation, glm::vec3(0.f, 1.f, 0.f)); } //Returns Up vector: invert axis to get oposite direction
 
     //---------------------------------Pitch & Yaw------------------------------------------------
     //Euler angles will be used and are vectors fixed to a rigid object and uses rotations in form of: yaw(x), pitch(y) and roll(z)

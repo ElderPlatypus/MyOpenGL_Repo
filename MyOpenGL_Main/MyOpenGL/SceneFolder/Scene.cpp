@@ -44,33 +44,17 @@ void Scene::LoadActors()
 	playerSystem->AttachToCamera(mEntities, 0);
 	playerSystem->UseTexture(mEntities,0); 
 	playerSystem->GetPlayer(mEntities)->mEnableAABBCollision = true;
+	playerSystem->GetPlayer(mEntities)->SetLocalPosition(glm::vec3(0, 0, -10.f));
 
 	damageSystem = std::make_shared<DamageSystem>(damageManager);
 	damageSystem->Update(mEntities);
 
-
-
-
-
-
-	Actor::Spawner(10, -20, 20, 2);
+	Actor::Spawner(10, -50, 50, 2);
     for (const auto& actors : Actor::spawnVector)
 	{
 		actors->mEnableAABBCollision = true;
 	}
 
-
-
-	/////Player
-	//uActorMap["player"] = std::make_shared<Actor>(Mesh::CreateCube(2.0f),"player"); 
-	//uActorMap["player"]->SetTexBool(true);
-	//uActorMap["player"]->EnablePhysics = false;
-	//uActorMap["player"]->ExtrudeMesh(decrease, 2.0f); 
-	//uActorMap["player"]->SetLocalPosition(glm::vec3(0, 0, 5));
-	//uActorMap["player"]->mEnableAABBCollision = true; 
-	//uActorMap["player"]->isPlayer = false;
-	//uActorMap["player"]->mAttachToActor = false; 
-	//uActorMap["player"]->mCanMove = true; 
 	
 	// Define knot vectors
 	std::vector<float> uKnot = CreateRandomKnotVector<float>(7, 0.f, 2.f); 
@@ -87,8 +71,22 @@ void Scene::LoadActors()
     mSceneCamera = std::make_shared<Camera>("SceneCamera");
 	mSceneCamera->SetLocalPosition(glm::vec3(0, -10.0f, 10.f));
 
-	
 
+	std::vector<std::string> getData;
+
+	int counter = 0;
+	
+	getData.emplace_back("../MathLib/TerrainData/t1/data/32-2-517-141-10.laz"); 
+	getData.emplace_back("../MathLib/TerrainData/t1/data/32-2-517-141-11.laz");
+	getData.emplace_back("../MathLib/TerrainData/t1/data/32-2-517-141-20.laz");
+			
+	for (const auto& files : getData)
+	{
+		uActorMap["terrain" + std::to_string(counter)] = std::make_shared<Actor>(Mesh::CreatePointCloudFromLASFileSurface(files.c_str(), 2.f), "Terrain");
+		uActorMap["terrain" + std::to_string(counter)]->SetLocalPosition(glm::vec3(0, 0, 0)); 
+		counter++;
+	}
+	
 }
 
 void Scene::LoadContent()
@@ -160,6 +158,7 @@ void Scene::UpdateScene(float dt)
 	CollisionHandling(dt);
 	SpaceManipulation();
 	
+	Actor::ProjectileSpawner(playerSystem->GetPlayer(mEntities), mShader, dt);
 }
 
 ///Rednerer
@@ -198,8 +197,22 @@ void Scene::CollisionHandling(float dt) const
 		{
 			if (playerSystem->GetPlayer(mEntities)->isPlayer)
 			{
-				Collision::TrackPlayer(playerSystem->GetPlayer(mEntities), object, dt, 5);
+				Collision::TrackPlayer(playerSystem->GetPlayer(mEntities), object, dt, 5); 
 			}
+		}
+	}
+	if (!Actor::projectileVector.empty())
+	{
+		for (const auto& projectile : Actor::projectileVector)
+		{
+			if (!Actor::spawnVector.empty())
+			{
+				for (const auto& object : Actor::spawnVector)
+				{
+					Collision::ProjectileHit(projectile, object);
+				}
+			}
+			
 		}
 	}
 }
