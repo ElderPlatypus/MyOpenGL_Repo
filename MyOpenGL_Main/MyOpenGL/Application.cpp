@@ -80,7 +80,7 @@ void Application::Run_App()
     // -----------
     while (!glfwWindowShouldClose(mWindow)) 
     {
-        if (mScene->playerSystem->GetPlayer(mScene->mEntities)->Restart()) 
+        if (mScene->uActorMap.find("Player")->second->Restart())
         {
             std::cout << "\n\n";
             std::cout << "[LOG]:Player is dead. Exiting application \n";
@@ -294,24 +294,24 @@ void Application::UpdateCameraController(float dt)
  
 void Application::UpdateActorMovement(float dt) 
 {    
-        if (mScene->playerSystem->GetPlayer(mScene->mEntities)->isPlayer) 
+        if (mScene->uActorMap.find("Player")->second->isPlayer)
         {
             //Movement Keys
-            if (mKeyState[GLFW_KEY_W]) mScene->playerSystem->GetPlayer(mScene->mEntities)->ActorMovement(Forward, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_A]) mScene->playerSystem->GetPlayer(mScene->mEntities)->ActorMovement(Left, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_S]) mScene->playerSystem->GetPlayer(mScene->mEntities)->ActorMovement(Backwards, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_D]) mScene->playerSystem->GetPlayer(mScene->mEntities)->ActorMovement(Right, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_SPACE]) mScene->playerSystem->GetPlayer(mScene->mEntities)->ActorMovement(Up, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_LEFT_ALT]) mScene->playerSystem->GetPlayer(mScene->mEntities)->ActorMovement(Down, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_W]) mScene->uActorMap.find("Player")->second->ActorMovement(Forward, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_A]) mScene->uActorMap.find("Player")->second->ActorMovement(Left, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_S]) mScene->uActorMap.find("Player")->second->ActorMovement(Backwards, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_D]) mScene->uActorMap.find("Player")->second->ActorMovement(Right, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_SPACE]) mScene->uActorMap.find("Player")->second->ActorMovement(Up, mScene->mSceneCamera, dt); 
+            if (mKeyState[GLFW_KEY_LEFT_ALT]) mScene->uActorMap.find("Player")->second->ActorMovement(Down, mScene->mSceneCamera, dt); 
 
             //Increase Speed
-            if (mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->playerSystem->GetPlayer(mScene->mEntities)->ActorMovement(IncreaseSpeed, mScene->mSceneCamera, dt);
-            if (!mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->playerSystem->GetPlayer(mScene->mEntities)->ActorMovement(NormalSpeed, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->uActorMap.find("Player")->second->ActorMovement(IncreaseSpeed, mScene->mSceneCamera, dt);
+            if (!mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->uActorMap.find("Player")->second->ActorMovement(NormalSpeed, mScene->mSceneCamera, dt);
         }
 
-        if (mScene->playerSystem->GetPlayer(mScene->mEntities)->isPlayer)
+        if (mScene->uActorMap.find("Player")->second->isPlayer)
         {
-            if(mButtonState[GLFW_MOUSE_BUTTON_LEFT]) mScene->playerSystem->GetPlayer(mScene->mEntities)->Shoot(LeftMouseButton, mScene->playerSystem->GetPlayer(mScene->mEntities),dt);
+            if(mButtonState[GLFW_MOUSE_BUTTON_LEFT]) mScene->uActorMap.find("Player")->second->Shoot(LeftMouseButton,dt);  
         }
 
 
@@ -319,14 +319,14 @@ void Application::UpdateActorMovement(float dt)
 
 void Application::UpdateCameraPlacement(float dt)
 { 
-    if (mScene->playerSystem->GetPlayer(mScene->mEntities)->isPlayer)
+    if (mScene->uActorMap.find("Player")->second->isPlayer)
     {
-        if (mKeyState[GLFW_KEY_1]) mScene->playerSystem->GetPlayer(mScene->mEntities)->CameraStateControll(CameraFreeMovement_1, mScene->mSceneCamera, dt);
-        if (mKeyState[GLFW_KEY_2]) mScene->playerSystem->GetPlayer(mScene->mEntities)->CameraStateControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
-        if (mKeyState[GLFW_KEY_3]) mScene->playerSystem->GetPlayer(mScene->mEntities)->CameraStateControll(CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt);
+        if (mKeyState[GLFW_KEY_1]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraFreeMovement_1, mScene->mSceneCamera, dt);
+        if (mKeyState[GLFW_KEY_2]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
+        if (mKeyState[GLFW_KEY_3]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt);
         else
         {
-            if (mKeyState[GLFW_KEY_1]) mScene->playerSystem->GetPlayer(mScene->mEntities)->CameraStateControll(CameraFreeMovement_1, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_1]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraFreeMovement_1, mScene->mSceneCamera, dt);
         }
     }
 }

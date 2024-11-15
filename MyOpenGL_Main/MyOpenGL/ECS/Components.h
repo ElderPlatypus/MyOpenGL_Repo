@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <memory>
 #include <stdexcept>
-
+#include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -18,8 +18,8 @@
 
 //classes
 
-#include "../SceneFolder/Actor.h"
-#include "Entity.h" 
+class Actor;
+
  
 ///Components
 class IComponent
@@ -49,23 +49,23 @@ public:
 	}*/
 
 private:
-	std::unordered_map<int, std::vector<std::shared_ptr<T>>> m_componentArchive;
+	std::unordered_map<std::string, std::vector<std::shared_ptr<T>>> m_componentArchive; 
 
 public:
-	void AddComponent(const int& _entityId, const std::shared_ptr<T>& _component)
+	void AddComponent(const std::string& _entityType, const std::shared_ptr<T>& _component)   
 	{
-		if (_entityId < 0 || !_component) 
+		if (_entityType->empty() || !_component)     
 		{
-			throw std::runtime_error("[LOG:]Component not found or id doesnt exists."); 
-		}
-		m_componentArchive[_entityId].emplace_back((_component)); 
+			throw std::runtime_error("[LOG]:Component not found or id doesnt exists.");  
+		}   
+		m_componentArchive[_entityType].emplace_back(_component); 
 	}
 
-	std::shared_ptr<T> GetComponent(const int& _entityId)
+	std::shared_ptr<T> GetComponent(const std::string& _entityType) 
 	{
 		try
 		{
-			return m_componentArchive[_entityId].front();
+			return m_componentArchive[_entityType]->front();  
 		}
 		catch (const std::exception& e) {
 			// Catch any exception thrown during the execution
@@ -75,26 +75,24 @@ public:
 		}
 	}
 
-	bool HasComponent(const int& _entityId)
+	bool HasComponent(const std::string& _entityType) 
 	{
-		return m_componentArchive.find(_entityId) != m_componentArchive.end();
+		return m_componentArchive.find(_entityType) != m_componentArchive.end(); 
 	}
 
-	void RemoveComponent(const int& _entityId)
+	void RemoveComponent(const std::shared_ptr<std::string>& _entityType)
 	{
-		if (!HasComponent(_entityId))
+		if (!HasComponent(_entityType))
 		{
 			throw std::runtime_error("[ERROR]:Component not found for the given entity ID.");
 		}
-		m_componentArchive.erase(_entityId);
+		m_componentArchive->erase(_entityType);  
 	}
 
-	std::unordered_map<int, std::vector<std::shared_ptr<T>>> GetAllComponents() const 
+	std::unordered_map<std::string, std::vector<std::shared_ptr<T>>> GetAllComponents() const 
 	{
 		return m_componentArchive;
 	}
-
-
 };
 
 
@@ -115,7 +113,7 @@ struct PlayerComponent : public IComponent
 	{
 		std::cout << "PlayerComponent";
 	}
-	std::vector<std::shared_ptr<Actor>> actors;
+	std::vector<bool> _isPlayer;
 };
 
 

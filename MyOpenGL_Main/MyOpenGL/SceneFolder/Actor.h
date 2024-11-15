@@ -25,6 +25,7 @@ class Actor : public Mesh
 {
 private:
     std::shared_ptr<Mesh> mMesh; 
+
 public:
     ///Constructor & Destructor
     //---------------------------------Members------------------------------------------------
@@ -43,7 +44,7 @@ public:
     ///Mesh Modifications
     //---------------------------------Methods------------------------------------------------
     void ExtrudeMesh(Extrude _increase_or_decrease, const float& _extrude) const; 
-    int Id = 0;
+    inline static int mId = 0;
 
     ///Physics
     //---------------------------------Methods------------------------------------------------
@@ -107,7 +108,7 @@ public:
     //inline static int ActorType; //1 = cube, 2 = Sphere, 3 = Pyramid
     
     static void ProjectileSpawner(const std::shared_ptr<Actor>& actor, const std::shared_ptr<Shader>& Shader, float dt);
-    bool Shoot(Mouse shoot, const std::shared_ptr<Actor>& actor, float dt) const; 
+    bool Shoot(Mouse shoot, float dt) const; 
     inline static std::vector<std::shared_ptr<Actor>> projectileVector;
     inline static std::shared_ptr<Actor> projectileActor;
     inline static bool isShooting;
@@ -140,7 +141,7 @@ public:
     void  GetdrawActor(const std::shared_ptr<Shader>& shader) const { return mMesh->drawActor(shader); }
     const bool GetTexBool() const { return mMesh->mUseTex; }
 
-
+    const std::vector<Vertex> returnMeshVertices() const { return mMesh->mVertices; }
     const glm::vec3& GetExtent() const { return mMesh->mExtent; }
     const glm::vec3& GetCenter() const { return mMesh->mCenter; }
 
@@ -151,5 +152,7 @@ public:
 
     int GetHealth() const { return Health; }
     bool die = false;
-    bool Restart() { return die; };
+    bool Restart() const { return die; }
+
+
 };

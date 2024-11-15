@@ -3,7 +3,7 @@
 ///Acor constructor/destructor
 Actor::Actor(const std::shared_ptr<Mesh>& mesh, const std::string& name): mMesh(mesh), mName(name)
 {
-    Id++;
+    mId++;
     EnablePhysics = false;
     rigidB->pos = mMesh->GetLocalPosition(); 
     rigidB->acceleration = Environment::gravitationalAcceleraton; 
@@ -60,8 +60,6 @@ void Actor::DeleteSpawnvector_all(const std::vector<std::shared_ptr<Actor>>& act
     }
     Actor::projectileVector.clear();
 }
-
-
 
 void Actor::ExtrudeMesh(Extrude _increase_or_decrease, const float& _extrude) const
 {
@@ -377,18 +375,16 @@ void Actor::AI_Path(float dt)
 void Actor::ProjectileSpawner(const std::shared_ptr<Actor>& actor,  const std::shared_ptr<Shader>& Shader, float dt) 
 {
     float timer = dt;
-    int index = 0;
-    glm::vec3 movement = actor->GetLocalPosition();
- 
-
+    int index = 0; 
     if (isShooting) 
     { 
         index++; 
         projectileActor = std::make_shared<Actor>(Mesh::CreateCube(2), "spawnedSphere " + std::to_string(index)); 
 
         projectileActor->UseTexBool(true); 
+        projectileActor->mEnableAABBCollision = true;
         projectileActor->SetLocalRotation(actor->GetForwardVector()); 
-        projectileActor->SetLocalPosition(actor->GetLocalPosition() + glm::vec3(0,0,1)* dt/100.f);
+        projectileActor->SetLocalPosition(actor->GetLocalPosition() +  100.f*dt);
         Actor::projectileVector.emplace_back(projectileActor);  
     }
     if (!Actor::projectileVector.empty())
@@ -397,18 +393,17 @@ void Actor::ProjectileSpawner(const std::shared_ptr<Actor>& actor,  const std::s
         {
             for (const auto& it : Actor::projectileVector)
             {
-                  actor->DeleteSpawnvector_all(projectileVector); 
+                actor->DeleteSpawnvector_all(projectileVector);
             }
         }
-       for (const auto& actor : Actor::projectileVector) { actor->SetShader(Shader); actor->UpdateActors(dt); }
+        for (const auto& actor : Actor::projectileVector) { actor->SetShader(Shader); actor->UpdateActors(dt); }
     }
-    timer = 0;
     isShooting = false;
 }
 
-bool Actor::Shoot(Mouse shoot, const std::shared_ptr<Actor>& actor, float dt) const
+bool Actor::Shoot(Mouse shoot, float dt) const
 {
-    if (!actor->isPlayer)  
+    if (!isPlayer || !shoot)  
     {
         return false;
     }
@@ -496,12 +491,5 @@ void Actor::UpdateActors(float dt)
         return; 
     }
 }
-
-
-
-
-
-
-
 
 

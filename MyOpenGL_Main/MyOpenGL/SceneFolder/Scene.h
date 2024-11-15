@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <random>
 #include <memory>
+#include <string>
 
 //Includes
 #include "../CameraFolder/Camera.h"
@@ -18,7 +19,6 @@
 #include "../CameraFolder/Camera.h"
 #include "../Shaders/Texture.h"
 #include "../Physics/Collision.h"
-#include "../ECS/Entity.h"
 #include "../ECS/Systems.h"
 #include "../ECS/Components.h"
 #include "../MathLib/Formulas.h"
@@ -64,11 +64,6 @@ public:
 
 	//ECS
 	int numEntities = 0;
-	std::vector<std::shared_ptr<Entity>> mEntities;
-
-	std::shared_ptr<MovementSystem> movementSystem; 
-	std::shared_ptr<DamageSystem> damageSystem;
-	std::shared_ptr<PlayerSystem> playerSystem;
 	std::shared_ptr<ActorSystem> actorSystem;
 
 
@@ -79,5 +74,7 @@ public:
 	std::shared_ptr<ComponentArchive<ActorComponent>> actorManager = std::make_shared<ComponentArchive<ActorComponent>>();
 	std::shared_ptr<ComponentArchive<PlayerComponent>> playerManager = std::make_shared<ComponentArchive<PlayerComponent>>();
 
+
+	std::vector<std::vector<std::string>> terrainData;
 };
 

@@ -4,9 +4,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-class Vertex
+struct Vertex
 {
-public:
     glm::vec3 mPos;
     glm::vec3 mNormals;
     glm::vec2 mTextCoords;

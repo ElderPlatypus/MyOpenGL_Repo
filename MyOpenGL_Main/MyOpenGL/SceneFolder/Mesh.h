@@ -10,8 +10,8 @@
 #include <unordered_map>
 #include <glm/gtc/matrix_transform.hpp>
 
-//#define LASZIP_DYN_LINK 
-#include <LASzip/dll/laszip_api.h>
+////#define LASZIP_DYN_LINK 
+//#include <LASzip/dll/laszip_api.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -22,7 +22,6 @@
 #include "../Definitions.h"
 #include "../Shaders/Shader.h"
 #include "../MathLib/Transform.h"
-#include "../Shaders/Shader.h"
 #include "../CameraFolder/Camera.h"
 #include "../MathLib/Formulas.h"
 
@@ -163,13 +162,15 @@ public:
 			return std::make_shared<Mesh>(name, vertices, indices, useTex, drawType);   
 		}
 
+
 	public:
 		static std::shared_ptr<Mesh> CreatePointCloudFromLASFileSurface(const char* _fileDirectory, float _scaleFactor);
 	
+		static std::shared_ptr<Mesh> CreateTriangulationFromLASFileSurface(const char* _fileDirectory, float _scaleFactor, float _resolution);
 
+		static std::vector<Vertex> CreatePlaneFromLas(const char* _fileDirectory, float _scaleFactor, float _resolution); 
 
-
-
+		 
 
 
 };

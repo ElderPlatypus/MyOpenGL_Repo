@@ -520,84 +520,46 @@ void Mesh::drawActor(const std::shared_ptr<Shader>& shader) const
     ////glBindVertexArray(0);
 }
 
-std::shared_ptr<Mesh> Mesh::CreatePointCloudFromLASFileSurface(const char* _fileDirectory, float _scaleFactor)
+std::shared_ptr<Mesh> Mesh::CreatePointCloudFromLASFileSurface(const char* _fileDirectory, float _scaleFactor) 
 {
-    // create the reader
-    laszip_POINTER laszip_reader; 
-    if (laszip_create(&laszip_reader)){}
-    if(!laszip_reader){ std::cout << "[WARNING]:laszip_POINTER Not found\n"; return nullptr; }
+    auto data = LoadLAS_Data(_fileDirectory, _scaleFactor);
+    return std::make_shared<Mesh>("pointcloudterrain", data.first, data.second, false, 2);  
+    return nullptr;
+}
 
-    // open the reader
-    laszip_BOOL is_compressed;
-    if (laszip_open_reader(laszip_reader, _fileDirectory, &is_compressed)){}
-    if (!is_compressed) { std::cout << "[WARNING]:laszip_BOOL nOt found\n"; return nullptr; }
+std::shared_ptr<Mesh> Mesh::CreateTriangulationFromLASFileSurface(const char* _fileDirectory, float _scaleFactor, float _resolution)
+{
+    auto data = LoadLAS_Data(_fileDirectory, _scaleFactor);
+    std::vector<Vertex> vertices = data.first;
+    std::vector<Index> indices = data.second; 
 
-    // get a pointer to the header of the reader that was just populated
-    laszip_header* header = nullptr;
-    if (laszip_get_header_pointer(laszip_reader, &header)){}
-    if (!header) { std::cout << "[WARNING]:laszip_HEADER nOt found\n"; return nullptr; }
 
-    // get a pointer to the points that will be read
-    laszip_point* point;
-    if (laszip_get_point_pointer(laszip_reader, &point)){}
-    if (!point) { std::cout << "[WARNING]:laszip_POINTER nOt found\n"; return nullptr; }
+    return nullptr;
+}
 
-    // how many points does the file have
-    laszip_I64 numTotalPoints = (header->number_of_point_records ? header->number_of_point_records : header->extended_number_of_point_records); 
+std::vector<Vertex> Mesh::CreatePlaneFromLas(const char* _fileDirectory, float _scaleFactor, float _resolution)
+{
+    auto data = LoadLAS_Data(_fileDirectory, _scaleFactor);
+    std::vector<Vertex> vertices = data.first;
+    std::vector<Index> indices = data.second; 
 
-    // report how many points the file has
-    //LOG("Calculating %i points for TerrainSector", numTotalPoints);
-
-    std::vector<Vertex> tempVertices;
-
-    for (int i = 0; i < numTotalPoints; i++)
-    {
-        if (laszip_read_point(laszip_reader)) { }
-        // Apply scaling when reading point coordinates
-        float x = (float)(point->X * header->x_scale_factor + header->x_offset) * _scaleFactor;
-        float y = (float)(point->Y * header->y_scale_factor + header->y_offset) * _scaleFactor;
-        float z = (float)(point->Z * header->z_scale_factor + header->z_offset) * _scaleFactor;
-
-        glm::vec3 colorf = glm::vec3(0);
-        glm::vec3 vertPos = glm::vec3(x, z, y);
-
-        tempVertices.emplace_back(Vertex(vertPos, vertPos, vertPos));
-    }
-  
-
+    //creating the actual vertex vector for repositioning
     std::vector<Vertex> newVertices;
-    std::vector<Index> indices;
-    if (!tempVertices.empty())
+    if (!vertices.empty())
     {
+        glm::vec3 MinVert = vertices[0].mPos;
+        glm::vec3 MaxVert = vertices[0].mPos;
 
-        glm::vec3 MinVert = tempVertices[0].mPos;
-        glm::vec3 MaxVert = tempVertices[0].mPos;
-
-        for (const auto& vertex : tempVertices)
+        //Finding minimum and maximum values 
+        for (const auto& vertex : vertices)
         {
             MinVert = glm::min(MinVert, vertex.mPos);
-            MaxVert = glm::min(MaxVert, vertex.mPos);
+            MaxVert = glm::max(MaxVert, vertex.mPos);
         }
 
+        //calculating half the length of position
         glm::vec3 midPoint = (MinVert + MaxVert) / glm::vec3{ 2.f };
-
-        int counter = 0;
-        for (auto& vertex : tempVertices)
-        {
-            counter++;
-            vertex.mPos -= midPoint;
-            newVertices.emplace_back(vertex.mPos.x, vertex.mPos.y, vertex.mPos.z);
-            indices.emplace_back(counter);
-        }
     }
-
-    // Clean up the LASzip reader
-    if (laszip_close_reader(laszip_reader)) {}
-    //if (!laszip_create(&laszip_reader)) { std::cout << "[WARNING]:laszip_CLOSE ERROR \n"; return nullptr; }
-
-    if (laszip_destroy(laszip_reader)) {}
-    //if (!laszip_create(&laszip_reader)) { std::cout << "[WARNING]:laszip_DESTROY ERROR\n"; return nullptr; }
-
-    return std::make_shared<Mesh>("PointCloudTerrain", newVertices, indices, false, 2);
+    return {};
 }
 

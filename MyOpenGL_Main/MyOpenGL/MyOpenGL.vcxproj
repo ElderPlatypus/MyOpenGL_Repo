@@ -155,7 +155,6 @@
     <ClInclude Include="CameraFolder\Camera.h" />
     <ClInclude Include="Dependency\includes\stb\stb_image.h" />
     <ClInclude Include="ECS\Components.h" />
-    <ClInclude Include="ECS\Entity.h" />
     <ClInclude Include="ECS\Systems.h" />
     <ClInclude Include="includes\assimp\Bitmap.h" />
     <ClInclude Include="includes\GLFW\glfw3.h" />

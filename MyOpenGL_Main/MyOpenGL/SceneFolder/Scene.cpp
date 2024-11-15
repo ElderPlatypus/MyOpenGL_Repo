@@ -12,10 +12,7 @@ void Scene::LoadActors()
 	numEntities = 1;
 	for (int i = 0; i < numEntities; i++)
 	{
-		std::shared_ptr<Entity> entity = std::make_shared<Entity>(); 
-		entity->SetId(i);
-
-		mEntities.emplace_back(entity);
+	
 
 		std::shared_ptr<TransformComponent> transformComponent_1 = std::make_shared<TransformComponent>(); 
 		transformComponent_1->m_pos.emplace_back(glm::vec3(5, 3, 1 ));
@@ -24,36 +21,27 @@ void Scene::LoadActors()
 		std::shared_ptr<HealthComponent> healthComponent_1 = std::make_shared<HealthComponent>();
 		healthComponent_1->health.emplace_back(100);
 
-		std::shared_ptr<PlayerComponent> playerComponent = std::make_shared<PlayerComponent>();
-		playerComponent->actors.emplace_back(std::make_shared<Actor>(Mesh::CreateCube(2.0f), "Gætt"));
-
 		std::shared_ptr<ActorComponent> actorComponent = std::make_shared<ActorComponent>();
 		actorComponent->spawn.emplace_back(Actor::spawnVector);    
 
 		std::shared_ptr<DamageComponent> damageComponent = std::make_shared<DamageComponent>();
 		damageComponent->damage.emplace_back(20);
 
-		damageManager->AddComponent(entity->GetId(), damageComponent); 
-		playerManager->AddComponent(entity->GetId(), playerComponent);  
+		/*damageManager->AddComponent(entity->GetId(), damageComponent); 
 		transformManager->AddComponent(entity->GetId(),transformComponent_1); 
-		healthManager->AddComponent(entity->GetId(), healthComponent_1);
+		healthManager->AddComponent(entity->GetId(), healthComponent_1);*/
 	}
-
-	playerSystem = std::make_shared<PlayerSystem>(playerManager);
-	playerSystem->Update(mEntities);
-	playerSystem->AttachToCamera(mEntities, 0);
-	playerSystem->UseTexture(mEntities,0); 
-	playerSystem->GetPlayer(mEntities)->mEnableAABBCollision = true;
-	playerSystem->GetPlayer(mEntities)->SetLocalPosition(glm::vec3(0, 0, -10.f));
-
-	damageSystem = std::make_shared<DamageSystem>(damageManager);
-	damageSystem->Update(mEntities);
 
 	Actor::Spawner(10, -50, 50, 2);
     for (const auto& actors : Actor::spawnVector)
 	{
 		actors->mEnableAABBCollision = true;
 	}
+	uActorMap["Player"] = std::make_shared<Actor>(Mesh::CreateCube(2.0f), "PlayerMesh");
+	uActorMap["Player"]->UseTexBool(true);
+	uActorMap["Player"]->isPlayer = true;
+	uActorMap["Player"]->mAttachToActor = true;
+
 
 	
 	// Define knot vectors
@@ -70,23 +58,37 @@ void Scene::LoadActors()
 	///Create camera object
     mSceneCamera = std::make_shared<Camera>("SceneCamera");
 	mSceneCamera->SetLocalPosition(glm::vec3(0, -10.0f, 10.f));
-
-
-	std::vector<std::string> getData;
+	//mSceneCamera->SetAccelerationSpeed(10.f);
+	mSceneCamera->mFarplane = 500.f; 
+	mSceneCamera->UpdateProjectionMatrix();
 
 	int counter = 0;
+	int counter2 = 0;
 	
-	getData.emplace_back("../MathLib/TerrainData/t1/data/32-2-517-141-10.laz"); 
-	getData.emplace_back("../MathLib/TerrainData/t1/data/32-2-517-141-11.laz");
-	getData.emplace_back("../MathLib/TerrainData/t1/data/32-2-517-141-20.laz");
-			
-	for (const auto& files : getData)
+	//auto folder1 = LoadVectorOfPath("../myopengl/mathlib/terraindata/t1/data/", "c:/users/lenovo/documents/spilltech2024_h/myopengl_repo/myopengl_main/myopengl/mathlib/terraindata/t1/data");
+	//auto folder2 = LoadVectorOfPath("../myopengl/mathlib/terraindata/t2/data/", "c:/users/lenovo/documents/spilltech2024_h/myopengl_repo/myopengl_main/myopengl/mathlib/terraindata/t2/data");
+	auto folder3 = LoadVectorOfPath("../myopengl/mathlib/terraindata/t3/data/","c:/users/lenovo/documents/spilltech2024_h/myopengl_repo/myopengl_main/myopengl/mathlib/terraindata/t3/data");
+	//auto folder4 = LoadVectorOfPath("../myopengl/mathlib/terraindata/t4/data/", "c:/users/lenovo/documents/spilltech2024_h/myopengl_repo/myopengl_main/myopengl/mathlib/terraindata/t4/data");
+	
+	 
+	//terrainData.emplace_back(folder1);   
+	//terrainData.emplace_back(folder2);   
+	terrainData.emplace_back(folder3);   
+	//terrainData.emplace_back(folder4);  
+
+	for (const auto& files : terrainData)
 	{
-		uActorMap["terrain" + std::to_string(counter)] = std::make_shared<Actor>(Mesh::CreatePointCloudFromLASFileSurface(files.c_str(), 2.f), "Terrain");
-		uActorMap["terrain" + std::to_string(counter)]->SetLocalPosition(glm::vec3(0, 0, 0)); 
-		counter++;
+		//std::cout << "[LOG]:Reading from folder:" << counter2 << "\n";
+		for (int i = 0; i < files.size(); i++)
+		{
+			counter++;
+			//std::cout << "[LOG]:Path is:" << content.c_str() << "\n";
+			uActorMap["terrain" + std::to_string(counter)] = std::make_shared<Actor>(Mesh::CreatePointCloudFromLASFileSurface(files[0].c_str(), 0.02f), "Terrain");
+			//uActorMap["terrain" + std::to_string(counter)]->SetLocalPosition(glm::vec3(counter2 * 100.f, 0, 0));  
+		}
+		counter2++;
+		std::cout << "\n";
 	}
-	
 }
 
 void Scene::LoadContent()
@@ -98,7 +100,6 @@ void Scene::LoadContent()
 	
 	for (const std::pair<std::string,std::shared_ptr<Actor>> &actor : uActorMap) { actor.second->SetShader(mShader); }
 	for (const auto& actor : Actor::spawnVector) { actor->SetShader(mShader); }
-	playerSystem->SetShader(mEntities,mShader);
 	
 }
 
@@ -112,8 +113,11 @@ void Scene::UnloadContent()
 		}
 	}
 
-	playerSystem->GetPlayer(mEntities)->~Actor();
-
+	for (const auto& folder : terrainData)
+	{
+		folder.~vector();
+	
+	}
 	mSceneCamera = nullptr;
 
 	mShader = nullptr;
@@ -144,21 +148,12 @@ void Scene::UpdateScene(float dt)
 	  for (const auto& actor : Actor::spawnVector) { actor->UpdateActors(dt); }
 	}
 
-	playerSystem->DrawEntity(mEntities, dt);
-	for (const auto& object : Actor::projectileVector)
-	{
-		object->SetLocalRotation(playerSystem->GetPlayer(mEntities)->GetLocalRotation());
-		object->SetLocalPosition(object->GetLocalPosition() + (playerSystem->GetPlayer(mEntities)->GetLocalPosition() * dt * 100.f));
-
-		object->SetShader(mShader);
-		object->UpdateActors(dt);
-	}
 
 	//Collison Update
 	CollisionHandling(dt);
 	SpaceManipulation();
 	
-	Actor::ProjectileSpawner(playerSystem->GetPlayer(mEntities), mShader, dt);
+	Actor::ProjectileSpawner(uActorMap.find("Player")->second, mShader, dt); 
 }
 
 ///Rednerer
@@ -175,6 +170,8 @@ void Scene::SpaceManipulation() const //Only rotation can be manipulated before 
 	{
 		 object->mMesh->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime())); 
 	}*/
+
+	//uActorMap.find("Player")->second->SetLocalRotation(glm::vec3((float)glfwGetTime(), (float)glfwGetTime(), (float)glfwGetTime()));
 
 } 
 
@@ -195,9 +192,9 @@ void Scene::CollisionHandling(float dt) const
 	{
 		for (const auto& object : Actor::spawnVector)
 		{
-			if (playerSystem->GetPlayer(mEntities)->isPlayer)
-			{
-				Collision::TrackPlayer(playerSystem->GetPlayer(mEntities), object, dt, 5); 
+			if (uActorMap.find("Player")->second->isPlayer) 
+			{ 
+				//Collision::TrackPlayer(uActorMap.find("Player")->second, object, dt, 5);
 			}
 		}
 	}
