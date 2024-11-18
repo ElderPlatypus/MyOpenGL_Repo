@@ -24,13 +24,15 @@
 #include "../MathLib/Transform.h"
 #include "../CameraFolder/Camera.h"
 #include "../MathLib/Formulas.h"
+#include "../MathLib/Shapes.h"
+#include "../Utility/EnumArchive.h"
 
 class Mesh
 {
 public:
 	Mesh(const std::string& type, const std::vector<Vertex>& vertices,
 		 const std::vector<Index>& indices, const bool& useTex,
-		 const int& GLdrawType 
+		 const GLDrawType& GLdrawType 
 	);
 	
 	Mesh(const Mesh&) = delete;
@@ -41,25 +43,66 @@ public:
 	Mesh() = default;
 	~Mesh();
 
-	///Actor vertex data
-	static std::shared_ptr<Mesh> Create2DTriangle(float size);
-	static std::shared_ptr<Mesh> CreatePyramid(float size);
-	static std::shared_ptr<Mesh> CreateCube(float size);
-	static void CreateCube2(std::shared_ptr<Mesh>& mesh, float size); 
+	///Basic Shapes
+	static std::shared_ptr<Mesh> CreateCube(float size)
+	{
+		return CubeShape<Mesh>(size);
+	}
+	static std::shared_ptr<Mesh> Create2DTriangle(float size)
+	{
+		return TriangleShape<Mesh>(size);
+	}
+	static std::shared_ptr<Mesh> CreatePyramid(float size)
+	{
+		return PyramidShape<Mesh>(size);
+	}
+	static std::shared_ptr<Mesh> CreateSphere(const int& stackCount, const int& sectorCount, const int& radius)
+	{
+		return SphereShape<Mesh>(stackCount, sectorCount, radius);
+	}
+	static std::shared_ptr<Mesh> CreateCircle(const glm::vec3& origin, const float& radius, const int& num_segment)
+	{
+		return CircleShape<Mesh>(origin, radius, num_segment);
+	}
 	
+	///Planes & Curves
 	static std::shared_ptr<Mesh> CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
-		                                        const float& startVal, const float& endingVal, const float& resolution);
-	static std::shared_ptr<Mesh> CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution);
-	static std::shared_ptr<Mesh> CreatePlaneXY(const float& xMin, const float& yMin, const float& xMax, const float& yMax, const float& resolution);
-	static std::shared_ptr<Mesh> CreateSphere(const int& stackCount, const int& sectorCount, const int& radius);
+		                                                         const float& startVal, const float& endingVal, const float& resolution)
+	{
+		return InterpolationCurve3PointsShape<Mesh>(p1, p2, p3, startVal, endingVal, resolution);
+	}
+	static std::shared_ptr<Mesh> CreatePlaneXZ(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution)
+	{
+		return PlaneXZShape<Mesh>(xMin, zMin, xMax, zMax, resolution);   
+	}
+	static std::shared_ptr<Mesh> CreatePlaneXY(const float& xMin, const float& yMin, const float& xMax, const float& yMax, const float& resolution)
+	{
+		return PlaneXYShape<Mesh>(xMin, yMin, xMax, yMax, resolution);
+	}
+	
+	///Splines
 	static std::shared_ptr<Mesh> CreateSplineSurface(int resU, int resV, int du, int dv,
 		                                             const std::vector<float>& uKnot, const std::vector<float>& vKnot,
-		                                             const std::vector<std::vector<glm::vec3>>& controlPoints, const float& size);
+		                                             const std::vector<std::vector<glm::vec3>>& controlPoints, const float& size)
+	{
+		return BSplineSurfaceShape<Mesh>(resV, resV, du, dv, uKnot, vKnot, controlPoints, size); 
+	}
+	
+	///LAS
+	static std::shared_ptr<Mesh> CreatePointCloudFromLASFileSurface(const char* _fileDirectory, float _scaleFactor)
+	{
+		return PointCloudFromLas<Mesh>(_fileDirectory, _scaleFactor);
+	}
+	static std::shared_ptr<Mesh> CreateGridFromLas(const char* _fileDirectory, float _scaleFactor, float _resolution)
+	{
+		return TriangualtionGridFromLas<Mesh>(_fileDirectory, _scaleFactor, _resolution);
+	}
 
+	///Configure and draw Mesh
 	void configureMesh(); //Binds VAO,VB & EBO to respective mesh
 	void drawActor(const std::shared_ptr<Shader>& shader) const; 
 
-
+	
 	///Transformation
 	//---------------------------------Members------------------------------------------ 
 	std::vector<Vertex> mVertices{};
@@ -102,7 +145,7 @@ public:
 	///Textures
 	//---------------------------------Members------------------------------------------
 	bool mUseTex = false;
-	int drawType = 0;
+	GLDrawType drawType;
 	std::shared_ptr<Shader> mShader{ nullptr }; 
 	//---------------------------------Methods------------------------------------------
 	void SetShader(const std::shared_ptr<Shader>& shader) { mShader = shader; }
@@ -148,30 +191,10 @@ public:
 	bool isPlayer = false;
 	bool isActor = false;
 
-	private:
-		static void localUpdate(std::shared_ptr<Mesh>& mesh,const std::string& name, const std::vector<Vertex>& vertices, const std::vector<Index>& indices)
-		{
-			mesh->mType = name;
-			mesh->mVertices = vertices;
-			mesh->mIndices = indices;
-			mesh->mUseTex = true;
-			mesh->configureMesh();
-		}
-		static std::shared_ptr<Mesh> localUpdate(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<Index>& indices, const bool& useTex, const int& drawType)
-		{
-			return std::make_shared<Mesh>(name, vertices, indices, useTex, drawType);   
-		}
 
-
-	public:
-		static std::shared_ptr<Mesh> CreatePointCloudFromLASFileSurface(const char* _fileDirectory, float _scaleFactor);
 	
-		static std::shared_ptr<Mesh> CreateTriangulationFromLASFileSurface(const char* _fileDirectory, float _scaleFactor, float _resolution);
-
-		static std::vector<Vertex> CreatePlaneFromLas(const char* _fileDirectory, float _scaleFactor, float _resolution); 
-
-		 
-
+	
 
 };
+
 

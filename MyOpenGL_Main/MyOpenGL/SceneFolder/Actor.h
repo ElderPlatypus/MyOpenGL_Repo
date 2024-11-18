@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include <random>
+#include <unordered_map>
+#include <typeindex>
 #ifndef M_PI
 #define M_PI (constexpr)3.14159265358979323846
 #endif
@@ -19,6 +21,7 @@
 #include "../Physics/RigidBody.h"
 #include "../Physics/Environment.h" 
 #include "../Utility/EnumArchive.h"
+#include "../MathLib/Formulas.h"
 #include <glm/gtc/random.hpp>
 
 class Actor : public Mesh
@@ -60,8 +63,11 @@ public:
     std::shared_ptr<Mesh> mSurfaceMesh;
     //---------------------------------Methods------------------------------------------------
     void SetBarySurfaceMesh(const std::shared_ptr<Mesh>& _selectSurface);
-    std::shared_ptr<Actor> BarycentricCoordinates(float _dt);
-    glm::vec3 CalculateBarycentricCoordinates(glm::vec3 _p1, glm::vec3 _p2, glm::vec3 _p3, glm::vec3 _playerPos);
+
+    void UpdateBarycentricCoords(float dt) const
+    {
+        BarycentricCoordinates1<Mesh,Mesh>(mMesh,mSurfaceMesh, dt);    
+    }
     
     ///Lerp
     //---------------------------------Members------------------------------------------------
@@ -141,6 +147,9 @@ public:
     void  GetdrawActor(const std::shared_ptr<Shader>& shader) const { return mMesh->drawActor(shader); }
     const bool GetTexBool() const { return mMesh->mUseTex; }
 
+    ///Utility Getters
+    //---------------------------------Methods Setters------------------------------------------------ 
+    const std::shared_ptr<Mesh> getMesh() const { return mMesh; } 
     const std::vector<Vertex> returnMeshVertices() const { return mMesh->mVertices; }
     const glm::vec3& GetExtent() const { return mMesh->mExtent; }
     const glm::vec3& GetCenter() const { return mMesh->mCenter; }
@@ -154,5 +163,15 @@ public:
     bool die = false;
     bool Restart() const { return die; }
 
+    std::unordered_map<std::string, std::vector<std::shared_ptr<void>>> m_componentArchive;     
 
+    template<typename T>
+    void AddComponentArchive(const std::string& type, const std::shared_ptr<T>& componentArchcive) 
+    {
+        std::cout << "[LOG]:Component Archive added. Type is: \n";
+        componentArchcive->displayComponent();
+        m_componentArchive[type].emplace_back(componentArchcive);    
+        std::cout << "\n"; 
+        return;
+    }
 };

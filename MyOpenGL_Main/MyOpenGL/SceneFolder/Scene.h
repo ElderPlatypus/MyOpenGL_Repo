@@ -64,15 +64,11 @@ public:
 
 	//ECS
 	int numEntities = 0;
-	std::shared_ptr<ActorSystem> actorSystem;
-
 
 
 	std::shared_ptr<ComponentArchive<TransformComponent>> transformManager = std::make_shared<ComponentArchive<TransformComponent>>();
 	std::shared_ptr<ComponentArchive<HealthComponent>> healthManager = std::make_shared<ComponentArchive<HealthComponent>>();
 	std::shared_ptr<ComponentArchive<DamageComponent>> damageManager = std::make_shared<ComponentArchive<DamageComponent>>();
-	std::shared_ptr<ComponentArchive<ActorComponent>> actorManager = std::make_shared<ComponentArchive<ActorComponent>>();
-	std::shared_ptr<ComponentArchive<PlayerComponent>> playerManager = std::make_shared<ComponentArchive<PlayerComponent>>();
 
 
 	std::vector<std::vector<std::string>> terrainData;

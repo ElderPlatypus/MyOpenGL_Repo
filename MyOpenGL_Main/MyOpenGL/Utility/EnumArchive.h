@@ -30,3 +30,11 @@ enum CameraState
     CameraStatic_CharacterMovement_2,
     CameraStatic_FollowPlayer_3
 };
+
+enum GLDrawType
+{
+    Triangle,
+    Line_Strip,
+    Points,
+    Triangle_Fan
+};

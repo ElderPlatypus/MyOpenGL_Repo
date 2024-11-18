@@ -18,8 +18,6 @@
 
 //classes
 
-class Actor;
-
  
 ///Components
 class IComponent
@@ -54,7 +52,7 @@ private:
 public:
 	void AddComponent(const std::string& _entityType, const std::shared_ptr<T>& _component)   
 	{
-		if (_entityType->empty() || !_component)     
+		if (_entityType.empty() || !_component)      
 		{
 			throw std::runtime_error("[LOG]:Component not found or id doesnt exists.");  
 		}   
@@ -97,26 +95,6 @@ public:
 
 
 //TypeComponents
-struct ActorComponent : public IComponent
-{
-	void displayComponent() override
-	{
-		std::cout << "ActorComponent:";
-	}
-    std::vector<std::shared_ptr<Actor>> actors;
-	std::vector<std::vector<std::shared_ptr<Actor>>> spawn;
-};
-
-struct PlayerComponent : public IComponent
-{
-	void displayComponent() override
-	{
-		std::cout << "PlayerComponent";
-	}
-	std::vector<bool> _isPlayer;
-};
-
-
 struct TransformComponent : public IComponent
 {
 	void displayComponent() override

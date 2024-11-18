@@ -8,42 +8,38 @@ Scene::Scene(std::string name)
 ///Loaders & Unloaders
 void Scene::LoadActors()
 {
-	///Components
-	numEntities = 1;
-	for (int i = 0; i < numEntities; i++)
-	{
-	
-
-		std::shared_ptr<TransformComponent> transformComponent_1 = std::make_shared<TransformComponent>(); 
-		transformComponent_1->m_pos.emplace_back(glm::vec3(5, 3, 1 ));
-		transformComponent_1->_Size = 2;
-		   
-		std::shared_ptr<HealthComponent> healthComponent_1 = std::make_shared<HealthComponent>();
-		healthComponent_1->health.emplace_back(100);
-
-		std::shared_ptr<ActorComponent> actorComponent = std::make_shared<ActorComponent>();
-		actorComponent->spawn.emplace_back(Actor::spawnVector);    
-
-		std::shared_ptr<DamageComponent> damageComponent = std::make_shared<DamageComponent>();
-		damageComponent->damage.emplace_back(20);
-
-		/*damageManager->AddComponent(entity->GetId(), damageComponent); 
-		transformManager->AddComponent(entity->GetId(),transformComponent_1); 
-		healthManager->AddComponent(entity->GetId(), healthComponent_1);*/
-	}
-
+	///Spawner_____________________________________________________
 	Actor::Spawner(10, -50, 50, 2);
     for (const auto& actors : Actor::spawnVector)
 	{
 		actors->mEnableAABBCollision = true;
 	}
-	uActorMap["Player"] = std::make_shared<Actor>(Mesh::CreateCube(2.0f), "PlayerMesh");
+	///Regular Triangulation Plane_____________________________________________________
+	uActorMap["RegularSurfaceXZ"] = std::make_shared<Actor>(Mesh::CreatePlaneXZ(0.f, 0.f, 30.f, 30.f, 0.3f), "BaryMesh");
+	uActorMap["RegularSurfaceXZ"]->UseTexBool(true);
+
+
+	///Player_____________________________________________________
+	//uActorMap["Player"] = std::make_shared<Actor>(Mesh::CreateCircle(glm::vec3(0.f, 0.f, 0.f), 5.f, 20), "PlayerMesh");
+	uActorMap["Player"] = std::make_shared<Actor>(Mesh::CreateCube(2.f), "PlayerMesh");
 	uActorMap["Player"]->UseTexBool(true);
 	uActorMap["Player"]->isPlayer = true;
 	uActorMap["Player"]->mAttachToActor = true;
+	uActorMap["Player"]->SetBarySurfaceMesh(uActorMap["RegularSurfaceXZ"]->getMesh());  
+	uActorMap["Player"]->AddComponentArchive("Damage", damageManager);
+
+	///Components_____________________________________________________
+	std::shared_ptr<HealthComponent> healthComponent_1 = std::make_shared<HealthComponent>();
+	healthComponent_1->health.emplace_back(100);
+
+	std::shared_ptr<DamageComponent> damageComponent = std::make_shared<DamageComponent>();
+	damageComponent->damage.emplace_back(20);
+
+	healthManager->AddComponent("Health", healthComponent_1);
+	damageManager->AddComponent("Damage", damageComponent);
 
 
-	
+	///B_Spline_____________________________________________________
 	// Define knot vectors
 	std::vector<float> uKnot = CreateRandomKnotVector<float>(7, 0.f, 2.f); 
 	std::vector<float> vKnot = CreateRandomKnotVector<float>(7, 0.f, 2.f); 
@@ -51,17 +47,20 @@ void Scene::LoadActors()
 	// Define control points (2D grid)
 	std::vector<std::vector<glm::vec3>> controlPoints = CreateKnotVectorTuple(3,3, 0.f, 2.f); 
 	
-	uActorMap["surface"] = std::make_shared<Actor>(Mesh::CreateSplineSurface(20,20,2,2,uKnot,vKnot,controlPoints,10.f),"splineStuff");  
-	uActorMap["surface"]->UseTexBool(true); 
-	uActorMap["surface"]->SetLocalPosition(glm::vec3(0, 0, 0));
+	uActorMap["Bspline"] = std::make_shared<Actor>(Mesh::CreateSplineSurface(20,20,2,2,uKnot,vKnot,controlPoints,10.f),"splineStuff");  
+	uActorMap["Bspline"]->UseTexBool(true); 
+	uActorMap["Bspline"]->SetLocalPosition(glm::vec3(0, 0, 0));
+
+
 	
-	///Create camera object
+	///Camera_____________________________________________________
     mSceneCamera = std::make_shared<Camera>("SceneCamera");
 	mSceneCamera->SetLocalPosition(glm::vec3(0, -10.0f, 10.f));
 	//mSceneCamera->SetAccelerationSpeed(10.f);
 	mSceneCamera->mFarplane = 500.f; 
 	mSceneCamera->UpdateProjectionMatrix();
 
+	///LAS_____________________________________________________
 	int counter = 0;
 	int counter2 = 0;
 	
@@ -78,12 +77,13 @@ void Scene::LoadActors()
 
 	for (const auto& files : terrainData)
 	{
-		//std::cout << "[LOG]:Reading from folder:" << counter2 << "\n";
 		for (int i = 0; i < files.size(); i++)
 		{
 			counter++;
-			//std::cout << "[LOG]:Path is:" << content.c_str() << "\n";
-			uActorMap["terrain" + std::to_string(counter)] = std::make_shared<Actor>(Mesh::CreatePointCloudFromLASFileSurface(files[0].c_str(), 0.02f), "Terrain");
+			uActorMap["grid" + std::to_string(counter)] = std::make_shared<Actor>(Mesh::CreateGridFromLas(files[0].c_str(), 0.02f,0.5f), "grid");
+			//uActorMap["terrain" + std::to_string(counter)] = std::make_shared<Actor>(Mesh::CreatePointCloudFromLASFileSurface(files[0].c_str(), 0.02f), "Terrain");
+
+			return;
 			//uActorMap["terrain" + std::to_string(counter)]->SetLocalPosition(glm::vec3(counter2 * 100.f, 0, 0));  
 		}
 		counter2++;
@@ -93,11 +93,14 @@ void Scene::LoadActors()
 
 void Scene::LoadContent()
 {
+	///Actors_____________________________________________________
 	LoadActors();
 
+	///Shaders_____________________________________________________
 	mShader = std::make_shared<Shader>("Shaders/Triangle.vs", "Shaders/Triangle.fs");
 	mTexture = std::make_shared<Texture>("Shaders/wall.jpg",mShader);     
 	
+	///Apply Shaders_____________________________________________________
 	for (const std::pair<std::string,std::shared_ptr<Actor>> &actor : uActorMap) { actor.second->SetShader(mShader); }
 	for (const auto& actor : Actor::spawnVector) { actor->SetShader(mShader); }
 	
@@ -105,9 +108,10 @@ void Scene::LoadContent()
 
 void Scene::UnloadContent()
 {
+	///Unload Content_____________________________________________________
 	for (const std::pair<std::string, std::shared_ptr<Actor>> actor : uActorMap)
 	{
-		if (actor.second != nullptr)
+		if (actor.second)
 		{
 			actor.second->~Actor();
 		}
@@ -129,40 +133,37 @@ void Scene::UnloadContent()
 	uActorMap.clear();
 }
 
-///Updater
 void Scene::UpdateScene(float dt)
 {
-	//Camera Update
+	///Camera Update_____________________________________________________
 	mSceneCamera->UpdateCamera(dt); 
 	BindCamera();
 
-	//Actor Update for Bary coords
-	
+	///Actor Update_____________________________________________________
 	if (!uActorMap.empty())
 	{
 		for (const std::pair<std::string, std::shared_ptr<Actor>> actor : uActorMap) { actor.second->UpdateActors(dt); }
-
 	}
+	///Spawner Update_____________________________________________________
 	if (!Actor::spawnVector.empty())
 	{
 	  for (const auto& actor : Actor::spawnVector) { actor->UpdateActors(dt); }
 	}
+	Actor::ProjectileSpawner(uActorMap.find("Player")->second, mShader, dt); 
 
 
-	//Collison Update
+	///Camera Update_____________________________________________________
 	CollisionHandling(dt);
 	SpaceManipulation();
 	
-	Actor::ProjectileSpawner(uActorMap.find("Player")->second, mShader, dt); 
 }
 
-///Rednerer
 void Scene::RenderScene(float dt, Transform globaltransform)
 { 
+	///Render Scene_____________________________________________________
 	UpdateScene(dt);  
 }
 
-///Tranformations
 void Scene::SpaceManipulation() const //Only rotation can be manipulated before call in Render. Offset needs to be set in LoacActors.
 {
 	///Spawn objects
@@ -175,7 +176,6 @@ void Scene::SpaceManipulation() const //Only rotation can be manipulated before 
 
 } 
 
-///Shader Binder
 void Scene::BindCamera() const
 {
 	mShader->setMat4("view", mSceneCamera->GetViewMatrix()); 

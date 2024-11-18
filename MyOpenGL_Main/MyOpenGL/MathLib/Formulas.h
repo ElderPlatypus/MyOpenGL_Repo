@@ -21,6 +21,7 @@
 #include "../Definitions.h"
 #include "../MathLib/Vertex.h"
 
+//Spline Formulas
 static float cox_deBoorFormula(int i, int p, float t, const std::vector<float>& knotVector)
 {
 
@@ -110,6 +111,7 @@ static glm::vec3 EvaluateBSplineSurfaceNormal(float u, float v, int du, int dv, 
     return normal;
 }
 
+//Random generator
 template<typename T>
 std::vector<T> CreateRandomKnotVector(const int& size, const float& min, const float& max)
 {
@@ -154,7 +156,7 @@ static std::vector<std::vector<glm::vec3>> CreateKnotVectorTuple(size_t outerSiz
     return KnotTuple; 
 }
 
-
+//Las Loader
 static std::pair <std::vector<Vertex>, std::vector<Index>> LoadLAS_Data(const char* _fileDirectory, float _scaleFactor)
 {
     double timer = 0;
@@ -246,7 +248,96 @@ static std::pair <std::vector<Vertex>, std::vector<Index>> LoadLAS_Data(const ch
     if (laszip_close_reader(laszip_pointer)) {}
     if (laszip_destroy(laszip_pointer)) {}
 
-    timer = 0;
     std::cout << "[LOG]:Calulation time:" << timer << "\n\n";
+    timer = 0;
     return std::make_pair(newVertices, indices); 
 }
+
+
+//Barycentric coordinate handler
+static glm::vec3 CalculateBarycentricCoordinates(glm::vec3 _p1, glm::vec3 _p2, glm::vec3 _p3, glm::vec3 _playerPos)
+{
+    ///Setting default values to zero
+    _p1.y = 0.f;
+    _p2.y = 0.f;
+    _p3.y = 0.f;
+    _playerPos.y = 0.f;
+    glm::vec3 baryCoords{ 0.f,0.f,0.f };
+
+    ///Calculating triangle surface area
+    glm::vec3 u = { _p2 - _p1 }; //sw
+    glm::vec3 v = { _p3 - _p1 }; //sw
+    glm::vec3 n = glm::cross(u, v);
+    float triangleSurfaceArea = n.y;
+
+    ///Sub Triangle vectors
+    glm::vec3 newU = { glm::cross(_p2 - _playerPos, _p3 - _playerPos) };
+    glm::vec3 newV = { glm::cross(_p3 - _playerPos, _p1 - _playerPos) };
+    glm::vec3 newW = { glm::cross(_p1 - _playerPos, _p2 - _playerPos) };
+
+    ///Calculate area with respect to reverse clockwise direction
+    //Sub Triangle 1 baryCoords X
+    n = newU;
+    baryCoords.x = n.y / triangleSurfaceArea;
+
+    //Sub Triangle 2 baryCoords Y
+    n = newV;
+    baryCoords.y = n.y / triangleSurfaceArea;
+
+    //Sub Triangle 3 baryCoords z
+    n = newW;
+    baryCoords.z = n.y / triangleSurfaceArea;
+
+    return baryCoords;
+}
+
+template<typename T1, typename T2>    
+static void BarycentricCoordinates1(const std::shared_ptr<T1>& mMesh, const std::shared_ptr<T2>& mSurfaceMesh, float dt) 
+{
+    if (!mSurfaceMesh) { std::cout << "[WARNING]: No suitable surface selected \n"; return; };
+    //vector of vertices and indices 
+    for (size_t i = 0; i < mSurfaceMesh->mIndices.size(); i += 3)
+    {
+        //Assigning the values
+        const unsigned int index1 = mSurfaceMesh->mIndices[i];
+        const unsigned int index2 = mSurfaceMesh->mIndices[i + 1];
+        const unsigned int index3 = mSurfaceMesh->mIndices[i + 2];
+         
+        //Collecting the postions of the indices 
+        glm::vec3 point1 = mSurfaceMesh->mVertices[index1].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale();
+        glm::vec3 point2 = mSurfaceMesh->mVertices[index2].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale(); 
+        glm::vec3 point3 = mSurfaceMesh->mVertices[index3].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale();
+
+        //Initialising variable which calculates bary-coords using the CalcBary-coords method
+        glm::vec3 baryCoords = CalculateBarycentricCoordinates(point1, point2, point3, mMesh->GetLocalPosition());
+
+        //Creating a variable which utilizes the calc-bary method
+        float baryHeight = ((baryCoords.x * point1.y) + (baryCoords.y * point2.y + (mMesh->mExtent.y / 2)) + (baryCoords.z * point3.y));
+
+        //If-checks if certain criterias are met folowing the rules for bary-coords behaviour
+        if (baryCoords.x == 0 || baryCoords.y == 0 || baryCoords.z == 0)
+        {
+            mMesh->SetLocalPosition(mMesh->GetLocalPosition() + glm::vec3(0.01f, 0.f, 0.01f));
+            baryCoords = CalculateBarycentricCoordinates(point1, point2, point3, mMesh->GetLocalPosition());
+        }
+
+        if (baryCoords.x > 0 && baryCoords.y > 0 && baryCoords.z > 0)
+        {
+            mMesh->SetLocalPosition(glm::vec3(mMesh->GetLocalPosition().x, baryHeight, mMesh->GetLocalPosition().z)); 
+            //std::cout << "Bary coords works: " << std::endl;
+            //std::cout << baryHeight << std::endl;
+        }
+
+    }
+    return;
+  
+    
+}
+
+template<typename T>
+glm::vec3 Lerp(glm::vec3 a, glm::vec3 b, T t)   
+{
+    //Lerp formula
+    return a + t * (b - a);
+}
+
