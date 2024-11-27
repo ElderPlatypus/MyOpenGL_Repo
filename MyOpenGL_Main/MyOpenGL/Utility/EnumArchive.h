@@ -36,5 +36,12 @@ enum GLDrawType
     Triangle,
     Line_Strip,
     Points,
-    Triangle_Fan
+    Triangle_Fan,
+    PolygonMode
+};
+
+enum TexType
+{
+    wall,
+    container
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-//External
+//External Includes
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
@@ -32,11 +32,7 @@ struct Vertex
         mTextCoords = textCoords;
     }
      
- /*   Vertex(const glm::vec3& position, const glm::vec3& normals)
-    {
-        mPos = position;
-        mNormals = normals;
-    }*/
+
 
     static void configureVertexAttribs()
     {

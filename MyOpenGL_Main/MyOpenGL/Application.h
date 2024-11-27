@@ -1,17 +1,18 @@
 #pragma once
 
-//External
+//Includes c++
 #include <iostream>
 #include <string>
 #include <map>
 #include <unordered_map>
+
+//External Includes
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "glm/glm.hpp"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 
-//Classes
+
+//Full inclusion
 #include "SceneFolder/Scene.h"
 #include "Shaders/ShaderFileLoader.h"
 #include "Shaders/Shader.h"
@@ -54,13 +55,13 @@ public:
 	int mHeight{ 1080 };
 	std::string mName;
 
-	///Util Funtions
-	void ExitApplication(float dt);
 
 	//---------------------------------Update callback from Camera class------------------------------------------
 	void UpdateCameraController(float dt);
 	void UpdateActorMovement(float dt);
 	void UpdateCameraPlacement(float dt);
 
-
+	///Utility
+	void UtilyKeyBinds(float dt);
+	bool seeWireFrame = false;
 };

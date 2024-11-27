@@ -1,13 +1,15 @@
 #ifndef SHADER_H
 #define SHADER_H
-#include "glad/glad.h" // include glad to get the required OpenGL headers
-#include "GLFW/glfw3.h"
+
+//Includes c++
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 
-//Needed oncludes to run glUniformMatrix
+//External Includes
+#include "glad/glad.h" 
+#include "GLFW/glfw3.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -26,6 +28,7 @@ public:
 	// utility uniform functions
 	void setBool(const std::string& uniform_name, bool value) const;
 	void setInt(const std::string& uniform_name, int value) const;
+    void setUInt(const std::string& uniform_name, int value) const; 
 	void setFloat(const std::string& uniform_name, float value) const;
 
     // activate the shader

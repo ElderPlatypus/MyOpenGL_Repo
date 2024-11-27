@@ -1,23 +1,22 @@
 #pragma once
 
+//External Includes
 #define GLM_ENABLE_EXPERIMENTAL
-//External
-#include <typeindex>
-#include <iostream>
-#include <unordered_map>
-#include <memory>
-#include <stdexcept>
-#include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+//Includes c++
 #include <algorithm>
-
-//classes
-
+#include <typeindex>
+#include <iostream>
+#include <unordered_map>
+#include <memory>
+#include <stdexcept>
+#include <vector>
  
 ///Components
 class IComponent

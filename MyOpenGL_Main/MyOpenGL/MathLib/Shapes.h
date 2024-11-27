@@ -1,16 +1,35 @@
 #pragma once
 
-//Includes
+//External Includes
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/random.hpp>
+
+//Includes c++
+#include <chrono>
+#include <algorithm>
 #include <memory>
 #include <vector>
-#include <glm/gtc/matrix_transform.hpp>
+#include <string>
+#include <array>
+#include <iostream>
+#include <utility>
+#include <unordered_map>
 
 
-//External Includes
-#include "../MathLib/Vertex.h"
+//Full incluson
 #include "../Definitions.h"
 #include "../MathLib/Formulas.h"
+#include "../Physics/Collision.h"
+#include "../Utility/EnumArchive.h"
 
+//Forward Declaring
+struct Vertex;
 
 //Basic Shapes ____________________________________________
 template <typename T>
@@ -257,8 +276,8 @@ std::shared_ptr<T> BSplineSurfaceShape(int resU, int resV, int du, int dv,
             auto v = j / (resV - 1);
 
             //Evaluate the surface in both direction U & V
-            glm::vec3 surfacePoint = EvaluateBSplineSurface(u, v, du, dv, uKnot, vKnot, controlPoints);  
-            glm::vec3 surfaceNormal = EvaluateBSplineSurfaceNormal(u, v, du, dv, resU, resV, uKnot, vKnot, controlPoints); 
+            glm::vec3 surfacePoint = MathLib::EvaluateBSplineSurface(u, v, du, dv, uKnot, vKnot, controlPoints);
+            glm::vec3 surfaceNormal = MathLib::EvaluateBSplineSurfaceNormal(u, v, du, dv, resU, resV, uKnot, vKnot, controlPoints);
             glm::vec2 texCoords = glm::vec2(u, v);
 
             vertices.emplace_back(Vertex(surfacePoint * size, surfaceNormal * size, texCoords * size));
@@ -349,47 +368,62 @@ std::shared_ptr<T> InterpolationCurve3PointsShape(const glm::vec2& p1, const glm
 template <typename T>
 std::shared_ptr<T> PlaneXZShape(const float& xMin, const float& zMin, const float& xMax, const float& zMax, const float& resolution)
 {
+
+    if ((xMin >= xMax) || (zMin >= zMax))  
+    {
+        std::cout << "[WARNING]:xMin or zMin is lesser than xMax or zMax \n\n";
+        return nullptr;
+    }
+    std::cout << "[LOG]:Loading PlaneXZ \n";
     std::vector<Vertex> vertices;
     std::vector<Index> indices;
-    float y;
     int i = 0;
-    float t, s; 
-    float nx, ny, nz = 1.0f / (xMax-xMin); 
+    float nx = 0.f;
+    float ny = 0.f;
+    float nz = 1.f; 
+
+    float maxVerts = (xMax - xMin) * (zMax - zMin) / (resolution * resolution);
+    std::cout << "[LOG]:Amount of Vertices to Calcuate:" << maxVerts << "\n"; 
 
     for (auto x = xMin; x < xMax; x += resolution)
     {
-        for (auto z = zMin; z < zMax; z += resolution)
+        for (auto z = zMin; z < zMax; z += resolution) 
         {
+            //Texture Coordinates
+            float s = (x - xMin) / (xMax - xMin);
+            float t = (z - zMin) / (zMax - zMin);
 
-            ///Lower Triangle
-            y = glm::cos(x) * glm::cos(z); //Bottom Left  
-            vertices.emplace_back(x, y, z, nx, ny, nz, s, t); 
-            indices.emplace_back(i);
+            float y0 = glm::cos(x) * glm::cos(z); // Bottom Left  
+            float y1 = glm::cos(x + resolution) * glm::cos(z); // Bottom Right 
+            float y2 = glm::cos(x) * glm::cos(z + resolution); // Top Left  
+            float y3 = glm::cos(x + resolution) * glm::cos(z + resolution); // Top Right
 
-            y = glm::cos(x + resolution) * glm::cos(z); //Bottom Right 
-            vertices.emplace_back(x + resolution, y, z, nx, ny, nz, s, t); 
-            indices.emplace_back(i + 1);
+            // Lower Triangle
+            vertices.emplace_back(x, y0, z, nx, ny, nz, s, t);
+            indices.emplace_back(i++); //Bottom Left
 
-            y = glm::cos(x) * glm::cos(z + resolution); //Top Left  
-            vertices.emplace_back(x, y, z + resolution, nx, ny, nz, s, t); 
-            indices.emplace_back(i + 2);
+            vertices.emplace_back(x + resolution, y1, z, nx, ny, nz, s, t);
+            indices.emplace_back(i++); //Bottom Right
 
-            ///Upper Triangle
-            indices.emplace_back(i + 2);  //Top Left   
+            vertices.emplace_back(x, y2, z + resolution, nx, ny, nz, s, t);
+            indices.emplace_back(i++); //Top Left
 
-            indices.emplace_back(i + 1); //Bottom Right 
+            // Upper Triangle
+            vertices.emplace_back(x + resolution, y3, z + resolution, nx, ny, nz, s, t);
+            indices.emplace_back(i - 2);  // Top Left   
+            indices.emplace_back(i - 1); // Bottom Right 
 
-            y = glm::cos(x + resolution) * glm::cos(z + resolution); //Top Rigth
-            vertices.emplace_back(x + resolution, y, z + resolution, nx, ny, nz, s, t);  
-            indices.emplace_back(i + 3);
-
-            s = x / (xMax + resolution);  
-            t = z / (zMax + resolution);
-
-            i += 4; //Inrementing by 4 to get newt square
-        }
+            indices.emplace_back(i++);
+        } 
     }
 
+    auto normals = MathLib::CalculateNormalVector(vertices, indices);
+    for (size_t index = 0; index < vertices.size(); index++) 
+    {
+        vertices[index].mNormals = normals[index];    
+        //std::cout << "[LOG]:Normal Values X:" << testing[index].x << " Y:" << testing[index].y << " Z:" << testing[index].z <<"\n";    
+    }
+    std::cout << "[LOG]:Finished Loading\n\n";  
     return std::make_shared<T>("PlaneXZ", vertices, indices, true, Triangle);
 }
 
@@ -440,69 +474,139 @@ std::shared_ptr<T> PlaneXYShape(const float& xMin, const float& yMin, const floa
 }
 
 template <typename T>
-std::shared_ptr<T> TriangualtionGridFromLas(const char* _fileDirectory, float _scaleFactor, float _resolution)
+std::shared_ptr<T> TriangualtionGridFromLas(const char* _fileDirectory, const float& _scaleFactor, const int& _resolution) 
 {
-    auto data = LoadLAS_Data(_fileDirectory, _scaleFactor);
+    std::cout << "[LOG]:Loading Triangulation Grid \n";
+    //Loading pointcloud data from LAS
+    auto data = MathLib::LoadLAS_Data(_fileDirectory, _scaleFactor);
     std::vector<Vertex> vertices = data.first;
     std::vector<Index> indices = data.second;
 
+    //Defining local variables
     std::vector<Vertex> newVertices;
     std::vector<Index> newIndices;
 
+    //Initialising min & max value for first vertex
     float MaxX = vertices[0].mPos.x;
     float MinX = vertices[0].mPos.x;
     float MaxZ = vertices[0].mPos.z;
     float MinZ = vertices[0].mPos.z;
 
+
     //Finding minimum and maximum values 
     for (const auto& vertex : vertices)
     {
-        MaxX = glm::max(MaxX, vertex.mPos.x);
+        MaxX = glm::max(MaxX, vertex.mPos.x); 
         MinX = glm::min(MinX, vertex.mPos.x);
         MaxZ = glm::max(MaxZ, vertex.mPos.z);
         MinZ = glm::min(MinZ, vertex.mPos.z);
     }
 
-    int i = 0;
-    int c = 0;
-    float y = 0.f;
-    for (float x = MinX; x < MaxX; x += _resolution)
+    //Distance
+    float distX = (MaxX - MinX)/ (float)_resolution;
+    float distZ = (MaxZ - MinZ)/ (float)_resolution;
+
+    //Creating spatialGrid
+    std::unordered_map<std::pair<int, int>, std::vector<Vertex>, MathLib::PairHash<int,int>> spatialGrid;      
+
+    // Populate the spatial grid
+    for (const auto& vertex : vertices)
     {
-        for (float z = MinZ; z < MaxZ; z += _resolution)
+        int gridX = static_cast<int>((vertex.mPos.x - MinX) / distX);
+        int gridZ = static_cast<int>((vertex.mPos.z - MinZ) / distZ);
+
+        spatialGrid[{gridX, gridZ}].push_back(vertex);
+    }
+
+    //Max num vertices
+    int maxVerts = (_resolution + 1) * (_resolution + 1); 
+    std::cout << "[LOG]:Amount of Vertices to Calcuate:"  << maxVerts << "\n";
+
+    //Loading variables
+    float LoadPercentage = 0;
+    int totalIterations = (_resolution + 1) * (_resolution + 1);
+
+    //Generating vertices for triangulation
+    for (int i = 0; i <= _resolution; i++)
+    {
+        for (int j = 0; j <= _resolution; j++)       
         {
-            ///Upper Triangle
-            //Bottom Left  
-            newVertices.emplace_back(x, y, z, 0.f, 1.f, 0.f, x, z);
-            newIndices.emplace_back(i);
+            float height = 0.f;
+            int increment = 0;
 
-            //Bottom Right 
-            newVertices.emplace_back(x + _resolution, y, z, 0.f, 1.f, 0.f, x, z);
-            newIndices.emplace_back(i + 1);
+            //Texture coordinates
+            float s = static_cast<float> (i) / (_resolution); 
+            float t = static_cast<float> (j) / (_resolution);
 
-            //Top Left   
-            newVertices.emplace_back(x, y, z + _resolution, 0.f, 1.f, 0.f, x, z);
-            newIndices.emplace_back(i + 2);
+             glm::vec3 center = glm::vec3(MinX + distX * i, 0.f, MinZ + distZ * j); 
 
-            ///Lower Triangle
-            //Top Left   
-            newIndices.emplace_back(i + 2);
-            //Bottom Right 
-            newIndices.emplace_back(i + 1);
-            //Top Rigth
-            newVertices.emplace_back(x + _resolution, y, z + _resolution, 0.f, 1.f, 0.f, x, z);
-            newIndices.emplace_back(i + 3);
+             //Grid indexes
+             int gridX = i;
+             int gridZ = j;
 
-            c++;
-            i += 4;
+             //If the grid at the givem row & column is not the last pair it continues iteration
+             if (spatialGrid.find({ gridX,gridZ }) != spatialGrid.end())
+             {
+                 //Calculatin average height based on existing vertices in partition
+                 for (const auto& vertex : spatialGrid.find({ gridX,gridZ })->second)  
+                 {
+                     //Collision detection for height
+                     if (Collision::AABBConvex(vertex.mPos, center, 200.f, 2.0f))
+                     {
+                         height += vertex.mPos.y;
+                         increment++;
+                     }
+                 }
+                 LoadPercentage = (static_cast<float>(i * (_resolution + 1) + j) / totalIterations) * 100;  
+             }
+
+            //Determine height of current vertex
+            height = (increment > 0) ? (height / increment) : 0.f;   
+            glm::vec3 vert = glm::vec3(MinX + distX * i, height, MinZ + distZ * j);     
+
+            newVertices.emplace_back(vert.x, vert.y, vert.z, 0.0f, height, 0.0f, s ,t);   
+        }
+        std::cout << "[LOG]:Row:" << i << " done | Total-->Percentage:(" << LoadPercentage << "%)\n";  
+        std::cout.flush();
+    } 
+
+    //Generating indices for triangulation
+    for (int i = 0; i < _resolution; i++)
+    {
+        for (int j = 0; j < _resolution; j++)
+        {
+            int bottomLeft  = (i * (_resolution + 1)) + j;
+            int bottomRight = bottomLeft + 1; 
+            int topLeft     = ((i + 1) * (_resolution + 1)) + j;
+            int topRight    = topLeft + 1; 
+
+            //Lower Triangle
+            newIndices.emplace_back(bottomLeft);
+            newIndices.emplace_back(bottomRight);
+            newIndices.emplace_back(topLeft); 
+
+            //Upper
+            newIndices.emplace_back(topLeft);
+            newIndices.emplace_back(bottomRight);
+            newIndices.emplace_back(topRight);  
         }
     }
-    return std::make_shared<T>("Triangualtion", newVertices, newIndices, true, Line_Strip);  
+
+    //Calculate normals
+    auto normals = MathLib::CalculateNormalVector(newVertices, newIndices);
+    for (size_t index = 0; index < newVertices.size(); index++) 
+    {
+        newVertices[index].mNormals = normals[index];  
+        //std::cout << "[LOG]:Normal Values X:" << normals[index].x << " Y:" << normals[index].y << " Z:" << normals[index].z <<"\n";
+    } 
+
+    return std::make_shared<T>("TriangualtionGrid", newVertices, newIndices, true, Triangle);     
 }
 
 template <typename T>
 std::pair <std::vector<Vertex>, std::vector<Index>> GetTriangualtionGridDataFromLas(const char* _fileDirectory, float _scaleFactor, float _resolution)
 {
-    auto data = LoadLAS_Data(_fileDirectory, _scaleFactor);
+    auto data = MathLib::LoadLAS_Data(_fileDirectory, _scaleFactor);
     std::vector<Vertex> vertices = data.first;
     std::vector<Index> indices = data.second;
 
@@ -563,6 +667,12 @@ std::pair <std::vector<Vertex>, std::vector<Index>> GetTriangualtionGridDataFrom
 template <typename T>
 std::shared_ptr<T> PointCloudFromLas(const char* _fileDirectory, float _scaleFactor)
 {
-    auto data = LoadLAS_Data(_fileDirectory, _scaleFactor);
-    return std::make_shared<T>("PointCloud", data.first, data.second, false, Line_Strip); 
+    auto data = MathLib::LoadLAS_Data(_fileDirectory, _scaleFactor);
+    return std::make_shared<T>("PointCloud", data.first, data.second, false, Points);  
+}
+
+
+static std::string hello()
+{
+    std::cout << "Hello\n";
 }

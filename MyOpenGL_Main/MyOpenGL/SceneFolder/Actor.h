@@ -1,5 +1,6 @@
 #pragma once
-//Includes std
+
+//Includes c++
 #include <iostream>
 #include <vector>
 #include <string>
@@ -10,19 +11,23 @@
 #define M_PI (constexpr)3.14159265358979323846
 #endif
 
-//Class includes
-#include "../MathLib/Vertex.h"
+//Full inclusion
 #include "../SceneFolder/Mesh.h"
+#include "../Camera/Camera.h"  
 #include "../Definitions.h"
 #include "../Shaders/Shader.h"
-#include "../MathLib/Transform.h"
-#include "../Shaders/Shader.h"
-#include "../CameraFolder/Camera.h"
 #include "../Physics/RigidBody.h"
-#include "../Physics/Environment.h" 
 #include "../Utility/EnumArchive.h"
 #include "../MathLib/Formulas.h"
+
+//Forward Declaring
+class Camera;
+struct Vertex;
+class Environment;
+
+//External includes
 #include <glm/gtc/random.hpp>
+
 
 class Actor : public Mesh
 {
@@ -66,9 +71,10 @@ public:
 
     void UpdateBarycentricCoords(float dt) const
     {
-        BarycentricCoordinates1<Mesh,Mesh>(mMesh,mSurfaceMesh, dt);    
+        MathLib::BarycentricCoordinates<Mesh,Mesh>(mMesh,mSurfaceMesh, dt);    
     }
     
+
     ///Lerp
     //---------------------------------Members------------------------------------------------
     std::shared_ptr<Mesh> mLerpMesh;
@@ -130,7 +136,7 @@ public:
     void SetLocalScale(const glm::vec3& scale) const { mMesh->SetLocalScale(scale); }
     void SetLocalTransformMatrix(const glm::mat4& transformMatrix) const { mMesh->SetLocalTransformMatrix(transformMatrix); }
     void SetShader(const std::shared_ptr<Shader>& shader) const { mMesh->SetShader(shader); }
-    const bool UseTexBool(const bool& useTex) const { return mMesh->mUseTex = useTex; } 
+
 
     //---------------------------------Methods Getters------------------------------------------
     const std::shared_ptr<Transform> GetTransform() const { return mMesh->mTransform; }
@@ -145,7 +151,7 @@ public:
     float GetPitch() const { return mMesh->GetPitch(); }
     float GetYaw() const { return mMesh->GetYaw(); }
     void  GetdrawActor(const std::shared_ptr<Shader>& shader) const { return mMesh->drawActor(shader); }
-    const bool GetTexBool() const { return mMesh->mUseTex; }
+
 
     ///Utility Getters
     //---------------------------------Methods Setters------------------------------------------------ 
@@ -169,9 +175,26 @@ public:
     void AddComponentArchive(const std::string& type, const std::shared_ptr<T>& componentArchcive) 
     {
         std::cout << "[LOG]:Component Archive added. Type is: \n";
-        componentArchcive->displayComponent();
+        componentArchcive->displayComponent(); 
         m_componentArchive[type].emplace_back(componentArchcive);    
         std::cout << "\n"; 
         return;
     }
+
+    ///Texture control
+    const void UseTexConfig(const bool& useTex, const int& texType) const { mMesh->mUseTex = useTex; mMesh->mTexType = texType; }
+    const bool GetTexBool() const { return mMesh->mUseTex; }
+    const int GetTexType() const { return mMesh->mTexType; }
+
+    ///Light Control
+    const void UseLightConfig(const bool& useLight, const int& lightType) const { mMesh->mUseLight = useLight; mMesh->mlightType = lightType; } 
+    const void UseLightConfig(const bool& useLight) const { mMesh->mUseLight = useLight;}
+    const bool GetLightBool() const { return mMesh->mUseLight; } 
+    const int GetLightType() const { return mMesh->mlightType; }
+    const float SetAmbientStrengt(const float& ambientStrength) { mMesh->mAmbientStrength = ambientStrength; }
+    const glm::vec3 SetLightColor(const glm::vec3 lightColour) { mMesh->mLightColor = lightColour; }
+    const glm::vec3 SetLightPos(const glm::vec3 lightPos) { mMesh->mLightPos = lightPos; }
+    const glm::vec3 SetObjectColor(const glm::vec3 objectColour) { mMesh->mObjectColor = objectColour; }
+
+
 };

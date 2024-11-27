@@ -1,7 +1,7 @@
 #include "Application.h"
 
-std::string vs = ShaderLoader::LoadShaderFromFile("Shaders/Triangle.vs");
-std::string fs = ShaderLoader::LoadShaderFromFile("Shaders/Triangle.fs");
+std::string vs = ShaderLoader::LoadShaderFromFile("Shaders/VertexShader.vs");
+std::string fs = ShaderLoader::LoadShaderFromFile("Shaders/FragmentShader.fs");
 
 Application::~Application()
 {
@@ -38,7 +38,7 @@ void Application::Window_Init()
     if (mWindow == NULL)
     {
         /*std::cout << "Failed to create GLFW window" << std::endl;*/
-        assert(mWindow && "Failed to Load GLFWwindow!");
+        assert(mWindow && "Failed to Load GLFWwindow!\n");
         glfwTerminate();
     }
     glfwMakeContextCurrent(mWindow);
@@ -50,7 +50,7 @@ void Application::Window_Init()
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         //std::cout << "Failed to initialize GLAD" << std::endl
-        assert("Failed to Load GladLoad!");
+        assert("Failed to Load GladLoad!\n");
     }
 
     glEnable(GL_DEPTH_TEST); 
@@ -113,7 +113,7 @@ void Application::Run_App()
 
         // input
         // -----
-        ExitApplication(deltaTime);    
+        UtilyKeyBinds(deltaTime);    
 
         // render
         // ------
@@ -258,18 +258,6 @@ void Application::SetWidth(int width)
     mWidth = width;
 }
 
-
-///Util
-void Application::ExitApplication(float dt)
-{
-    if (mKeyState[GLFW_KEY_ESCAPE])
-    { 
-        std::cout << "Exit-Key Pressed" << std::endl;
-        glfwSetWindowShouldClose(mWindow, true); 
-    }
-}
-
-
 ///Camera Updta Controller
 void Application::UpdateCameraController(float dt)
 {
@@ -324,12 +312,31 @@ void Application::UpdateCameraPlacement(float dt)
         if (mKeyState[GLFW_KEY_1]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraFreeMovement_1, mScene->mSceneCamera, dt);
         if (mKeyState[GLFW_KEY_2]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
         if (mKeyState[GLFW_KEY_3]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt);
-        else
-        {
-            if (mKeyState[GLFW_KEY_1]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraFreeMovement_1, mScene->mSceneCamera, dt);
-        }
+    
     }
 }
+
+void Application::UtilyKeyBinds(float dt)
+{
+    if (mKeyState[GLFW_KEY_ESCAPE])
+    {
+        std::cout << "Exit-Key Pressed" << std::endl;
+        glfwSetWindowShouldClose(mWindow, true);
+    }
+    if (mKeyState[GLFW_KEY_8] && seeWireFrame == false) 
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+        seeWireFrame = true;
+        return;
+    }
+    if (mKeyState[GLFW_KEY_9] && seeWireFrame == true)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
+        seeWireFrame = false;
+        return;
+    }
+}
+
 
 
 

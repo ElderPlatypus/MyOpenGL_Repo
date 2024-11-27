@@ -1,15 +1,14 @@
 #pragma once
 
-//External
+//Includes c++
 #include <typeindex>
 #include <iostream>
 #include <unordered_map>
 #include <memory>
 #include <stdexcept>
 
-//classes
+//Full Incluson
 #include "Components.h"
-#include "../SceneFolder/Actor.h"
 
 ///_________________________System Interface Class___________________________
 struct ISystem

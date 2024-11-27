@@ -201,17 +201,18 @@ void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& ca
             mMovementSpeed = camera->GetAccelerationSpeed() * 1.5f;
             break;
         case NormalSpeed:
-            mMovementSpeed = camera->GetAccelerationSpeed(); 
+            mMovementSpeed = mMovementSpeed; 
             break;
 
         default:
-            mMovementSpeed = camera->GetAccelerationSpeed(); 
-            break;
+            mMovementSpeed = mMovementSpeed;
+            break; 
         }
         
         SetLocalRotation(camera->GetLocalRotation());    
         SetLocalPosition(GetLocalPosition() + movement);
-        camera->SetLocalPosition(GetLocalPosition() - (camera->GetForwardVector() * 10.f) + (camera->GetUpVector() * 5.f)); 
+        camera->SetMaxMovementSpeed(mMovementSpeed);
+        camera->SetLocalPosition(GetLocalPosition() - (camera->GetForwardVector() * 10.f) + (camera->GetUpVector() * 5.f));  
 
     }
 }
@@ -296,7 +297,7 @@ void Actor::ProjectileSpawner(const std::shared_ptr<Actor>& actor,  const std::s
         index++; 
         projectileActor = std::make_shared<Actor>(Mesh::CreateCube(2), "spawnedSphere " + std::to_string(index)); 
 
-        projectileActor->UseTexBool(true); 
+        projectileActor->UseTexConfig(true,0); 
         projectileActor->mEnableAABBCollision = true;
         projectileActor->SetLocalRotation(actor->GetForwardVector()); 
         projectileActor->SetLocalPosition(actor->GetLocalPosition() +  100.f*dt);
@@ -344,15 +345,15 @@ void Actor::Spawner(const int& _spawnAmount, const float& _distributionX, const 
         {
         case 1:
             spawnedActor = std::make_shared<Actor>(Mesh::CreateCube(1.0f), "spawnedCube " + std::to_string(amount));
-            spawnedActor->UseTexBool(true);
+            spawnedActor->UseTexConfig(true, 0);
             break;
         case 2:
             spawnedActor = std::make_shared<Actor>(Mesh::CreateSphere(16, 16, 1), "spawnedSphere " + std::to_string(amount));
-            spawnedActor->UseTexBool(true);
+            spawnedActor->UseTexConfig(true, 0);
             break;
         case 3:
             spawnedActor = std::make_shared<Actor>(Mesh::CreatePyramid(5.0f), "spawnedPyramid " + std::to_string(amount));
-            spawnedActor->UseTexBool(true);
+            spawnedActor->UseTexConfig(true, 0);
             break;
         }
 
@@ -369,7 +370,7 @@ void Actor::Spawner(const int& _spawnAmount, const float& _distributionX, const 
 ///Update Actors
 void Actor::UpdateActors(float dt)
 {
-    if (!mMesh) return; 
+    if (!mMesh){ assert(mMesh && "No Mesh found\n"); return;}
 
 
     //Updating the rigid body
@@ -377,6 +378,7 @@ void Actor::UpdateActors(float dt)
     {
         UpdateVelocity(dt);
         rigidB->Update(dt);
+
         //Updaing the center value
         mMesh->mCenter = mMesh->GetLocalPosition();
 
@@ -384,13 +386,20 @@ void Actor::UpdateActors(float dt)
         {
             mMesh->SetLocalPosition(rigidB->pos);   
         }
+
         //Bind shaders to Model-uniform
         mMesh->mShader->setMat4("model", mMesh->GetLocalTransformMatrix()); 
-        mMesh->TexBool(GetTexBool());  
-        mMesh->UseLight(mMesh->GetLightBool()); 
+
+        //Configure texture
+        mMesh->TexConfig(GetTexBool(), GetTexType());  
+
+        //Configure light
+        mMesh->LightConfig(GetLightBool(), GetLightType()); 
+        
+        //Draw actor`s mesh
         mMesh->drawActor(mMesh->mShader);
 
-        //Confirms if any calculation bools  are enabled
+        //Additional updtes
         if (mSurfaceMesh)
         {
             UpdateBarycentricCoords(dt);
@@ -399,11 +408,6 @@ void Actor::UpdateActors(float dt)
         {
             AI_Path(dt);
         }
-    }
-    else 
-    { 
-        assert(mMesh && "No Mesh found"); 
-        return; 
     }
 }
 

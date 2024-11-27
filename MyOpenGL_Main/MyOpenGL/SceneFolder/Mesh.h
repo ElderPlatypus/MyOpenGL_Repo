@@ -1,6 +1,6 @@
 #pragma once
 
-//External
+//Includes c++
 #include <iostream>
 #include <vector>
 #include <string>
@@ -8,24 +8,21 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+
+//External Includes
 #include <glm/gtc/matrix_transform.hpp>
 
-////#define LASZIP_DYN_LINK 
-//#include <LASzip/dll/laszip_api.h>
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
-//Classes
-#include "../MathLib/Vertex.h"
+//Full Inclusion
 #include "../Definitions.h"
 #include "../Shaders/Shader.h"
 #include "../MathLib/Transform.h"
-#include "../CameraFolder/Camera.h"
 #include "../MathLib/Formulas.h"
 #include "../MathLib/Shapes.h"
 #include "../Utility/EnumArchive.h"
+
+//Forawrd Declaring
+struct Vertex;
+
 
 class Mesh
 {
@@ -93,10 +90,16 @@ public:
 	{
 		return PointCloudFromLas<Mesh>(_fileDirectory, _scaleFactor);
 	}
-	static std::shared_ptr<Mesh> CreateGridFromLas(const char* _fileDirectory, float _scaleFactor, float _resolution)
+	static std::shared_ptr<Mesh> CreateGridFromLas(const char* _fileDirectory, const float& _scaleFactor, const int& _resolution)
 	{
-		return TriangualtionGridFromLas<Mesh>(_fileDirectory, _scaleFactor, _resolution);
+		return TriangualtionGridFromLas<Mesh>(_fileDirectory, _scaleFactor, _resolution); 
 	}
+
+	///Transformation
+    //---------------------------------Binders------------------------------------------ 
+	VAO mVAO{ 0U };
+	VBO mVBO{ 0U };
+	EBO mEBO{ 0U };
 
 	///Configure and draw Mesh
 	void configureMesh(); //Binds VAO,VB & EBO to respective mesh
@@ -109,10 +112,6 @@ public:
 	std::vector<Index> mIndices{};
 	std::string mName{};
 	std::string mType{};
-
-	VAO mVAO{ 0U };
-	VBO mVBO{ 0U };
-	EBO mEBO{ 0U };
 
 	std::shared_ptr<Transform> mTransform = std::make_shared<Transform>(); 
 
@@ -145,55 +144,221 @@ public:
 	///Textures
 	//---------------------------------Members------------------------------------------
 	bool mUseTex = false;
+	int mTexType = 0; 
 	GLDrawType drawType;
 	std::shared_ptr<Shader> mShader{ nullptr }; 
 	//---------------------------------Methods------------------------------------------
 	void SetShader(const std::shared_ptr<Shader>& shader) { mShader = shader; }
 
-	void TexBool(const bool& useBool) 
+	void TexConfig(const bool& useTexture, const int& texType)
 	{
-		mUseTex = useBool;
-		mShader->setBool("useTex", useBool); 
+		mUseTex = useTexture;
+		mTexType = texType; 
+		mShader->use(); 
+		mShader->setBool("useTex", useTexture);
+		mShader->setInt("texType", mTexType);
 	}
-	
+
+
 	///Lighting
 	//---------------------------------Members------------------------------------------
 	float mAmbientStrength = 1.0f;
-	const glm::vec3& mLightColor{ 1.f, 1.f, 1.f };
-	const glm::vec3& mLightPos{ 0.f,0.f,0.f };
-	const glm::vec3& mObjectColor{ 1.f,0.7f,0.2f };
-	static inline bool mUseLight;
-	//---------------------------------Methods------------------------------------------
-	inline void UseLight(const bool& useBool)
+	glm::vec3 mLightColor{ 0.0f, 1.0f, 0.0f };
+	glm::vec3 mLightPos{ 0.f,100.f,0.f };
+	glm::vec3 mObjectColor{ 1.f, 0.f, 0.0f };
+
+	//Slope
+	glm::vec3 slopeVec{ };
+	glm::vec3 slopeColour{}; 
+	float slope = 0.f;
+	float averageSlope = 0.f;
+	float normalizedSlope = 0.f;
+	float slopeMagnitude = 0.0f;
+	bool mUseLight = false;
+	int mlightType = 0;
+	//---------------------------------Default Shader------------------------------------------
+	void SetShaderDefaults(bool useLight) const
 	{
-		/*if (!this) return;*/
-		
-		mUseLight = useBool;
-		if (mUseLight == true)
+		mShader->setBool("useLight", useLight);
+		mShader->setVec3("lightColor", glm::vec3(0.0f, 0.0f, 1.0f));
+		mShader->setVec3("lightPos", glm::vec3(0.f, 100.f, 0.f));
+		mShader->setVec3("objectColor", glm::vec3(1.f, 0.f, 0.0f));  
+		mShader->setFloat("ambientStrength", 5.f);
+	}
+	//Slope:vertices
+	float totalSlope = 0.0f;
+	int counter = 0;
+	float maxSlope = std::numeric_limits<float>::lowest();
+	float minSlope = std::numeric_limits<float>::max();
+
+	//---------------------------------Calculate slope based on derivatives------------------------------------------
+	glm::vec3 CalculateSlopeColour()
+	{
+
+		ResetSlopeStatistics();
+		//Iterating over each vertex to calculate current & next normal
+		for (size_t i = 0; i < mVertices.size() - 1; i++)
 		{
-			mShader->use();
-			mShader->setVec3("lightColor", mLightColor);
-			mShader->setVec3("lightPos", mLightPos);
-			mShader->setVec3("objectColor", mObjectColor);
+			const auto& currentHeight = mVertices[i].mPos.y;
+			const auto& nextHeight = mVertices[i + 1].mPos.y;
+			//std::cout << "[LOG]:Current Height:" << currentHeight << " Next Height:" << nextHeight << "\n";
+
+			 //Calculate the horizontal distance (this is 2D distance on the X/Z plane)
+			float distance = glm::distance(glm::vec2(mVertices[i].mPos.x, mVertices[i].mPos.z),
+				                           glm::vec2(mVertices[i + 1].mPos.x, mVertices[i + 1].mPos.z));
+
+			//std::cout << "[LOG]:Distance:" << distance << "\n";  
+
+			//Calculatig vertical change
+			float verticalChange = nextHeight - currentHeight; //Actual slope value
+			//std::cout << "[LOG]:Vertical Change:" << verticalChange << "\n";
+			
+			//Condition to see if the slope ascend
+			if (distance > 0.0f)
+			{
+				slope = verticalChange / distance; //Calculating the raw slope scalar
+				//std::cout << "Vertical Change: " << verticalChange << ", Slope: " << slope << ", Slope Magnitude: " << distance << "\n";  
+				totalSlope += slope;
+				counter++;
+
+				// Collect min/max slopes for normalization purposes
+				minSlope = std::min(minSlope, slope);
+				maxSlope = std::max(maxSlope, slope);
+
+		/*		std::cout << "Counters: " << counter
+					<< ", minSlope: " << minSlope
+					<< ", maxSlope: " << maxSlope
+					<< ", averageSlope: " << averageSlope
+					<< ", normalizedSlope: " << normalizedSlope << "\n";
+				std::cout.flush();*/
+			}
+			else
+			{
+				//std::cout << "Zero or negative distance detected at index " << i << "\n";
+				continue; // Skip this iteration
+			}
+		}
+
+		// After collecting slopes
+		if (counter > 0)
+		{
+			averageSlope = totalSlope / counter;
+
+			// Proper normalization handling
+			if (maxSlope > minSlope)
+			{
+				normalizedSlope = (averageSlope - minSlope) / (maxSlope - minSlope);
+			}
+			else
+			{
+				// Use a default normalized slope if max and min are the same
+				normalizedSlope = 0.0f;
+			}
+
+			// Clamp normalizedSlope between 0 and 1
+			normalizedSlope = glm::clamp(normalizedSlope, 0.0f, 1.0f);
 		}
 		else
 		{
-			mShader->use();
-			mShader->setVec3("lightColor", glm::vec3(0.f));
-			mShader->setVec3("lightPos", glm::vec3(0.f));
-			mShader->setVec3("objectColor", glm::vec3(0.f));
+			std::cout << "No valid slopes were calculated.\n";
+			return mObjectColor;
+		}
+		//std::cout << "Normalised slope before proccesing:" << normalizedSlope << "\n";  
+
+	    //Returing updated slopeColour vector
+		return DetermineColor(normalizedSlope);
+	}
+	
+	void ResetSlopeStatistics() 
+	{
+		totalSlope = 0.0f;
+		counter = 0;
+		maxSlope = std::numeric_limits<float>::lowest();
+		minSlope = std::numeric_limits<float>::max();
+	}
+
+	//---------------------------------Determine colour according to the normalized slope------------------------------------------
+	glm::vec3 DetermineColor(float normalizedSlope)
+	{
+		if (normalizedSlope < 0.10f) // Significant decline
+		{
+			std::cout << "Almost Flat: " << normalizedSlope << "\n";
+			return glm::vec3(0.0f, 0.0f, 1.0f); // Blue
+		}
+		else if (normalizedSlope < 0.25f) // Mild decline
+		{
+			std::cout << "Mild Decline: " << normalizedSlope << "\n";
+			return  MathLib::Lerp(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(1.0f, 0.0f, 0.0f), normalizedSlope - 0.10f); // Blue-->Red
+		}
+		else if (normalizedSlope < 0.40f) // Moderate steep
+		{
+			std::cout << "Moderate Decline: " << normalizedSlope << "\n";
+			return  MathLib::Lerp(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), normalizedSlope - 0.40f); // Red-->Green
+		}
+		else if (normalizedSlope < 0.55f) // Mild ascent
+		{
+			std::cout << "Mild Transition: " << normalizedSlope << "\n";
+			return   MathLib::Lerp(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), normalizedSlope - 0.55f); // Green-->White
+		}
+		else if (normalizedSlope < 0.70f) // Mild ascent
+		{
+			std::cout << "Steep: " << normalizedSlope << "\n";
+			return   MathLib::Lerp(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 0.0f, 1.0f), normalizedSlope - 0.70f); // White-->Purple
+		}
+		else if (normalizedSlope < 0.85f) // Mild ascent
+		{
+			std::cout << "Very Steept: " << normalizedSlope << "\n";
+			return   MathLib::Lerp(glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), normalizedSlope - 0.85f); // Purple-->Cyan
+		}
+		else // Significant ascent
+		{
+			std::cout << "Extreme Ascent: " << normalizedSlope << "\n";
+			return  glm::vec3(1.0f, 0.0f, 0.0f); // Cyan
 		}
 	}
-	const bool& GetLightBool() const { return mUseLight; }
+
+	//---------------------------------Light application------------------------------------------
+	void LightConfig(const bool& useLight, const int& lightType) 
+	{
+		mUseLight = useLight;
+		mlightType = lightType;
+
+		if (mUseLight)
+		{
+			mShader->use();
+			mShader->setBool("useLight", mUseLight);
+			mShader->setVec3("lightColor", mLightColor);
+			mShader->setVec3("lightPos", mLightPos);
+			mShader->setFloat("ambientStrength", mAmbientStrength);
+
+			switch (lightType) 
+			{
+			  case 0:
+				  mShader->setVec3("objectColor", mObjectColor); 
+				  break;
+			  case 1:
+			  {
+				  slopeColour = CalculateSlopeColour(); 
+			      mShader->setVec3("objectColor", slopeColour); 
+
+				  break;
+			  }
+			  default:
+				  SetShaderDefaults(mUseLight); 
+				  return;
+			} 
+		}
+		else
+		{
+			SetShaderDefaults(mUseLight);
+		}
+	}
+
 
 	///ESC
 	//---------------------------------Members------------------------------------------
 	bool isPlayer = false;
 	bool isActor = false;
-
-
-	
-	
 
 };
 

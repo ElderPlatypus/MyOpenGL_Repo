@@ -1,12 +1,15 @@
 #pragma once
-#include "../MathLib/Transform.h"
-#include "../SceneFolder/Actor.h"
+
+//Full inclusion
+#include "../Physics/Environment.h"
+
+//External includes
 #include <glm/gtc/random.hpp>
 
-class Collision
+struct Collision
 {
-public:
-	static bool AABB(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor>& b)
+	template<typename Actor, typename Actor1>
+	static bool AABB(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor1>& b)
 	{
 		//Check if actors have collision enables
 		if (!a || !b || !a->mEnableAABBCollision || !b->mEnableAABBCollision) return false;
@@ -40,7 +43,8 @@ public:
 		return false;
 	}
 
-	static bool AABBInverse(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor>& b) 
+	template<typename Actor, typename Actor1>
+	static bool AABBInverse(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor1>& b)
 	{
 		if (!a->mEnableInverseAABB || !b->mEnableInverseAABB) return false;
 
@@ -84,7 +88,8 @@ public:
 		return false;
 	}
 
-	static void TrackPlayer(const std::shared_ptr<Actor>& _target, const std::shared_ptr<Actor>& _seeker, float dt, float homingSpeed)
+	template<typename Actor, typename Actor1>
+	static void TrackPlayer(const std::shared_ptr<Actor>& _target, const std::shared_ptr<Actor1>& _seeker, float dt, float homingSpeed)
 	{
 		if (!_target || !_seeker)
 		{
@@ -114,7 +119,8 @@ public:
 		return;
 	}
 
-	static void ProjectileHit(const std::shared_ptr<Actor>& _projectile, const std::shared_ptr<Actor>& _target)
+	template<typename Actor, typename Actor1>
+	static void ProjectileHit(const std::shared_ptr<Actor>& _projectile, const std::shared_ptr<Actor1>& _target)
 	{
 		if (!_projectile || !_target) 
 		{
@@ -138,7 +144,27 @@ public:
 		return;
 	}
 
+	static bool AABBConvex(const glm::vec3& verticesPos, const glm::vec3& center, const float& sectorRadius, const float& extentRadius)
+	{
+		//Define max and min extent
+		glm::vec3 minExtent = { center.x - extentRadius, 0.f, center.z - extentRadius };
+		glm::vec3 maxExtent = { center.x + extentRadius, 0.f, center.z + extentRadius }; 
 
+		//calculate sum of extent
+		glm::vec3 sumOfExtent = (maxExtent - minExtent);    
+		sumOfExtent.y = sectorRadius;  
 
+		glm::vec3 centerDiff = verticesPos - center; 
+
+		for (int i = 0; i < 3; i++)
+		{
+			// Check for no overlap
+			if (glm::abs(centerDiff[i]) >= sumOfExtent[i])
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 };
 

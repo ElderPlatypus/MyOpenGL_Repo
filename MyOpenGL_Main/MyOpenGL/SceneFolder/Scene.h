@@ -1,6 +1,6 @@
 #pragma once
 
-//External
+//Includes c++
 #include <iostream>
 #include <vector>
 #include <unordered_map>
@@ -8,15 +8,14 @@
 #include <memory>
 #include <string>
 
-//Includes
-#include "../CameraFolder/Camera.h"
+//Full Inclusion
+#include "../Camera/Camera.h"
 #include "../Shaders/Shader.h"
 #include "../Shaders/ShaderFileLoader.h"
 #include "../MathLib/Transform.h"
 #include "../SceneFolder/Actor.h"
 #include "../SceneFolder/Mesh.h"
 #include "../Application.h"
-#include "../CameraFolder/Camera.h"
 #include "../Shaders/Texture.h"
 #include "../Physics/Collision.h"
 #include "../ECS/Systems.h"
@@ -33,10 +32,10 @@ public:
 
 	std::shared_ptr<Shader> mShader;
 	std::shared_ptr<Camera> mSceneCamera; 
-	std::shared_ptr<Texture> mTexture;
+	std::unordered_map<std::string, std::shared_ptr<Texture>> uTextureMap; 
+
 	Scene(std::string name);
 	Scene() = default;
-
 
 	//Loaders
 	void LoadActors();

@@ -2,8 +2,8 @@
 
 ///Constructor and Destructor
 Mesh::Mesh(const std::string& type, const std::vector<Vertex>& vertices,
-           const std::vector<Index>& indices, const bool& useTex,
-           const GLDrawType& GLdrawType) : mVertices(vertices), mIndices(indices), mType(type), drawType(GLdrawType)
+           const std::vector<Index>& indices, const bool& useTex,const GLDrawType& GLdrawType) 
+           : mVertices(vertices), mIndices(indices), mType(type), drawType(GLdrawType)
 {
     configureMesh();
 
@@ -53,7 +53,7 @@ void Mesh::drawActor(const std::shared_ptr<Shader>& shader) const
         switch (drawType)
         {
         case Triangle: 
-            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); break;
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0);  break;
         case Line_Strip:
             glDrawElements(GL_LINE_STRIP, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); break;
         case Points:
