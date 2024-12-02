@@ -4,7 +4,7 @@
 Actor::Actor(const std::shared_ptr<Mesh>& mesh, const std::string& name): mMesh(mesh), mName(name)
 {
     mId++;
-    EnablePhysics = false;
+    mEnablePhysics = false;
     rigidB->pos = mMesh->GetLocalPosition(); 
     rigidB->acceleration = Environment::gravitationalAcceleraton; 
 }
@@ -17,50 +17,6 @@ Actor::~Actor()
     mMesh = nullptr; 
 }
 
-void Actor::DeleteSpawnvector_single(const std::shared_ptr<Actor>& actor)
-{
-    if (Actor::spawnVector.empty())
-    {
-        return;
-    }
-
-    // Remove the actor from the spawn vector
-    auto it = std::find(Actor::spawnVector.begin(), Actor::spawnVector.end(), actor);
-    if (it != Actor::spawnVector.end())
-    {
-        // Properly delete the associated mesh before erasing the actor
-        if (it->get()->mMesh)
-        {
-            it->get()->mMesh.reset(); // Use smart pointer reset for proper memory management
-        }
-        Actor::spawnVector.erase(it);
-    }
-}
-
-void Actor::DeleteSpawnvector_all(const std::vector<std::shared_ptr<Actor>>& actorVec)
-{
-    if (actorVec.empty()) 
-    {
-        return;
-    }
-
-    for (const auto& actor : actorVec) 
-    { 
-        // Remove the actor from the spawn vector
-        auto it = std::find(Actor::projectileVector.begin(), Actor::projectileVector.end(), actor);
-        if (it != Actor::projectileVector.end())
-        {
-            // Properly delete the associated mesh before erasing the actor
-            if (it->get()->mMesh)
-            {
-                it->get()->mMesh.reset(); // Use smart pointer reset for proper memory management
-            }
-            Actor::projectileVector.erase(it);
-        }
-    }
-    Actor::projectileVector.clear();
-} 
-
 void Actor::ExtrudeMesh(Extrude _increase_or_decrease, const float& _extrude) const
 {
     if (_extrude == 1.0f)
@@ -69,7 +25,7 @@ void Actor::ExtrudeMesh(Extrude _increase_or_decrease, const float& _extrude) co
     }
     switch (_increase_or_decrease)
     {
-    case increase:
+    case Increase:
         {
          for (auto& getVert : mMesh->mVertices)
          {
@@ -78,16 +34,17 @@ void Actor::ExtrudeMesh(Extrude _increase_or_decrease, const float& _extrude) co
              mMesh->maxExtent = glm::max(mMesh->maxExtent, getVert.mPos);
          }
          mMesh->mExtent = (mMesh->maxExtent - mMesh->minExtent) * 0.5f;
-         mMesh->configureMesh();
+         mMesh->updateVertexAttribs();
+
          break;
         }
-    case decrease:
+    case Decrease: 
        {
         for (auto& getVert: mMesh->mVertices)
         {
             getVert.mPos /= _extrude;
         }
-        mMesh->configureMesh();
+        mMesh->updateVertexAttribs();
         break;
        }
     }
@@ -108,6 +65,22 @@ void Actor::UpdateVelocity(float dt)
     mAcceleration = glm::vec3(0.f);
 }
 
+void Actor::EnablePhysics(const bool& enablePhysics)
+{
+    if (!mMesh)
+    {
+        std::cerr << "[WARNING]:No Mesh detected \n";
+        return;
+    }
+    else
+    {
+        mEnablePhysics = enablePhysics; 
+        //std::cout << "[LOG]:Actor Physics Updated Successfully \n";
+    }
+    //std::cout << "\n";
+}
+
+
 ///Barycentric Coordinates
 void Actor::SetBarySurfaceMesh(const std::shared_ptr<Mesh>& _selectSurface)
 {
@@ -117,8 +90,21 @@ void Actor::SetBarySurfaceMesh(const std::shared_ptr<Mesh>& _selectSurface)
         return;
     }
     mSurfaceMesh = _selectSurface; 
+    //std::cout << "[LOG]:Actor BarySurface Updated Successfully \n";
+    //std::cout << "\n";
     return;
-} 
+}
+
+void Actor::UpdateBarycentricCoords(float dt) const 
+{
+    MathLib::DoBarycentricCoordinatesMesh<Mesh,Mesh>(mMesh, mSurfaceMesh, dt);  
+}
+
+void Actor::UpdateBarycentricCoordsRigidB(const std::shared_ptr<Actor>& actor, float dt) const 
+{
+    MathLib::DoBarycentricCoordinatesActor<Actor,Mesh>(actor, mSurfaceMesh, dt);   
+}
+
 
 ///Actor movement
 void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& camera, float dt) 
@@ -288,35 +274,6 @@ void Actor::AI_Path(float dt)
 }
 
 ///Camera Support
-void Actor::ProjectileSpawner(const std::shared_ptr<Actor>& actor,  const std::shared_ptr<Shader>& Shader, float dt) 
-{
-    float timer = dt;
-    int index = 0; 
-    if (isShooting) 
-    { 
-        index++; 
-        projectileActor = std::make_shared<Actor>(Mesh::CreateCube(2), "spawnedSphere " + std::to_string(index)); 
-
-        projectileActor->UseTexConfig(true,0); 
-        projectileActor->mEnableAABBCollision = true;
-        projectileActor->SetLocalRotation(actor->GetForwardVector()); 
-        projectileActor->SetLocalPosition(actor->GetLocalPosition() +  100.f*dt);
-        Actor::projectileVector.emplace_back(projectileActor);  
-    }
-    if (!Actor::projectileVector.empty())
-    {
-        if (timer > 10.f)
-        {
-            for (const auto& it : Actor::projectileVector)
-            {
-                actor->DeleteSpawnvector_all(projectileVector);
-            }
-        }
-        for (const auto& actor : Actor::projectileVector) { actor->SetShader(Shader); actor->UpdateActors(dt); }
-    }
-    isShooting = false;
-}
-
 bool Actor::Shoot(Mouse shoot, float dt) const
 {
     if (!isPlayer || !shoot)  
@@ -332,61 +289,28 @@ bool Actor::Shoot(Mouse shoot, float dt) const
     return false;
 }
 
-///Spawner
-void Actor::Spawner(const int& _spawnAmount, const float& _distributionX, const float& _distributionZ, const int& _actorType)
-{
-    numSpawn = _spawnAmount;
-    for (int amount = 0; amount < _spawnAmount; amount++)
-    {
-        if (_spawnAmount <= 0) { std::cout << "Amount is less or equal to 0" << std::endl; return; }
-
-        Actor::spawnVector.reserve(_spawnAmount);
-        switch (_actorType)
-        {
-        case 1:
-            spawnedActor = std::make_shared<Actor>(Mesh::CreateCube(1.0f), "spawnedCube " + std::to_string(amount));
-            spawnedActor->UseTexConfig(true, 0);
-            break;
-        case 2:
-            spawnedActor = std::make_shared<Actor>(Mesh::CreateSphere(16, 16, 1), "spawnedSphere " + std::to_string(amount));
-            spawnedActor->UseTexConfig(true, 0);
-            break;
-        case 3:
-            spawnedActor = std::make_shared<Actor>(Mesh::CreatePyramid(5.0f), "spawnedPyramid " + std::to_string(amount));
-            spawnedActor->UseTexConfig(true, 0);
-            break;
-        }
-
-        std::random_device rd;  // Obtain a random number from hardware
-        std::mt19937 eng(rd()); // Seed the generator
-        std::uniform_real_distribution<float> distr(_distributionX, _distributionZ); // Define the range
-
-        spawnedActor->SetLocalPosition(glm::vec3(distr(eng), distr(eng), distr(eng))); 
-        spawnedActor->rigidB->pos = spawnedActor->GetLocalPosition();
-        Actor::spawnVector.emplace_back(spawnedActor);
-    }
-}
-
 ///Update Actors
 void Actor::UpdateActors(float dt)
 {
     if (!mMesh){ assert(mMesh && "No Mesh found\n"); return;}
 
-
     //Updating the rigid body
     if (mMesh) 
     {
-        UpdateVelocity(dt);
-        rigidB->Update(dt);
 
-        //Updaing the center value
-        mMesh->mCenter = mMesh->GetLocalPosition();
-
-        if (EnablePhysics)
+        if (mEnablePhysics)
         {
-            mMesh->SetLocalPosition(rigidB->pos);   
+            mMesh->SetLocalPosition(rigidB->pos); 
+            UpdateVelocity(dt); 
+            rigidB->Update(dt);
+            mMesh->mCenter = GetLocalPosition();
         }
-
+        else
+        {
+            //Updaing the center value
+            mMesh->mCenter = GetLocalPosition();
+        }
+       
         //Bind shaders to Model-uniform
         mMesh->mShader->setMat4("model", mMesh->GetLocalTransformMatrix()); 
 
@@ -395,20 +319,20 @@ void Actor::UpdateActors(float dt)
 
         //Configure light
         mMesh->LightConfig(GetLightBool(), GetLightType()); 
-        
+
         //Draw actor`s mesh
         mMesh->drawActor(mMesh->mShader);
 
+
         //Additional updtes
-        if (mSurfaceMesh)
+      /*  if (mSurfaceMesh) 
         {
             UpdateBarycentricCoords(dt);
-        }
+        }*/
         if (mLerpMesh)
-        {
+        { 
             AI_Path(dt);
         }
     }
 }
-
 

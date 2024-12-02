@@ -3,44 +3,52 @@
   "WorkspaceRootPath": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Mesh.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\SceneFolder\\Mesh.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Scene.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\SceneFolder\\Scene.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\MathLib\\Shapes.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\MathLib\\Shapes.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\Physics\\RigidBody.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\Physics\\RigidBody.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Mesh.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\SceneFolder\\Mesh.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\MathLib\\Formulas.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\MathLib\\Formulas.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Scene.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\SceneFolder\\Scene.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Actor.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\SceneFolder\\Actor.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\MathLib\\Formulas.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\MathLib\\Formulas.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Spawner.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\SceneFolder\\Spawner.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Actor.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\SceneFolder\\Actor.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\Physics\\Collision.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\Physics\\Collision.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Mesh.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\SceneFolder\\Mesh.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Mesh.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\SceneFolder\\Mesh.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\ECS\\Components.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\ECS\\Components.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\Shaders\\Texture.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\Shaders\\Texture.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Scene.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\SceneFolder\\Scene.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\Application.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\Application.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -49,8 +57,8 @@
       "VerticalTabListWidth": 140,
       "DocumentGroups": [
         {
-          "DockedWidth": 150,
-          "SelectedChildIndex": 2,
+          "DockedWidth": 228,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Document",
@@ -60,46 +68,33 @@
               "RelativeDocumentMoniker": "MyOpenGL\\MathLib\\Formulas.h",
               "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\MathLib\\Formulas.h",
               "RelativeToolTip": "MyOpenGL\\MathLib\\Formulas.h",
-              "ViewState": "AgIAABMAAAAAAAAAAAAswG0AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAEEBAAAAAAAAAAAAAGIBAAB/AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-11-26T08:15:55.567Z",
+              "WhenOpened": "2024-11-30T17:25:20.462Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Components.h",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\ECS\\Components.h",
+              "RelativeDocumentMoniker": "MyOpenGL\\ECS\\Components.h",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\ECS\\Components.h",
+              "RelativeToolTip": "MyOpenGL\\ECS\\Components.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-12-02T14:18:50.981Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "Mesh.cpp",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Mesh.cpp",
-              "RelativeDocumentMoniker": "MyOpenGL\\SceneFolder\\Mesh.cpp",
-              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Mesh.cpp",
-              "RelativeToolTip": "MyOpenGL\\SceneFolder\\Mesh.cpp",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAAC0AAAATAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-11-26T10:04:52.962Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Mesh.h",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Mesh.h",
-              "RelativeDocumentMoniker": "MyOpenGL\\SceneFolder\\Mesh.h",
-              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Mesh.h",
-              "RelativeToolTip": "MyOpenGL\\SceneFolder\\Mesh.h",
-              "ViewState": "AgIAAKgAAAAAAAAAAAAAANEAAAA6AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-11-20T17:48:43.136Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
               "Title": "Actor.h",
               "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Actor.h",
               "RelativeDocumentMoniker": "MyOpenGL\\SceneFolder\\Actor.h",
               "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Actor.h",
               "RelativeToolTip": "MyOpenGL\\SceneFolder\\Actor.h",
-              "ViewState": "AgIAACwAAAAAAAAAAAAIwE4AAABeAAAAAAAAAA==",
+              "ViewState": "AgIAADQAAAAAAAAAAAAcwFsAAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2024-10-21T20:15:51.422Z",
               "EditorCaption": ""
@@ -107,71 +102,98 @@
             {
               "$type": "Document",
               "DocumentIndex": 9,
+              "Title": "Mesh.h",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Mesh.h",
+              "RelativeDocumentMoniker": "MyOpenGL\\SceneFolder\\Mesh.h",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Mesh.h",
+              "RelativeToolTip": "MyOpenGL\\SceneFolder\\Mesh.h",
+              "ViewState": "AgIAAG0AAAAAAAAAAAAswIEAAABeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-11-20T17:48:43.136Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "Scene.h",
               "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Scene.h",
               "RelativeDocumentMoniker": "MyOpenGL\\SceneFolder\\Scene.h",
               "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Scene.h",
               "RelativeToolTip": "MyOpenGL\\SceneFolder\\Scene.h",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAowCAAAAAhAAAAAAAAAA==",
+              "ViewState": "AgIAACEAAAAAAAAAAAAAAC8AAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-11-21T17:16:42.348Z"
+              "WhenOpened": "2024-11-21T17:16:42.348Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 7,
-              "Title": "Components.h",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\ECS\\Components.h",
-              "RelativeDocumentMoniker": "MyOpenGL\\ECS\\Components.h",
-              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\ECS\\Components.h",
-              "RelativeToolTip": "MyOpenGL\\ECS\\Components.h",
-              "ViewState": "AgIAAFQAAAAAAAAAAAAAAA8AAAAYAAAAAAAAAA==",
+              "Title": "Collision.h",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\Physics\\Collision.h",
+              "RelativeDocumentMoniker": "MyOpenGL\\Physics\\Collision.h",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\Physics\\Collision.h",
+              "RelativeToolTip": "MyOpenGL\\Physics\\Collision.h",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAswDIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-10-17T06:50:41.552Z",
-              "EditorCaption": ""
-            }
-          ]
-        },
-        {
-          "DockedWidth": 292,
-          "SelectedChildIndex": 1,
-          "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Shapes.h",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\MathLib\\Shapes.h",
-              "RelativeDocumentMoniker": "MyOpenGL\\MathLib\\Shapes.h",
-              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\MathLib\\Shapes.h",
-              "RelativeToolTip": "MyOpenGL\\MathLib\\Shapes.h",
-              "ViewState": "AgIAAAQCAAAAAAAAAAAwwCUCAAAHAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-11-16T14:46:50.518Z",
+              "WhenOpened": "2024-11-28T14:32:19.471Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Scene.cpp",
               "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Scene.cpp",
               "RelativeDocumentMoniker": "MyOpenGL\\SceneFolder\\Scene.cpp",
-              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Scene.cpp",
-              "RelativeToolTip": "MyOpenGL\\SceneFolder\\Scene.cpp",
-              "ViewState": "AgIAADIAAAAAAAAAAAAqwFYAAAAvAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Scene.cpp*",
+              "RelativeToolTip": "MyOpenGL\\SceneFolder\\Scene.cpp*",
+              "ViewState": "AgIAAKgAAAAAAAAAAAAAAOgAAABFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-10-21T13:02:34.636Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "Texture.cpp",
-              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\Shaders\\Texture.cpp",
-              "RelativeDocumentMoniker": "MyOpenGL\\Shaders\\Texture.cpp",
-              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\Shaders\\Texture.cpp",
-              "RelativeToolTip": "MyOpenGL\\Shaders\\Texture.cpp",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAABkAAAAsAAAAAAAAAA==",
+              "DocumentIndex": 11,
+              "Title": "Application.cpp",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\Application.cpp",
+              "RelativeDocumentMoniker": "MyOpenGL\\Application.cpp",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\Application.cpp",
+              "RelativeToolTip": "MyOpenGL\\Application.cpp",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAhwH8AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-11-21T16:25:55.207Z"
+              "WhenOpened": "2024-12-01T18:10:40.65Z"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 214,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "RigidBody.cpp",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\Physics\\RigidBody.cpp",
+              "RelativeDocumentMoniker": "MyOpenGL\\Physics\\RigidBody.cpp",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\Physics\\RigidBody.cpp",
+              "RelativeToolTip": "MyOpenGL\\Physics\\RigidBody.cpp",
+              "ViewState": "AgIAADEAAAAAAAAAAAAvwE0AAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-12-02T03:13:10.921Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Spawner.h",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Spawner.h",
+              "RelativeDocumentMoniker": "MyOpenGL\\SceneFolder\\Spawner.h",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Spawner.h",
+              "RelativeToolTip": "MyOpenGL\\SceneFolder\\Spawner.h",
+              "ViewState": "AgIAAJMAAAAAAAAAAAAcwB0BAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-12-01T15:13:14.409Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -181,9 +203,22 @@
               "RelativeDocumentMoniker": "MyOpenGL\\SceneFolder\\Actor.cpp",
               "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Actor.cpp",
               "RelativeToolTip": "MyOpenGL\\SceneFolder\\Actor.cpp",
-              "ViewState": "AgIAAHABAAAAAAAAAAAAAI8BAAApAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADIBAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-10-20T17:32:51.652Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Mesh.cpp",
+              "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Mesh.cpp",
+              "RelativeDocumentMoniker": "MyOpenGL\\SceneFolder\\Mesh.cpp",
+              "ToolTip": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\SceneFolder\\Mesh.cpp",
+              "RelativeToolTip": "MyOpenGL\\SceneFolder\\Mesh.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEkAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-11-26T10:04:52.962Z",
               "EditorCaption": ""
             }
           ]

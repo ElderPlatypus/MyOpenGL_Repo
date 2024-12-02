@@ -12,41 +12,47 @@ struct Collision
 	static bool AABB(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor1>& b)
 	{
 		//Check if actors have collision enables
-		if (!a || !b || !a->mEnableAABBCollision || !b->mEnableAABBCollision) return false;
+		if (!a || !b) return false;
 		
 		//Calculate the center difference and sum of the boundg boxes
-		glm::vec3 centerDiff =  a->GetCenter() - b->GetCenter();
-		glm::vec3 sumOfExtent = a->GetExtent() + b->GetExtent();
+		glm::vec3 centerDiff = glm::abs(a->GetCenter() - b->GetCenter()); 
+		glm::vec3 sumOfExtent = a->GetExtent() + b->GetExtent();  
 	
 		for (int i = 0; i < 3; i++)
 		{
 			// Check for no overlap
-			if (glm::abs(centerDiff[i]) >= sumOfExtent[i])
+			if (centerDiff[i] >= sumOfExtent[i]) 
 			{
 				return false;
 			}
 		}
+	}
 
-		glm::vec3 pushDirection = glm::normalize(centerDiff);
+	template<typename Actor, typename Actor1>
+	static bool AABB_y(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor1>& b)
+ 
+	{
+		//Check if actors have collision enables
+		if (!a || !b) return false;
 
-		// Resolve collision along the axes
-		for (int i = 0; i < 3; i++)
+		//Calculate the center difference and sum of the boundg boxes
+		float centerDiff_Y = glm::abs(a->GetCenter().y - b->GetCenter().y); 
+		float sumOfExtent = a->GetExtent().y + b->GetExtent().y; 
+
+		if (centerDiff_Y >= sumOfExtent)
 		{
-			if (glm::abs(centerDiff[i]) <= sumOfExtent[i])
-			{
-				//b->mMesh->SetLocalPosition(b->mMesh->GetLocalPosition() - pushDirection * (sumOfExtent[i] - glm::abs(centerDiff[i])));
-				//std::cout << "Collision detected on axis " << i << "\n";
-				return true;
-			}
-		} 
+			return false;
+		}
 
-		return false;
+		std::cout << "[LOG]:Collision Detected\n";
+		return true;
+
 	}
 
 	template<typename Actor, typename Actor1>
 	static bool AABBInverse(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor1>& b)
 	{
-		if (!a->mEnableInverseAABB || !b->mEnableInverseAABB) return false;
+		if (!a || !b) return false;
 
 		//Calculate the center difference and sum of the bounding boxes
 		const glm::vec3& centerDiff = glm::abs(b->GetCenter() - (a->GetCenter() + a->GetExtent()));
@@ -62,7 +68,7 @@ struct Collision
 			std::cout << boxExtent.x << " Box Extent X  \n"; 
 			std::cout << "\n";*/
 
-			a->rigidB->velocity.x *= -1;
+			a->rigidB->velocity.x *= -1; 
 			return true;
 		}
 		else if (centerDiff.y >= boxExtent.y)
@@ -106,7 +112,7 @@ struct Collision
 			//std::cout << "[LOG]:" << _seeker->mName << " Destroyed \n";  
 			std::cout << "[LOG]:Damage taken:" << std::to_string(10) << " health is: " << _target->GetHealth() << " \n"; 
 			_target->Health = _target->Health - 10;   
-			_seeker->DeleteSpawnvector_single(_seeker);
+			_seeker->~Actor(); 
 
 			if (_target->Health <= 0)
 			{
@@ -129,7 +135,7 @@ struct Collision
 		}
 		if (AABB(_projectile, _target))
 		{
-			_projectile->DeleteSpawnvector_single(_projectile); 
+			_projectile->~Actor();
 
 			//std::cout << "[LOG]:" << _seeker->mName << " Destroyed \n";  
 			std::cout << "[LOG]:" << std::to_string(50) << " Damage done to:" << _target->mName<< "\n";
@@ -137,7 +143,7 @@ struct Collision
 
 			if (_target->Health <= 0)
 			{
-				_target->DeleteSpawnvector_single(_target);  
+				_target->~Actor() ;
 			}
 			return;
 		}

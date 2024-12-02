@@ -3,7 +3,7 @@
 enum Extrude
 {
     //For extrude
-    increase, decrease,
+    Increase, Decrease,
 };
 
 enum Mouse
@@ -40,8 +40,30 @@ enum GLDrawType
     PolygonMode
 };
 
-enum TexType
+enum MeshShape
 {
-    wall,
-    container
+   Cube,
+   Sphere,
+   Pyramid
+};
+
+enum TextureType
+{
+    Wall = 0,
+    Container = 1
+};
+
+enum LightType
+{
+    Default = 0,
+    Slope = 1
+};
+
+enum CollisionTypes
+{
+    AABB,
+    AABBInverse,
+    TrackPlayer,
+    ProjectileHit,
+    AABBConvex
 };

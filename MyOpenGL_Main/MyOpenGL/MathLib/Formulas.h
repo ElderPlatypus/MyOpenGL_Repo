@@ -15,11 +15,14 @@
 #include <vector>
 #include <memory>
 #include <utility>
+#include <iostream>
+#include <random>
 
 
 //Includes
 #include "../Definitions.h"
 #include "../MathLib/Vertex.h"
+
 
 //External includes
 #include <LASzip/dll/laszip_api.h>
@@ -267,84 +270,92 @@ struct MathLib
 
 
     //Barycentric coordinate handler _____________________________________________
-     static glm::vec3 CalculateBarycentricCoordinates(glm::vec3 _p1, glm::vec3 _p2, glm::vec3 _p3, glm::vec3 _playerPos)
+    static glm::vec3 CalculateBarycentricCoordinates(glm::vec3 _p1, glm::vec3 _p2, glm::vec3 _p3, glm::vec3 _playerPos)
     {
-        ///Setting default values to zero
-        _p1.y = 0.f;
-        _p2.y = 0.f;
-        _p3.y = 0.f;
-        _playerPos.y = 0.f;
-        glm::vec3 baryCoords{ 0.f,0.f,0.f };
+        //Setting default values to zero
+        glm::vec3 baryCoords = {0.0f,0.0f,0.0f};
 
-        ///Calculating triangle surface area
-        glm::vec3 u = { _p2 - _p1 }; //sw
-        glm::vec3 v = { _p3 - _p1 }; //sw
+        //Calculating triangle surface area
+        glm::vec3 u =  _p2 - _p1; //sw
+        glm::vec3 v =  _p3 - _p1; //sw
         glm::vec3 n = glm::cross(u, v);
-        float triangleSurfaceArea = n.y;
+        float triangleSurfaceArea = glm::length(n); 
 
-        ///Sub Triangle vectors
-        glm::vec3 newU = { glm::cross(_p2 - _playerPos, _p3 - _playerPos) };
-        glm::vec3 newV = { glm::cross(_p3 - _playerPos, _p1 - _playerPos) };
-        glm::vec3 newW = { glm::cross(_p1 - _playerPos, _p2 - _playerPos) };
+        if (triangleSurfaceArea == 0.0f)
+        {
+            return baryCoords;
+        }
 
-        ///Calculate area with respect to reverse clockwise direction
-        //Sub Triangle 1 baryCoords X
-        n = newU;
-        baryCoords.x = n.y / triangleSurfaceArea;
+        //Sub Triangle vectors
+        glm::vec3 newU =  glm::cross(_p2 - _playerPos, _p3 - _playerPos);
+        glm::vec3 newV =  glm::cross(_p3 - _playerPos, _p1 - _playerPos);
+        glm::vec3 newW =  glm::cross(_p1 - _playerPos, _p2 - _playerPos);
+     
 
-        //Sub Triangle 2 baryCoords Y
-        n = newV;
-        baryCoords.y = n.y / triangleSurfaceArea;
+        //Calculate area for sub triangles reverse clock-wise
+        baryCoords.x = newU.y / triangleSurfaceArea;
+        baryCoords.y = newV.y / triangleSurfaceArea;
+        baryCoords.z = newW.y / triangleSurfaceArea;
 
-        //Sub Triangle 3 baryCoords z
-        n = newW;
-        baryCoords.z = n.y / triangleSurfaceArea;
-
+        // Normalizing the barycentric coordinates
+        float barySum = baryCoords.x + baryCoords.y + baryCoords.z;
+        if (barySum > 0.0f)
+        {
+            baryCoords /= barySum;
+        }
         return baryCoords;
     }
 
-    template<typename T1, typename T2>
-    static void BarycentricCoordinates(const std::shared_ptr<T1>& mMesh, const std::shared_ptr<T2>& mSurfaceMesh, float dt)
+    template <typename T1, typename T2>
+    static void DoBarycentricCoordinatesMesh(const std::shared_ptr<T1>& mMesh, const std::shared_ptr<T2>& mSurfaceMesh, float dt)
     {
         if (!mSurfaceMesh) { std::cout << "[WARNING]: No suitable surface selected \n"; return; };
 
         //vector of vertices and indices 
         for (size_t i = 0; i < mSurfaceMesh->mIndices.size(); i += 3)
         {
-            //Assigning the values
-            const unsigned int index1 = mSurfaceMesh->mIndices[i];
-            const unsigned int index2 = mSurfaceMesh->mIndices[i + 1];
-            const unsigned int index3 = mSurfaceMesh->mIndices[i + 2];
-
             //Collecting the postions of the indices 
-            glm::vec3 point1 = mSurfaceMesh->mVertices[index1].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale();
-            glm::vec3 point2 = mSurfaceMesh->mVertices[index2].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale();
-            glm::vec3 point3 = mSurfaceMesh->mVertices[index3].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale();
+            glm::vec3 point1 = mSurfaceMesh->mVertices[mSurfaceMesh->mIndices[i]].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale(); 
+            glm::vec3 point2 = mSurfaceMesh->mVertices[mSurfaceMesh->mIndices[i + 1]].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale(); 
+            glm::vec3 point3 = mSurfaceMesh->mVertices[mSurfaceMesh->mIndices[i + 2]].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale(); 
 
             //Initialising variable which calculates bary-coords using the CalcBary-coords method
             glm::vec3 baryCoords = CalculateBarycentricCoordinates(point1, point2, point3, mMesh->GetLocalPosition());
 
-            //Creating a variable which utilizes the calc-bary method
-            float baryHeight = ((baryCoords.x * point1.y) + (baryCoords.y * point2.y + (mMesh->mExtent.y / 2)) + (baryCoords.z * point3.y));
-
             //If-checks if certain criterias are met folowing the rules for bary-coords behaviour
-            if (baryCoords.x == 0 || baryCoords.y == 0 || baryCoords.z == 0)
-            {
-                mMesh->SetLocalPosition(mMesh->GetLocalPosition() + glm::vec3(0.01f, 0.f, 0.01f));
-                baryCoords = CalculateBarycentricCoordinates(point1, point2, point3, mMesh->GetLocalPosition());
-            }
-
             if (baryCoords.x > 0 && baryCoords.y > 0 && baryCoords.z > 0)
             {
-                mMesh->SetLocalPosition(glm::vec3(mMesh->GetLocalPosition().x, baryHeight, mMesh->GetLocalPosition().z));
-                //std::cout << "Bary coords works: " << std::endl;
-                //std::cout << baryHeight << std::endl;
+                float baryHeight = (baryCoords.x * point1.y) + (baryCoords.y * point2.y) + (baryCoords.z * point3.y);
+                mMesh->SetLocalPosition(glm::vec3(mMesh->GetLocalPosition().x, baryHeight + mMesh->mExtent.y, mMesh->GetLocalPosition().z));
+                break;
             }
-
         }
-        return;
+    }
 
+    template <typename T1, typename T2>
+    static void DoBarycentricCoordinatesActor(const std::shared_ptr<T1>& mActor, const std::shared_ptr<T2>& mSurfaceMesh, float dt)
+    {
+        if (!mSurfaceMesh) { std::cout << "[WARNING]: No suitable surface selected \n"; return; };
 
+        //vector of vertices and indices 
+        for (size_t i = 0; i < mSurfaceMesh->mIndices.size(); i += 3)
+        {
+            //Collecting the postions of the indices 
+            glm::vec3 point1 = mSurfaceMesh->mVertices[mSurfaceMesh->mIndices[i]].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale();
+            glm::vec3 point2 = mSurfaceMesh->mVertices[mSurfaceMesh->mIndices[i + 1]].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale();
+            glm::vec3 point3 = mSurfaceMesh->mVertices[mSurfaceMesh->mIndices[i + 2]].mPos + mSurfaceMesh->GetLocalPosition() * mSurfaceMesh->GetLocalScale();
+
+            //Initialising variable which calculates bary-coords using the CalcBary-coords method
+            glm::vec3 baryCoords = CalculateBarycentricCoordinates(point1, point2, point3, mActor->rigidB->GetLocalPosition());
+
+            //If-checks if certain criterias are met folowing the rules for bary-coords behaviour
+            if (baryCoords.x > 0 && baryCoords.y > 0 && baryCoords.z > 0)
+            {
+                float baryHeight = (baryCoords.x * point1.y) + (baryCoords.y * point2.y) + (baryCoords.z * point3.y);
+                mActor->rigidB->SetLocalPosition(glm::vec3(mActor->rigidB->GetLocalPosition().x, baryHeight + mActor->getMesh()->mExtent.y, mActor->rigidB->GetLocalPosition().z));
+                break;
+            }
+        }
     }
 
     //Usefull Mathematical Formulas _____________________________________________
@@ -382,7 +393,7 @@ struct MathLib
             float weight = glm::length(AC) * glm::length(AB);
 
 
-            newNormals[index0] += normal * weight;
+            newNormals[index0] += normal * weight; 
             newNormals[index1] += normal * weight;
             newNormals[index2] += normal * weight;
         }
@@ -405,4 +416,11 @@ struct MathLib
         }
     };
 
+    struct GridHash
+    {
+        std::size_t operator() (const glm::ivec3& key) const
+        {
+            return std::hash<int>()(key.x) ^ (std::hash<int>()(key.y) << 1) ^ (std::hash<int>()(key.z) << 2);
+        }
+    };
 };

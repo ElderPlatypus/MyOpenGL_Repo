@@ -153,6 +153,7 @@
     <ClCompile Include="SceneFolder\Actor.cpp" />
     <ClCompile Include="SceneFolder\Mesh.cpp" />
     <ClCompile Include="SceneFolder\Scene.cpp" />
+    <ClCompile Include="SceneFolder\Spawner.cpp" />
     <ClCompile Include="Shaders\Shader.cpp" />
     <ClCompile Include="Shaders\ShaderFileLoader.cpp" />
     <ClCompile Include="Shaders\Texture.cpp" />
@@ -171,10 +172,12 @@
     <ClInclude Include="includes\KHR\khrplatform.h" />
     <ClInclude Include="MathLib\Formulas.h" />
     <ClInclude Include="MathLib\Shapes.h" />
+    <ClInclude Include="MathLib\SpatialPartition.h" />
     <ClInclude Include="Physics\Environment.h" />
     <ClInclude Include="Physics\RigidBody.h" />
     <ClInclude Include="SceneFolder\ActorMovement.h" />
     <ClInclude Include="SceneFolder\Mesh.h" />
+    <ClInclude Include="SceneFolder\Spawner.h" />
     <ClInclude Include="Shaders\Texture.h" />
     <ClInclude Include="Physics\Collision.h" />
     <ClInclude Include="Utility\FileHandler.h" />

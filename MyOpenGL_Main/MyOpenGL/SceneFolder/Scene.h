@@ -14,6 +14,7 @@
 #include "../Shaders/ShaderFileLoader.h"
 #include "../MathLib/Transform.h"
 #include "../SceneFolder/Actor.h"
+#include "../SceneFolder/Spawner.h"
 #include "../SceneFolder/Mesh.h"
 #include "../Application.h"
 #include "../Shaders/Texture.h"
@@ -44,6 +45,8 @@ public:
 
 	//Updaters
 	void UpdateScene(float dt);
+	void Update_uMapActors(float dt);
+	void Set_uMapShader(const std::shared_ptr<Shader>& shader);
 
 	//Renderer
 	void RenderScene(float dt, Transform globalTransform = {});
@@ -57,12 +60,12 @@ public:
 
 	//Collision control
 	Collision* mCollision{ nullptr };
-	void CollisionHandling(float dt) const; 
+	void CollisionHandling(float dt); 
 
-	int score = 0;
 
 	//ECS
 	int numEntities = 0;
+	int score = 0;
 
 
 	std::shared_ptr<ComponentArchive<TransformComponent>> transformManager = std::make_shared<ComponentArchive<TransformComponent>>();
