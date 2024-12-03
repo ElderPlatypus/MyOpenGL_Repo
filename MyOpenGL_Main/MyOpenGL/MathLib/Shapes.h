@@ -256,31 +256,26 @@ std::shared_ptr<T> CircleShape(const glm::vec3& origin, const float& radius, con
 
 //Curves and Planes ____________________________________________
 template <typename T> 
-std::shared_ptr<T> BSplineSurfaceShape(int resU, int resV, int du, int dv,
-                                                   const std::vector<float>& uKnot, const std::vector<float>& vKnot,
-                                                   const std::vector<std::vector<glm::vec3>>& controlPoints, const float& size)
+std::shared_ptr<T> BSplineSurfaceShape(const int& resU, const int& resV, const int& du, const int& dv, std::vector<std::vector<glm::vec3>> controlPoints, const float& size)
 {
     //Creating fundament
     std::vector<Vertex> vertices; 
     std::vector<Index> indices; 
 
-    size_t numPoints_U = uKnot.size(); 
-    size_t numPoints_V = vKnot.size();
-
     for (float i = 0; i < resU; i++)
     {
-        auto u = i / (resU - 1);
+        auto u = i / (resU - 1); //Normalize u
 
         for (float j = 0; j < resV; j++)
         {
-            auto v = j / (resV - 1);
+            auto v = j / (resV - 1); // Normalize v
 
             //Evaluate the surface in both direction U & V
-            glm::vec3 surfacePoint = MathLib::EvaluateBSplineSurface(u, v, du, dv, uKnot, vKnot, controlPoints);
-            glm::vec3 surfaceNormal = MathLib::EvaluateBSplineSurfaceNormal(u, v, du, dv, resU, resV, uKnot, vKnot, controlPoints);
+            glm::vec3 surfacePoint = MathLib::EvaluateBSplineSurface(u, v, du, dv,  controlPoints);
+            glm::vec3 surfaceNormal = MathLib::EvaluateBSplineSurfaceNormal(u, v, du, dv, resU, resV, controlPoints);
             glm::vec2 texCoords = glm::vec2(u, v);
 
-            vertices.emplace_back(Vertex(surfacePoint * size, surfaceNormal * size, texCoords * size));
+            vertices.emplace_back(Vertex(surfacePoint * size, surfaceNormal, texCoords));    
         }
     }
 
@@ -305,7 +300,6 @@ std::shared_ptr<T> BSplineSurfaceShape(int resU, int resV, int du, int dv,
             indices.push_back(bottomRight);
         }
     }
-
     return std::make_shared<T>("BSplineSurface", vertices, indices, true, Triangle);
 }
 
@@ -324,9 +318,6 @@ std::shared_ptr<T> InterpolationCurve3PointsShape(const glm::vec2& p1, const glm
         p1,
         p2,
         p3
-        /* glm::vec2(0,0),
-         glm::vec2(1,1),
-         glm::vec2(5,2)*/
     };
 
     //Creating variables for matrix A and vector b
@@ -362,7 +353,7 @@ std::shared_ptr<T> InterpolationCurve3PointsShape(const glm::vec2& p1, const glm
         indices.emplace_back(i);
     }
 
-    return std::make_shared<T>("InterpolationCurve", vertices, indices, true, Triangle);
+    return std::make_shared<T>("InterpolationCurve", vertices, indices, true, Line_Strip); 
 }
 
 template <typename T>

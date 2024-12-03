@@ -359,7 +359,6 @@ public:
 		//std::cout << "\n";
 	}
 
-
 	//Enable states
 	static void EnablePhysics_all(const bool& enablePhysics)
 	{

@@ -101,8 +101,8 @@ void Actor::UpdateBarycentricCoords(float dt) const
 }
 
 void Actor::UpdateBarycentricCoordsRigidB(const std::shared_ptr<Actor>& actor, float dt) const 
-{
-    MathLib::DoBarycentricCoordinatesActor<Actor,Mesh>(actor, mSurfaceMesh, dt);   
+{ 
+    MathLib::DoBarycentricCoordinatesActor<Actor,Mesh>(actor, mSurfaceMesh, dt);    
 }
 
 

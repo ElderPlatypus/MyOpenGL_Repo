@@ -9,10 +9,10 @@ Scene::Scene(std::string name)
 void Scene::LoadActors()
 {
 	///Spawner_____________________________________________________
-	Spawner::SpawnActors(5, -50, 50, MeshShape::Sphere);
+	Spawner::SpawnActors(10, -50, 50, MeshShape::Sphere);
 	Spawner::UseTexture_all(TextureType::Wall); 
 	Spawner::EnablePhysics_all(true);  
-	Spawner::SetPosition_all(glm::vec3(0.f, 50.f, 0.f)); 
+	Spawner::SetPosition_all(glm::vec3(0.f, 20.f, 0.f)); 
 
 	///Regular Triangulation Plane_____________________________________________________
 	//uActorMap["RegularSurfaceXZ"] = std::make_shared<Actor>(Mesh::CreatePlaneXZ(-20.f, -20.f, 20.f, 20.f, 0.1f),"baryMesh");
@@ -28,7 +28,6 @@ void Scene::LoadActors()
 	uActorMap["Player"]->UseLightConfig(true,LightType::Default); 
 	uActorMap["Player"]->isPlayer = true;
 	uActorMap["Player"]->mAttachToActor = true;
-	//uActorMap["Player"]->SetBarySurfaceMesh(uActorMap["RegularSurfaceXZ"]->getMesh());   
 	//uActorMap["Player"]->AddComponentArchive("Damage", damageManager);
 
 	///Components_____________________________________________________
@@ -40,25 +39,10 @@ void Scene::LoadActors()
 
 	healthManager->AddComponent("Health", healthComponent_1);
 	damageManager->AddComponent("Damage", damageComponent);
-
-
-	///B_Spline_____________________________________________________
-	// Define knot vectors
-	std::vector<float> uKnot = MathLib::CreateRandomKnotVector<float>(7, 0.f, 2.f);  
-	std::vector<float> vKnot = MathLib::CreateRandomKnotVector<float>(7, 0.f, 2.f);
-
-	// Define control points (2D grid)
-	std::vector<std::vector<glm::vec3>> controlPoints = MathLib::CreateKnotVectorTuple(3,3, 0.f, 2.f);
-	
-	/*uActorMap["Bspline"] = std::make_shared<Actor>(Mesh::CreateSplineSurface(20,20,2,2,uKnot,vKnot,controlPoints,10.f),"splineStuff");  
-	uActorMap["Bspline"]->UseTexBool(true); 
-	uActorMap["Bspline"]->SetLocalPosition(glm::vec3(0, 0, 0));*/
-
-
 	
 	///Camera_____________________________________________________
     mSceneCamera = std::make_shared<Camera>("SceneCamera");
-	mSceneCamera->SetLocalPosition(glm::vec3(0, -100.0f, 300.f));
+	mSceneCamera->SetLocalPosition(glm::vec3(0, -10.0f, 300.f));
 	//mSceneCamera->SetAccelerationSpeed(10.f);
 	mSceneCamera->mFarplane = 800.f; 
 	mSceneCamera->UpdateProjectionMatrix();
@@ -88,14 +72,23 @@ void Scene::LoadActors()
 			uActorMap["grid"]->UseLightConfig(true,LightType::Slope);    
 			//uActorMap["grid"]->SetLocalPosition(glm::vec3(0.f, -200.f, 0.f));
 
-			//uActorMap["pointcloud"] = std::make_shared<Actor>(Mesh::CreatePointCloudFromLASFileSurface(files[0].c_str(), 0.02f), "Terrain");
-			//uActorMap["pointcloud"]->UseLightConfig(false); 
-			//uActorMap["pointcloud"]->SetLocalPosition(glm::vec3(0.f, 50.f, 0.f));
+			uActorMap["pointcloud"] = std::make_shared<Actor>(Mesh::CreatePointCloudFromLASFileSurface(files[0].c_str(), 0.02f), "Terrain"); 
+			uActorMap["pointcloud"]->UseLightConfig(false);  
+			uActorMap["pointcloud"]->SetLocalPosition(glm::vec3(0.f, 50.f, 50.f)); 
 		}
 	}
 
-	uActorMap["Player"]->SetBarySurfaceMesh(uActorMap["grid"]->getMesh());
-	//Spawner::SetBarySurfaceMesh_all(uActorMap["grid"]->getMesh());
+	uActorMap["Player"]->SetBarySurfaceMesh(uActorMap["grid"]->getMesh()); 
+
+	///B_Spline_____________________________________________________
+	// Define control points (2D grid)
+	const std::vector<std::vector<glm::vec3>>& controlPoints = MathLib::CreateUniformControlPoints(10, 10, 0.0f, 100.0f);
+	const std::vector<std::vector<glm::vec3>>& controlPointsA = MathLib::CreateControlPointsFromActor<Actor>(0.0f, 100.0f, uActorMap["grid"]); 
+
+	uActorMap["Bspline"] = std::make_shared<Actor>(Mesh::CreateSplineSurface(50, 50, 4, 4, controlPoints, 10.f), "splineStuff");
+	uActorMap["Bspline"]->UseTexConfig(true, TextureType::Container); 
+	//uActorMap["Bspline"]->getMesh()->updateVertexAttribs(); 
+	//uActorMap["Bspline"]->SetLocalPosition(glm::vec3(0, 0, 0)); 
 }
 
 void Scene::LoadContent()
@@ -210,34 +203,52 @@ void Scene::BindCamera() const
 void Scene::CollisionHandling(float dt) 
 {
 	//Player & spawned objects
-	
+	auto getFric = MathLib::CalculateFriction(uActorMap["grid"]); 
+
 	if (!Spawner::spawnList.empty()) 
 	{
-		for (const auto& actor : Spawner::spawnList)
+		for (size_t i = 0; i < Spawner::spawnList.size(); i++)
 		{
-			/*if (actor->rigidB->GetLocalPosition().y < uActorMap["grid"]->GetLocalPosition().y) 
-			{
-				actor->rigidB->SetLocalPosition(glm::vec3(actor->rigidB->pos.x, uActorMap["grid"]->GetLocalPosition().y - actor->mExtent.y, actor->GetLocalPosition().x));
-			}*/
+			//Current actor
+			auto& actor = Spawner::spawnList[i]; 
 
-			bool isColliding = Collision::AABB_y<Actor, Actor>(actor, uActorMap["grid"]);
+			//CollisionCheck
+			bool isColliding = Collision::AABB<Actor, Actor>(actor, uActorMap["grid"]);
+
 
 			if (isColliding)  
 			{
-				Spawner::SetBarySurfaceMesh_all(uActorMap["grid"]->getMesh());
+				//Set friction
+				actor->rigidB->ApplyFriction(getFric); 
+				//actor->rigidB->ConstraintPosition(-uActorMap["grid"]->mExtent,uActorMap["grid"]->mExtent);   
 
+				//Attach to baryMesh
+				Spawner::SetBarySurfaceMesh_all(uActorMap["grid"]->getMesh());
 				actor->UpdateBarycentricCoordsRigidB(actor, dt);  
+				actor->rigidB->Roll(actor->rigidB->GetLocalPosition());    
+			    actor->rigidB->velocity *= 0.5f;
+
+				//Check for collison with other actors
+				for (size_t j = i + 1; j < Spawner::spawnList.size(); j++)  
+			    {
+				    auto& otherActor = Spawner::spawnList[j]; 
+				    
+				    if (Collision::BallBall<Actor,Actor>(actor, otherActor)) 
+				    {
+				    	actor->rigidB->ApplyForce(glm::vec3(-0.01f, 0.0f, 0.0f));
+				    	otherActor->rigidB->ApplyForce(glm::vec3(0.01f, 0.0f, 0.0f));
+				    }
+			    }
 				//glm::vec3 baryCoords
 				//actor->rigidB->Reflect(glm::vec3(0.0f, 0.1f, 0.0f)); 
 				//actor->rigidB->RigidBodyStop(); 
-				//actor->rigidB->Roll(actor->rigidB->GetLocalPosition());        
-				//actor->rigidB->ConstraintPosition(uActorMap["grid"]->mCenter,uActorMap["grid"]->mExtent);  
-				 
+		        
 			}
 			else
 			{
 				Spawner::ClearBarySurfaceMesh_all();
 			}
+			
 		}
 	}
 }

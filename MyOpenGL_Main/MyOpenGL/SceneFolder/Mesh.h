@@ -78,11 +78,9 @@ public:
 	}
 	
 	///Splines
-	static std::shared_ptr<Mesh> CreateSplineSurface(int resU, int resV, int du, int dv,
-		                                             const std::vector<float>& uKnot, const std::vector<float>& vKnot,
-		                                             const std::vector<std::vector<glm::vec3>>& controlPoints, const float& size)
+	static std::shared_ptr<Mesh> CreateSplineSurface(const int& resU, const int& resV, const int& du, const int& dv, const std::vector<std::vector<glm::vec3>>& controlPoints, const float& size)
 	{
-		return BSplineSurfaceShape<Mesh>(resV, resV, du, dv, uKnot, vKnot, controlPoints, size); 
+		return BSplineSurfaceShape<Mesh>(resV, resV, du, dv, controlPoints, size); 
 	}
 	
 	///LAS
@@ -171,6 +169,7 @@ public:
 
 
 	//---------------------------------Calculate slope based on derivatives------------------------------------------
+	float fric = 0.0f;
 	glm::vec3 slopeColour;
 	void CalculateSlopeColour();
 	

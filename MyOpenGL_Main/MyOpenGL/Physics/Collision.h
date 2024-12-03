@@ -26,27 +26,7 @@ struct Collision
 				return false;
 			}
 		}
-	}
-
-	template<typename Actor, typename Actor1>
-	static bool AABB_y(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor1>& b)
- 
-	{
-		//Check if actors have collision enables
-		if (!a || !b) return false;
-
-		//Calculate the center difference and sum of the boundg boxes
-		float centerDiff_Y = glm::abs(a->GetCenter().y - b->GetCenter().y); 
-		float sumOfExtent = a->GetExtent().y + b->GetExtent().y; 
-
-		if (centerDiff_Y >= sumOfExtent)
-		{
-			return false;
-		}
-
-		std::cout << "[LOG]:Collision Detected\n";
 		return true;
-
 	}
 
 	template<typename Actor, typename Actor1>
@@ -171,6 +151,42 @@ struct Collision
 			}
 		}
 		return true;
+	}
+
+	template<typename Actor, typename Actor1>
+	static bool BallBall(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor1>& b) 
+	{
+		//Check if actors have collision enables
+		if (!a || !b) return false;
+
+		//Calculate the center difference and sum of the boundg boxes
+		glm::vec3 centerDiff = glm::abs(a->GetCenter() - b->GetCenter());
+		float distance = glm::length(centerDiff);
+
+		float combinedRadius = a->GetExtent().x + b->GetExtent().x;
+
+		if (distance < combinedRadius)
+		{
+
+			glm::vec3 collisionNormal = glm::normalize(centerDiff);
+
+			float penetrationDepth = combinedRadius - distance; 
+
+			a->SetLocalPosition(a->GetLocalPosition() + collisionNormal * (penetrationDepth * 0.5f)); 
+			b->SetLocalPosition(b->GetLocalPosition() - collisionNormal * (penetrationDepth * 0.5f)); 
+
+			glm::vec3 relativeVelocity = a->rigidB->velocity - b->rigidB->velocity;
+			float impactSpeed = glm::dot(relativeVelocity, collisionNormal);
+
+			if (impactSpeed < 0)
+			{
+				glm::vec3 impulse = collisionNormal * impactSpeed * 2.0f;
+				a->rigidB->velocity -= impulse;
+				b->rigidB->velocity += impulse;
+			}
+			return true;
+		}
+		return false; 
 	}
 };
 
