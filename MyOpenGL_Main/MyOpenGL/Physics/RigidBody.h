@@ -14,6 +14,7 @@ public:
 	glm::vec3 pos;
 	glm::vec3 velocity;
 	glm::vec3 acceleration;
+	float friction = 0.0f;
 
 	RigidBody(float mass = 1.0f, const glm::vec3& pos = glm::vec3(0.0f), const glm::vec3& velocity = glm::vec3(0.0f), const glm::vec3& acceleration = glm::vec3(0.0f));
 	void Update(float dt, const glm::vec3& minBound, const glm::vec3& maxBound);
@@ -24,6 +25,7 @@ public:
 	void ApplyForce(glm::vec3 direction, float magnitude);
 	void ApplyImpulse(glm::vec3 force, float dt);
 	void ApplyImpulse(glm::vec3 direction, float magnitude,  float dt);
+	void ApplyFriction(float newFriction);
 
 	//Energy Tranfers
 	void EnergyTransfer(float joules);

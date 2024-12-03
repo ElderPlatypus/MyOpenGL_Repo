@@ -66,7 +66,6 @@ void Mesh::drawActor(const std::shared_ptr<Shader>& shader) const
             glDrawElements(GL_TRIANGLE_FAN, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); break;
         default:
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); break;
-
         }
     }
 }
@@ -111,25 +110,33 @@ void Mesh::SetShaderDefaults(bool useLight) const
 
 void Mesh::CalculateSlopeColour()
 {
+    //Initialising local variables
     float min = 0;
     float max = 0;
     float average = 0;
     for (size_t i = 0; i < mVertices.size(); i++)
     {
+        //Initialising the variable for the ground normal
         glm::vec3 groundNormal(0.f, 1.f, 0.f); 
 
+        //Calcuating dot product and 
         float dotProduct = glm::dot(mVertices[i].mNormals, groundNormal); 
-        float absolute = glm::length(mVertices[i].mNormals) * glm::length(groundNormal); 
+        float magnitude = glm::length(mVertices[i].mNormals) * glm::length(groundNormal); 
 
+        //Convertig angle to radian
         const float radianConvert = 180.f / 3.14f;
-        float angle = acos(dotProduct / absolute) * radianConvert; 
 
+        //Using arccos to find angle on slope and converting to radian
+        float angle = asin(dotProduct / magnitude) * radianConvert; 
+
+        //Calulating min and max and average angle
         min = glm::min(min, angle);
         max = glm::max(max, angle); 
         average = (min + max) / 2.0f;
         //std::cout << "[LOG]:Average is:" << average << "\n";
         //std::cout << "[LOG]:Angle is:" << angle << "\n";
 
+        //Contitions for applying colour
         if (angle < average)  
         {
             mVertices[i].mColour = glm::vec3(0.5f, 0.35f, 0.05f); // Brown
@@ -148,11 +155,14 @@ void Mesh::CalculateSlopeColour()
 
 void Mesh::LightConfig(const bool& useLight, const LightType& lightType) 
 {
+    //Updating members
     mUseLight = useLight;
     mlightType = lightType;
 
+    //Safe check if light is being used for mesh
     if (mUseLight) 
     {
+        //Updating shader
         mShader->use();
         mShader->setBool("useLight", mUseLight); 
         mShader->setVec3("lightColor", mLightColor);
@@ -160,6 +170,7 @@ void Mesh::LightConfig(const bool& useLight, const LightType& lightType)
         mShader->setFloat("ambientStrength", mAmbientStrength);
         mShader->setFloat("specularStrength", mSpecularStrength);
 
+        //Selecting light type
         switch (lightType)
         {
         case Default: 
@@ -168,7 +179,6 @@ void Mesh::LightConfig(const bool& useLight, const LightType& lightType)
         case Slope: 
         {
             CalculateSlopeColour();
-            //std::cout << "[Log]: Slope Colour X:" << slopeColour.x << " Y:" << slopeColour.y << " Z:" << slopeColour.z << "\n";
             mShader->setVec3("objectColor", slopeColour);
             break;
         }

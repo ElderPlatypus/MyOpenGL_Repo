@@ -27,144 +27,247 @@
 //External includes
 #include <LASzip/dll/laszip_api.h>
 
+class Actor;
 struct MathLib
 {
 
     //Spline Formulas _____________________________________________
-    static float cox_deBoorFormula(int i, int p, float t, const std::vector<float>& knotVector)
+    static float NURBS(size_t i, size_t j, float t, const std::vector<float>& knotVector)    
     {
-
         ///Calculate Points on a B-Spline or Nurbs
-       // i = index
-       // p = degree
-       // t = position also known as (X) in B(X)
-       // vector of vector-knots
+        // i = index
+        // p = degree
+        // t = position also known as (X) in B(X)
+        // vector of vector-knots
 
-       //de-Boor`s recursive formula
-        if (p == 0)
+        //Base Case of degree 0 | Basis Function
+        if (j == 0)
         {
             return (knotVector[i] <= t && t < knotVector[i + 1]) ? 1.0f : 0.0f;
         }
-        else
+       
+        if (i + j >= knotVector.size() || i + j + 1 >= knotVector.size())
         {
-            float leftDenominator = knotVector[i + p] - knotVector[i];
-            float rightDenominator = knotVector[i + p + 1] - knotVector[i + 1];
-
-            float left = 0.0f;
-            float right = 0.0f;
-
-            if (leftDenominator != 0)
-            {
-                left = (t - knotVector[i]) / leftDenominator * cox_deBoorFormula(i, p - 1, t, knotVector);
-            }
-
-            if (rightDenominator != 0)
-            {
-                right = (knotVector[i + 1 + p] - t) / rightDenominator * cox_deBoorFormula(i + 1, p - 1, t, knotVector);
-            }
-            return left + right;
+            //Out of bounds
+            return 0.0f;
         }
 
+        //Recursive case | calculation of degree > 0
+        float leftDenominator = knotVector[i + j] - knotVector[i];
+        float rightDenominator = knotVector[i + j + 1] - knotVector[i + 1];
+
+        float leftSide = 0.0f;
+        float rightSide = 0.0f;
+
+        if (leftDenominator != 0)
+        {
+            leftSide = (t - knotVector[i]) / leftDenominator * NURBS(i, j - 1, t, knotVector);
+        }
+
+        if (rightDenominator != 0)
+        {
+            rightSide = (knotVector[i + 1 + j] - t) / rightDenominator * NURBS(i + 1, j - 1, t, knotVector);
+        }
+        return leftSide + rightSide;
     }
 
-    static glm::vec3 EvaluateBSplineSurface(float u, float v, int du, int dv, const std::vector<float>& uKnot, const std::vector<float>& vKnot, const std::vector<std::vector<glm::vec3>>& controlPoints)
+    static glm::vec3 EvaluateBSplineSurface(const float& u, const float& v, const int& degreeU, const int& degreeV, const std::vector<std::vector<glm::vec3>>& controlPoints)
     {
         ///Evaluate points and attributes on a splineSurface
         // u & v = points evaluated
-        // du & dv = degree of u and v
+        // i & j = degree of u and v
         // uKnot & vKnot = vectors cotaining the knot-vectors
         // controlpoints = vector of vectors containing glm::vec3-->vector on a 3D-axis
+        if (controlPoints.empty() || controlPoints[0].empty())
+        {
+            //Default return value
+            return glm::vec3(0.f);
+        }
 
+        //Calculate knot vectors
+        const auto& data = CalculateKnotVector(degreeU, degreeV); 
+        std::vector<float> knotVectorU = data.first;
+        std::vector<float> knotVectorV = data.second; 
+
+        //Initliasining surfacePoints
         glm::vec3 surfacePoint(0.0f);
-        const size_t& numControlPointsU = controlPoints.size();
-        const size_t& numControlPointsV = controlPoints[0].size() - 1;
+        const size_t& numControlPointsU = controlPoints.size(); //Direction X
+        const size_t& numControlPointsV = controlPoints[0].size(); //Direction Y
+
+        //Initialzing weight for normalization
+        float totWeight = 0.0f;
 
         //Iterate over all existing points
-        for (int i = 0; i < numControlPointsU; i++)
+        for (size_t i = 0; i < numControlPointsU; i++) 
         {
-            for (int j = 0; j < numControlPointsV; j++)
+            for (size_t j = 0; j < numControlPointsV; j++)
             {
                 //calculates basisFunction based on the controlPoints influence in respect to U & V direction
-                float splineEvaluation_i = cox_deBoorFormula(i, du, u, uKnot);
-                float splineEvaluation_j = cox_deBoorFormula(j, dv, v, vKnot);
+                float basisU = NURBS(i, degreeU, u, knotVectorU); 
+                float basisV = NURBS(j, degreeV, v, knotVectorV); 
+
+                //Calculating current weight
+                float currentWeight = basisU * basisV;
 
                 //calculating the weight based on the sum of the basis functions using cox-deBoor`s algorithm
-                glm::vec3 controlPointWeight = splineEvaluation_i * splineEvaluation_j * controlPoints[i][j];
-                surfacePoint += controlPointWeight;
+                surfacePoint += currentWeight * controlPoints[i][j];
+                totWeight += currentWeight;
             }
         }
-        //Returns a mathematical vector filled with wighted surface points
+        //Normalizing surface point if not zero
+        if (totWeight > 0.0f)
+        {
+            surfacePoint /= totWeight; 
+        }
+
+        //Returns a mathematical vector filled with weighted surface points
         return surfacePoint;
     }
 
-    static glm::vec3 EvaluateBSplineSurfaceNormal(float u, float v, int du, int dv, int resU, int resV, const std::vector<float>& uKnot, const std::vector<float>& vKnot, const std::vector<std::vector<glm::vec3>>& controlPoints)
+    static glm::vec3 EvaluateBSplineSurfaceNormal(const float& u, const float& v, const int& degreeU, const int& degreeV, const int& resU, const int& resV, const std::vector<std::vector<glm::vec3>>& controlPoints)
     {
         ///Evaluate points and attributes on a splineSurface and calculate the normal vector
         // u & v = points evaluated
-        // du & dv = degree of u and v
+        // i & j = degree of u and v
         // resU & resV = resolution of the surface in the respective direction
         // uKnot & vKnot = vectors cotaining the knot-vectors
         // controlpoints = vector of vectors containing glm::vec3-->vector on a 3D-axis
 
-        //Creating three vectors of surface points to be evaluated
-        glm::vec3 splineX = EvaluateBSplineSurface(u, v, du, dv, uKnot, vKnot, controlPoints);
-        glm::vec3 splineU = EvaluateBSplineSurface((u + 1.0f) / resU, v, du, dv, uKnot, vKnot, controlPoints);
-        glm::vec3 splineV = EvaluateBSplineSurface(u, (v + 1.0f) / resV, du, dv, uKnot, vKnot, controlPoints);
+        float epsilon = 0.001f;
 
-        //Calculatin the tangents to find the normal-vectors
+        //Creating three vectors of surface points to be evaluated
+        glm::vec3 splineX = EvaluateBSplineSurface(u, v, degreeU, degreeV, controlPoints); 
+        glm::vec3 splineU = EvaluateBSplineSurface(u + epsilon , v, degreeU, degreeV, controlPoints);
+        glm::vec3 splineV = EvaluateBSplineSurface(u, v + epsilon , degreeU, degreeV, controlPoints); 
+
+        //Calculating the tangents to find the normal-vectors
         glm::vec3 tangentU = splineU - splineX;
         glm::vec3 tangentV = splineV - splineX;
 
+        //Close to zero handler
+        if (glm::length(tangentU) < 1e-6f || glm::length(tangentV) < 1e-6f)
+        {
+            return glm::normalize(glm::vec3(0.0f, 1.0f, 0.0f));
+        }
+
+        //Calulate unity vector
         glm::vec3 normal = glm::normalize(glm::cross(tangentU, tangentV));
 
         return normal;
     }
 
     //Random generator _____________________________________________
-    template<typename T>
-    static std::vector<T> CreateRandomKnotVector(const int& size, const float& min, const float& max)
+    static std::pair<std::vector<float>, std::vector<float>> CalculateKnotVector(const size_t& numControlPointsU, const size_t& numControlPointsV)
     {
-        std::vector<T> vectorKnot{ 0,0,0 };
 
-        std::random_device rd;  // Obtain a random number from hardware
-        std::mt19937 eng(rd()); // Seed the generator
-        std::uniform_real_distribution<float> distr(min, max); // Define the range
+        //Degree of the spline
+        size_t degreeU = 2;
+        size_t degreeV = 2; 
 
-        if (size <= 0 || min < 0 || max <= 0)
+        size_t sizeU = numControlPointsU + degreeU + 1;
+        size_t sizeV = numControlPointsV + degreeV + 1;  
+
+        std::vector<float> vectorKnotU(sizeU); //Dir X
+        std::vector<float> vectorKnotV(sizeV); //Dir Y
+
+        //Assume this for explenation: numControlpoints = 5, degree = 3
+        for (size_t k = 0; k  < sizeU; k++) 
         {
-            std::cout << "[WARNING]:size is less or equal to 0 \n";
-            return {};
-        }
-        for (int i = 0; i < size; i++)
-        {
-            vectorKnot.emplace_back(distr(eng));
-        }
-        return vectorKnot;
-    }
-
-    static std::vector<std::vector<glm::vec3>> CreateKnotVectorTuple(size_t outerSize, size_t innerSize, const float& min, const float& max)
-    {
-        std::vector<std::vector<glm::vec3>> KnotTuple(outerSize, std::vector<glm::vec3>(innerSize));
-
-        std::random_device rd;  // Obtain a random number from hardware
-        std::mt19937 eng(rd()); // Seed the generator
-        std::uniform_real_distribution<float> distr(min, max); // Define the range
-
-        if (outerSize <= 0 || innerSize <= 0 || min < 0 || max <= 0)
-        {
-            std::cout << "[WARNING]:size is less or equal to 0 \n";
-            return {};
-        }
-        for (size_t i = 0; i < outerSize; ++i)
-        {
-            for (size_t j = 0; j < innerSize; ++j)
+            if (k < degreeU) // 0 < 3 --> vectorKnot[0] = 0.0f
             {
-                KnotTuple[i][j] = glm::vec3((distr(eng)), (distr(eng)), (distr(eng)));
+                vectorKnotU[k] = 0.0f; 
+            } 
+            else if(k >= degreeU && k < sizeU - degreeU) // 4  >=  degreeU && 4 < sizeU - degreeU --> 4 >= 3 && 4 < 6 --> vectorKnot[4] = 4 - 3 = 1
+            {
+                vectorKnotU[k] = (float)(k - degreeU); 
+            }
+            else  // 6 >= 9 - 3 <==> 6 >= 6 --> vectorKnot[6] = 5 - 3 = 2
+            {
+                vectorKnotU[k] = (float)(numControlPointsU - degreeU);
             }
         }
-        return KnotTuple;
+
+        for (size_t k = 0; k < sizeV; k++)
+        {
+            if (k < degreeV)
+            {
+                vectorKnotV[k] = 0.0f;
+            }
+            else if (k >= degreeV && k < sizeV - degreeV)  
+            {
+                vectorKnotV[k] = (float)(k - degreeV);
+            }
+            else
+            {
+                vectorKnotV[k] = (float)(numControlPointsV - degreeV); 
+            }
+        }
+
+        return std::make_pair(vectorKnotU,vectorKnotV);
     }
 
+    static std::vector<std::vector<glm::vec3>> CreateUniformControlPoints(const int& numU, const int& numV, const float& min, const float& max)
+    {
+
+        if (numU <= 0 || numV <= 0)
+        {
+            std::cerr << "[WARNING]: Size must be greater than 0\n";
+            return {};
+        }
+        std::vector<std::vector<glm::vec3>> controlPoints(numU, std::vector<glm::vec3>(numV));
+
+        //Populate controlPoints
+        for(int i = 0; i < numU; i++)     
+        {
+            for(int j = 0; j < numV; j++) 
+            {
+                float x = i * (max - min) / (numU - 1) + min; 
+                float z = j * (max - min) / (numV - 1) + min; 
+                float y = std::sin(x) * std::cos(z) * (max - min) / 2.0f;  
+
+                controlPoints[i][j] = glm::vec3(x, y, z); 
+            }
+        }
+        return controlPoints; 
+    }
+
+    template <typename T>
+    static std::vector<std::vector<glm::vec3>> CreateControlPointsFromActor(const float& min, const float& max, const std::shared_ptr<T>& actor) 
+    {
+
+        if (actor->getMesh()->mVertices.size() <= 1)
+        {
+            std::cerr << "[WARNING]: Size must be greater than 1\n";
+            return { {}, {} };
+        }
+
+        //Number of control points. Using square root since grid is of second degree
+        int totalVertices = (int)actor->getMesh()->mVertices.size(); 
+        int numControlPointsX = (int)(glm::sqrt(totalVertices)); 
+        int numControlPointsY = totalVertices/numControlPointsX ;
+
+        if (numControlPointsX * numControlPointsY != totalVertices) 
+        {
+            return { {}, {} };
+        }
+
+        //2D Vetor to populate with control points
+        std::vector<std::vector<glm::vec3>> controlPoints(numControlPointsX, std::vector<glm::vec3>(numControlPointsY)); 
+
+        //Populate control points 
+        for (int i = 0; i < numControlPointsX; i++)
+        {
+            for (int j = 0; j < numControlPointsY; j++)  
+            {
+                //Access corresponding vertex
+                int vertexIndex = i * numControlPointsY + j; 
+                controlPoints[i][j] = glm::vec3(actor->getMesh()->mVertices[vertexIndex].mPos);
+            }
+        }
+        return controlPoints;
+    }
+   
+    
     //Las Loader _____________________________________________
     static std::pair <std::vector<Vertex>, std::vector<Index>> LoadLAS_Data(const char* _fileDirectory, float _scaleFactor)
     {
@@ -370,7 +473,7 @@ struct MathLib
     {
         std::vector<glm::vec3> newNormals;
         newNormals.resize(vertexArray.size(), glm::vec3(0.f));
-
+  
         // Ensure there are at least 3 vertices to form a triangle
         if (indexArray.size() < 3)
         {
@@ -389,7 +492,7 @@ struct MathLib
 
             glm::vec3 AB = B - A;
             glm::vec3 AC = C - A;
-            glm::vec3 normal = glm::normalize(glm::cross(AB, AC));
+            glm::vec3 normal = glm::cross(AB, AC);
             float weight = glm::length(AC) * glm::length(AB);
 
 
@@ -405,6 +508,7 @@ struct MathLib
         return newNormals;
     }
 
+    //Hash maps
     template<typename T1, typename T2>
     struct PairHash
     {
@@ -423,4 +527,39 @@ struct MathLib
             return std::hash<int>()(key.x) ^ (std::hash<int>()(key.y) << 1) ^ (std::hash<int>()(key.z) << 2);
         }
     };
+
+
+    //Friction
+    template<typename T>
+    static float CalculateFriction(const std::shared_ptr<T>& actor)
+    {
+        float fric = 0.0f; 
+        //Initialising local variables
+        float min = 0;
+        float max = 0;
+        float average = 0;
+        for (size_t i = 0; i < actor->mVertices.size(); i++)
+        {
+            //Initialising the variable for the ground normal
+            glm::vec3 groundNormal(0.f, 1.f, 0.f);
+
+            //Calcuating dot product and 
+            float dotProduct = glm::dot(actor->mVertices[i].mNormals, groundNormal);
+            float magnitude = glm::length(actor->mVertices[i].mNormals) * glm::length(groundNormal);
+
+            //Convertig angle to radian
+            const float radianConvert = 180.f / 3.14f;
+
+            //Using arccos to find angle on slope and converting to radian
+            float angle = glm::atan(dotProduct / magnitude) * radianConvert;     
+
+            float force = angle * glm::cos(angle) * 9.81f; 
+            //Calulating min and max and average angle
+            min = glm::min(min, angle);
+            max = glm::max(max, angle);
+            average = (min + max) / 2.0f;
+            fric = force; 
+        }
+        return fric;
+    }
 };

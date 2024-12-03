@@ -5,8 +5,8 @@ RigidBody::RigidBody(float mass, const glm::vec3& pos, const glm::vec3& velocity
 
 void RigidBody::Update(float dt, const glm::vec3& minBound, const glm::vec3& maxBound)
 {
-	pos += velocity * dt + 0.5f * acceleration * glm::pow(dt, 2.0f);
-	velocity += acceleration * dt;
+	velocity += acceleration * dt - friction;
+	pos += velocity * dt + 0.5f * acceleration * (dt * dt); 
 
 	ConstraintPosition(minBound, maxBound);
 	velocity *= 0.98f;
@@ -14,10 +14,10 @@ void RigidBody::Update(float dt, const glm::vec3& minBound, const glm::vec3& max
 
 void RigidBody::Update(float dt)
 {
-	pos += velocity * dt + 0.5f * acceleration * glm::pow(dt, 2.0f);
-	velocity += acceleration * dt;
+	velocity += acceleration * dt - friction; 
+	pos += velocity * dt + 0.5f * acceleration * (dt*dt); 
 
-	//velocity *= 0.98f; 
+	velocity *= 0.98f; 
 }
 
 void RigidBody::ApplyForce(glm::vec3 force)
@@ -38,6 +38,12 @@ void RigidBody::ApplyImpulse(glm::vec3 force, float dt)
 void RigidBody::ApplyImpulse(glm::vec3 direction, float magnitude, float dt)
 {
 	ApplyImpulse(direction * magnitude,dt);
+}
+
+void RigidBody::ApplyFriction(float newFriction)
+{
+	//std::cout << "[LOG]:Friction Applied \n";
+	friction = newFriction;
 }
 
 void RigidBody::EnergyTransfer(float joules)
@@ -80,7 +86,7 @@ void RigidBody::ConstraintPosition(const glm::vec3& minBound, const glm::vec3& m
 
 void RigidBody::Roll(const glm::vec3& baryCoords)
 {
-	 acceleration =  acceleration + glm::vec3(baryCoords.x*baryCoords.z,baryCoords.y*baryCoords.z,glm::pow(baryCoords.z,2)-1);
+	 acceleration =  9.81f * glm::vec3(baryCoords.x * baryCoords.y, (baryCoords.y * baryCoords.y) - 1, baryCoords.z * baryCoords.y); 
 }
 
 void RigidBody::SetLocalPosition(const glm::vec3& _pos)

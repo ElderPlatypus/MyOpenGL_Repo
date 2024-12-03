@@ -191,6 +191,7 @@
     <ClInclude Include="MathLib\Transform.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="Shaders\FragmentShader.fs" />
     <None Include="Shaders\VertexShader.vs" />
   </ItemGroup>
