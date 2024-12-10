@@ -9,10 +9,11 @@ Scene::Scene(std::string name)
 void Scene::LoadActors()
 {
 	///Spawner_____________________________________________________
-	Spawner::SpawnActors(10, -50, 50, MeshShape::Sphere);
-	Spawner::UseTexture_all(TextureType::Wall); 
-	Spawner::EnablePhysics_all(true);  
-	Spawner::SetPosition_all(glm::vec3(0.f, 20.f, 0.f)); 
+	uSpawnerMap["Balls"] = std::make_shared<Spawner>(100,60.f,60.f,MeshShape::Sphere);
+	uSpawnerMap["Balls"]->UseTexture_all(TextureType::Wall);
+	uSpawnerMap["Balls"]->EnablePhysics_all(true);
+	uSpawnerMap["Balls"]->SetPosition_all(glm::vec3(0.f, -150.f, 0.f));
+
 
 	///Regular Triangulation Plane_____________________________________________________
 	//uActorMap["RegularSurfaceXZ"] = std::make_shared<Actor>(Mesh::CreatePlaneXZ(-20.f, -20.f, 20.f, 20.f, 0.1f),"baryMesh");
@@ -20,15 +21,29 @@ void Scene::LoadActors()
 	//uActorMap["RegularSurfaceXZ"]->UseLightConfig(true,LightType::Slope);
 	//uActorMap["RegularSurfaceXZ"]->SetLocalPosition(glm::vec3(0, 10.f, 0)); 
 
+	//uActorMap["Ground"] = std::make_shared<Actor>(Mesh::CreateFlastSurfaceXZ(10.f), "groundMesh");
+	//uActorMap["Ground"]->UseTexConfig(true, TextureType::Container); 
+	//uActorMap["Ground"]->SetLocalPosition(glm::vec3(0, 10.f, 0));
+
 
 	///Player_____________________________________________________
-	//uActorMap["Player"] = std::make_shared<Actor>(Mesh::CreateCircle(glm::vec3(0.f, 0.f, 0.f), 5.f, 20), "PlayerMesh");
-	uActorMap["Player"] = std::make_shared<Actor>(Mesh::CreateCube(3.f), "PlayerMesh");
-	uActorMap["Player"]->UseTexConfig(true, TextureType::Container);
+	uActorMap["Player"] = std::make_shared<Actor>(Mesh::CreateSphere(30,30,40), "PlayerMesh", CollisionType::BallBall);    
+	uActorMap["Player"]->UseTexConfig(true, TextureType::SnowFlake);
 	uActorMap["Player"]->UseLightConfig(true,LightType::Default); 
 	uActorMap["Player"]->isPlayer = true;
 	uActorMap["Player"]->mAttachToActor = true;
-	//uActorMap["Player"]->AddComponentArchive("Damage", damageManager);
+	uActorMap["Player"]->SetLocalPosition(glm::vec3(0.f, 0.f, -20.f));
+	//uActorMap["Player"]->AddComponentArchive("Damage", damageManager); 
+
+	///Test Sphere
+	uActorMap["Test"] = std::make_shared<Actor>(Mesh::CreateSphere(20, 20, 8), "TestMesh", CollisionType::BallBall);  
+	uActorMap["Test"]->UseTexConfig(true, TextureType::Wall); 
+	uActorMap["Test"]->UseLightConfig(true, LightType::Default);
+	uActorMap["Test"]->isPlayer = true;
+	uActorMap["Test"]->mAttachToActor = true;
+	uActorMap["Test"]->SetLocalPosition(glm::vec3(0.f, -100.f, 0.f));
+	uActorMap["Test"]->EnablePhysics(true);
+
 
 	///Components_____________________________________________________
 	std::shared_ptr<HealthComponent> healthComponent_1 = std::make_shared<HealthComponent>();
@@ -37,58 +52,47 @@ void Scene::LoadActors()
 	std::shared_ptr<DamageComponent> damageComponent = std::make_shared<DamageComponent>();
 	damageComponent->damage.emplace_back(20);
 
+	std::shared_ptr<PhysicsComponent> physicsComponent_1 = std::make_shared<PhysicsComponent>();
+	physicsComponent_1->m_EnablePhysics.emplace_back(true);
+
+	/*std::shared_ptr<SceneGraphComponent> sceneGraphComponent = std::shared_ptr<SceneGraphComponent>();
+	sceneGraphComponent->uActorMap["cCube"] = std::make_shared<Actor>(Mesh::CreateCube(2), "cCube", CollisionType::AABB); 
+
 	healthManager->AddComponent("Health", healthComponent_1);
 	damageManager->AddComponent("Damage", damageComponent);
+	physicsManager->AddComponent("Physic", physicsComponent_1);
+	sceneGraphManager->AddComponent("SceneGraph", sceneGraphComponent);*/
+
+
 	
 	///Camera_____________________________________________________
-    mSceneCamera = std::make_shared<Camera>("SceneCamera");
-	mSceneCamera->SetLocalPosition(glm::vec3(0, -10.0f, 300.f));
-	//mSceneCamera->SetAccelerationSpeed(10.f);
+    mSceneCamera = std::make_shared<Camera>("SceneCamera"); 
+	mSceneCamera->SetLocalPosition(glm::vec3(0, -10.0f, 150.f));
+	mSceneCamera->SetAccelerationSpeed(100.f);
 	mSceneCamera->mFarplane = 800.f; 
 	mSceneCamera->UpdateProjectionMatrix();
 
 	///LAS_____________________________________________________
-	int counter = 0;
-	int counter2 = 0;
-	
-	//auto folder1 = LoadVectorOfPath("../myopengl/mathlib/terraindata/t1/data/", "c:/users/lenovo/documents/spilltech2024_h/myopengl_repo/myopengl_main/myopengl/mathlib/terraindata/t1/data");
-	//auto folder2 = LoadVectorOfPath("../myopengl/mathlib/terraindata/t2/data/", "c:/users/lenovo/documents/spilltech2024_h/myopengl_repo/myopengl_main/myopengl/mathlib/terraindata/t2/data");
+	auto folder1 = LoadVectorOfPath("../myopengl/mathlib/terraindata/t1/data/", "c:/users/lenovo/documents/spilltech2024_h/myopengl_repo/myopengl_main/myopengl/mathlib/terraindata/t1/data");
+	auto folder2 = LoadVectorOfPath("../myopengl/mathlib/terraindata/t2/data/", "c:/users/lenovo/documents/spilltech2024_h/myopengl_repo/myopengl_main/myopengl/mathlib/terraindata/t2/data");
 	auto folder3 = LoadVectorOfPath("../myopengl/mathlib/terraindata/t3/data/","c:/users/lenovo/documents/spilltech2024_h/myopengl_repo/myopengl_main/myopengl/mathlib/terraindata/t3/data");
-	//auto folder4 = LoadVectorOfPath("../myopengl/mathlib/terraindata/t4/data/", "c:/users/lenovo/documents/spilltech2024_h/myopengl_repo/myopengl_main/myopengl/mathlib/terraindata/t4/data");
+	auto folder4 = LoadVectorOfPath("../myopengl/mathlib/terraindata/t4/data/", "c:/users/lenovo/documents/spilltech2024_h/myopengl_repo/myopengl_main/myopengl/mathlib/terraindata/t4/data");
 	
-	 
-	//terrainData.emplace_back(folder1);   
-	//terrainData.emplace_back(folder2);   
-	terrainData.emplace_back(folder3);   
-	//terrainData.emplace_back(folder4);  
+	//uActorMap["grid"] = std::make_shared<Actor>(Mesh::CreateGridFromLas(folder4[1].c_str(), 0.2f, 300), "TriangulationGrid");  ;      
+	//uActorMap["grid"]->UseLightConfig(true, LightType::Slope); 
+	//uActorMap["grid"]->SetLocalPosition(glm::vec3(0.f, -200.f, 0.f));
 
-	for (const auto& files : terrainData)
-	{
-		for (int i = 0; i < 1; i++)
-		{
-			counter++;
-			uActorMap["grid"] = std::make_shared<Actor>(Mesh::CreateGridFromLas(files[0].c_str(), 0.2f,300), "TriangulationGrid");
-			//uActorMap["grid"]->UseTexConfig(true, 0);   
-			uActorMap["grid"]->UseLightConfig(true,LightType::Slope);    
-			//uActorMap["grid"]->SetLocalPosition(glm::vec3(0.f, -200.f, 0.f));
+	///Box limit
+	uBoundingMap["Box"] = std::make_shared<Actor>(Mesh::CreateCube(300), "Box", CollisionType::AABBInverse); 
+	uBoundingMap["Box"]->UseTexConfig(true, TextureType::Container);
 
-			uActorMap["pointcloud"] = std::make_shared<Actor>(Mesh::CreatePointCloudFromLASFileSurface(files[0].c_str(), 0.02f), "Terrain"); 
-			uActorMap["pointcloud"]->UseLightConfig(false);  
-			uActorMap["pointcloud"]->SetLocalPosition(glm::vec3(0.f, 50.f, 50.f)); 
-		}
-	}
 
-	uActorMap["Player"]->SetBarySurfaceMesh(uActorMap["grid"]->getMesh()); 
+	///ParticleSystems
+	//uParticleMap["snow"] = std::make_shared<ParticleSimulation>(1000, MeshShape::Sphere, ParticleType::Snow);     
+	//uParticleMap["snow"]->SnowParticle(0.f, 100.f, uBoundingMap["Box"],uActorMap);
 
-	///B_Spline_____________________________________________________
-	// Define control points (2D grid)
-	const std::vector<std::vector<glm::vec3>>& controlPoints = MathLib::CreateUniformControlPoints(10, 10, 0.0f, 100.0f);
-	const std::vector<std::vector<glm::vec3>>& controlPointsA = MathLib::CreateControlPointsFromActor<Actor>(0.0f, 100.0f, uActorMap["grid"]); 
-
-	uActorMap["Bspline"] = std::make_shared<Actor>(Mesh::CreateSplineSurface(50, 50, 4, 4, controlPoints, 10.f), "splineStuff");
-	uActorMap["Bspline"]->UseTexConfig(true, TextureType::Container); 
-	//uActorMap["Bspline"]->getMesh()->updateVertexAttribs(); 
-	//uActorMap["Bspline"]->SetLocalPosition(glm::vec3(0, 0, 0)); 
+	uParticleMap["water"] = std::make_shared<ParticleSimulation>(1000, MeshShape::Sphere, ParticleType::Rain);
+	uParticleMap["water"]->RainParticle(0.f, 100.f, uBoundingMap["Box"], uActorMap); 
 }
 
 void Scene::LoadContent()
@@ -100,37 +104,32 @@ void Scene::LoadContent()
 	mShader = std::make_shared<Shader>("Shaders/VertexShader.vs", "Shaders/FragmentShader.fs");
 
 	uTextureMap["wall"] = std::make_shared<Texture>(0, GL_TEXTURE0, "texture1", "Shaders/wall.jpg", mShader);
-	uTextureMap["container"] = std::make_shared<Texture>(1,GL_TEXTURE1,"texture2", "Shaders/container.jpg", mShader);  
+	uTextureMap["container"] = std::make_shared<Texture>(1, GL_TEXTURE1, "texture2", "Shaders/container.jpg", mShader);
+	uTextureMap["snowflake"] = std::make_shared<Texture>(2, GL_TEXTURE2,"texture3", "Shaders/snowflake.jpg", mShader);
 
 	///Apply Shaders_____________________________________________________
 	Set_uMapShader(mShader);
-	Spawner::SetShaderSpawnVector(mShader); 
 }
 
 void Scene::UnloadContent()
 {
 	///Unload Content_____________________________________________________
-	for (const std::pair<std::string, std::shared_ptr<Actor>>& actor : uActorMap)
+	if (!uActorMap.empty())
 	{
-		if (actor.second)
-		{
-			actor.second->~Actor();
-		}
+		for (const std::pair<std::string, std::shared_ptr<Actor>>& actor : uActorMap) { actor.second->~Actor(); }
 	}
-
-	for (const std::pair<std::string, std::shared_ptr<Texture>>& texture : uTextureMap)
+	if (!uParticleMap.empty())
 	{
-		if (texture.second)
-		{
-			texture.second->~Texture();
-		}
+		for (const std::pair<std::string, std::shared_ptr<ParticleSimulation>>& actor : uParticleMap) { actor.second->~ParticleSimulation(); }
 	}
-
-	for (const auto& actor : Spawner::spawnList)
+	if (!uSpawnerMap.empty()) 
 	{
-	  actor->~Actor();
+		for (const std::pair<std::string, std::shared_ptr<Spawner>>& actor : uSpawnerMap) { actor.second->~Spawner(); }
 	}
-
+	if (!uTextureMap.empty())
+	{
+		for (const std::pair<std::string, std::shared_ptr<Texture>>& actor : uTextureMap) { actor.second->~Texture(); }
+	}
 	for (const auto& folder : terrainData)
 	{
 		folder.~vector();
@@ -141,19 +140,16 @@ void Scene::UnloadContent()
 	mShader = nullptr;
 	uActorMap.clear();
 	uTextureMap.clear();
-	Spawner::spawnList.clear();
+	uSpawnerMap.clear();
 }
 
 void Scene::UpdateScene(float dt)
 {
-	uActorMap["Player"]->UpdateBarycentricCoords(dt); 
 	///Camera Update_____________________________________________________
 	mSceneCamera->UpdateCamera(dt);   
 	BindCamera();
 	///Actor Update_____________________________________________________
 	Update_uMapActors(dt);
-	///Spawner Update_____________________________________________________
-	Spawner::UpdateSpawnVector(dt);
 	///Camera Update_____________________________________________________
 	CollisionHandling(dt);
 	SpaceManipulation();
@@ -161,10 +157,22 @@ void Scene::UpdateScene(float dt)
 }
 
 void Scene::Update_uMapActors(float dt)
-{
-	if (!uActorMap.empty())
+{ 
+	if (!uActorMap.empty()) 
 	{
 		for (const std::pair<std::string, std::shared_ptr<Actor>>& actor : uActorMap) { actor.second->UpdateActors(dt); }
+	}
+	if (!uBoundingMap.empty()) 
+	{
+		for (const std::pair<std::string, std::shared_ptr<Actor>>& actor : uBoundingMap) { actor.second->UpdateActors(dt); }
+	}
+	if (!uParticleMap.empty())
+	{
+		for (const std::pair<std::string, std::shared_ptr<ParticleSimulation>>& actor : uParticleMap) { actor.second->Update(dt); }
+	}
+	if (!uSpawnerMap.empty())
+	{
+		for (const std::pair<std::string, std::shared_ptr<Spawner>>& actor : uSpawnerMap) { actor.second->UpdateAll(dt);}
 	}
 }
 
@@ -173,6 +181,18 @@ void Scene::Set_uMapShader(const std::shared_ptr<Shader>& shader)
 	if (!uActorMap.empty())
 	{
 		for (const std::pair<std::string, std::shared_ptr<Actor>>& actor : uActorMap) { actor.second->SetShader(shader); }
+	}
+	if (!uBoundingMap.empty())
+	{
+		for (const std::pair<std::string, std::shared_ptr<Actor>>& actor : uBoundingMap) { actor.second->SetShader(shader); }
+	}
+	if (!uParticleMap.empty())
+	{
+		for (const std::pair<std::string, std::shared_ptr<ParticleSimulation>>& actor : uParticleMap) { actor.second->SetShader(shader); }
+	}
+	if (!uSpawnerMap.empty()) 
+	{
+		for (const std::pair<std::string, std::shared_ptr<Spawner>>& actor : uSpawnerMap) { actor.second->SetShaderAll(shader); } 
 	}
 }
 
@@ -203,54 +223,43 @@ void Scene::BindCamera() const
 void Scene::CollisionHandling(float dt) 
 {
 	//Player & spawned objects
-	auto getFric = MathLib::CalculateFriction(uActorMap["grid"]); 
+	auto getFric = MathLib::CalculateFriction(uBoundingMap["Box"]); 
 
-	if (!Spawner::spawnList.empty()) 
+	if (!uSpawnerMap["Balls"]->spawnVector.empty())
 	{
-		for (size_t i = 0; i < Spawner::spawnList.size(); i++)
+		for (size_t i = 0; i < uSpawnerMap["Balls"]->spawnVector.size(); i++)
 		{
 			//Current actor
-			auto& actor = Spawner::spawnList[i]; 
+			auto& actor = uSpawnerMap["Balls"]->spawnVector[i];
 
 			//CollisionCheck
-			bool isColliding = Collision::AABB<Actor, Actor>(actor, uActorMap["grid"]);
+			bool isColliding = Collision::AABBInverse<Actor, Actor>(actor, uBoundingMap["Box"]);
 
 
 			if (isColliding)  
 			{
 				//Set friction
-				actor->rigidB->ApplyFriction(getFric); 
-				//actor->rigidB->ConstraintPosition(-uActorMap["grid"]->mExtent,uActorMap["grid"]->mExtent);   
+				actor->rigidB->Roll(glm::vec3(0.0f,-1.0f,0.0f));
+				actor->rigidB->ApplyFriction(getFric);  
 
-				//Attach to baryMesh
-				Spawner::SetBarySurfaceMesh_all(uActorMap["grid"]->getMesh());
-				actor->UpdateBarycentricCoordsRigidB(actor, dt);  
-				actor->rigidB->Roll(actor->rigidB->GetLocalPosition());    
-			    actor->rigidB->velocity *= 0.5f;
+
 
 				//Check for collison with other actors
-				for (size_t j = i + 1; j < Spawner::spawnList.size(); j++)  
+				for (size_t j = i + 1; j < uSpawnerMap["Balls"]->spawnVector.size(); j++)
 			    {
-				    auto& otherActor = Spawner::spawnList[j]; 
-				    
-				    if (Collision::BallBall<Actor,Actor>(actor, otherActor)) 
-				    {
-				    	actor->rigidB->ApplyForce(glm::vec3(-0.01f, 0.0f, 0.0f));
-				    	otherActor->rigidB->ApplyForce(glm::vec3(0.01f, 0.0f, 0.0f));
-				    }
+				    auto& otherActor = uSpawnerMap["Balls"]->spawnVector[j];
+				     
+					Collision::BallBall<Actor, Actor>(actor, otherActor);
 			    }
-				//glm::vec3 baryCoords
-				//actor->rigidB->Reflect(glm::vec3(0.0f, 0.1f, 0.0f)); 
-				//actor->rigidB->RigidBodyStop(); 
-		        
 			}
-			else
-			{
-				Spawner::ClearBarySurfaceMesh_all();
-			}
-			
 		}
 	}
+	if (Collision::AABBInverse(uActorMap["Test"], uBoundingMap["Box"]))
+	{
+		uActorMap["Test"]->rigidB->Roll(glm::vec3(0.0f, -1.0f, 0.0f));
+	}
+	
+	Collision::BallBall(uActorMap["Test"], uActorMap["Player"]);
 }
 
 

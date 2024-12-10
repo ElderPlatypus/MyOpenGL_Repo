@@ -19,6 +19,7 @@
 #include "../MathLib/Formulas.h"
 #include "../MathLib/Shapes.h"
 #include "../Utility/EnumArchive.h"
+#include "../Physics/BoundingRegion.h"
 
 //Forawrd Declaring
 struct Vertex;
@@ -29,7 +30,7 @@ class Mesh
 public:
 	Mesh(const std::string& type, const std::vector<Vertex>& vertices,
 		 const std::vector<Index>& indices, const bool& useTex,
-		 const GLDrawType& GLdrawType 
+		 const GLDrawType& GLdrawType
 	);
 	
 	Mesh(const Mesh&) = delete;
@@ -63,6 +64,10 @@ public:
 	}
 	
 	///Planes & Curves
+	static std::shared_ptr<Mesh> CreateFlastSurfaceXZ(float size)
+	{
+		return FlatPlaneXZShape<Mesh>(size); 
+	}
 	static std::shared_ptr<Mesh> CreateInterpolationCurve3Points(const glm::vec2& p1, const glm::vec2& p2, const glm::vec2& p3,
 		                                                         const float& startVal, const float& endingVal, const float& resolution)
 	{
@@ -120,7 +125,6 @@ public:
 	glm::vec3 mExtent{ 0.0f, 0.0f, 0.0f };
 	glm::vec3 minExtent{ 0.0f, 0.0f, 0.0f };
 	glm::vec3 maxExtent{ 0.0f, 0.0f, 0.0f };
-
 	void UpdateBounds();
 
     //---------------------------------Methods Setters------------------------------------------------
@@ -154,6 +158,7 @@ public:
 	void SetShader(const std::shared_ptr<Shader>& shader) { mShader = shader; }
 	void SetShaderDefaults(bool useLight) const;
 
+
 	void TexConfig(const bool& useTexture, const TextureType& texType);
 	void LightConfig(const bool& useLight, const LightType& lightType);
 
@@ -170,7 +175,7 @@ public:
 
 	//---------------------------------Calculate slope based on derivatives------------------------------------------
 	float fric = 0.0f;
-	glm::vec3 slopeColour;
+	glm::vec3 slopeColour{};
 	void CalculateSlopeColour();
 	
 	///ESC

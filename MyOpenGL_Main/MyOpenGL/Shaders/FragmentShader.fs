@@ -12,6 +12,7 @@ in vec2 TexCoord;
 //Texture uniforms
 uniform sampler2D texture1; 
 uniform sampler2D texture2; 
+uniform sampler2D texture3; 
 uniform bool useTex; 
 uniform int texType;
 
@@ -55,6 +56,9 @@ void main()
              break;
          case 1:
              texColor = texture(texture2, TexCoord);
+             break;
+         case 2:
+             texColor = texture(texture3, TexCoord);
              break;
          default:
             texColor = texture(texture1, TexCoord);

@@ -144,11 +144,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Physics\BoundingRegion.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Camera\Camera.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Physics\Environment.cpp" />
+    <ClCompile Include="Physics\ParticleSimulation.cpp" />
     <ClCompile Include="Physics\RigidBody.cpp" />
     <ClCompile Include="SceneFolder\Actor.cpp" />
     <ClCompile Include="SceneFolder\Mesh.cpp" />
@@ -173,7 +175,9 @@
     <ClInclude Include="MathLib\Formulas.h" />
     <ClInclude Include="MathLib\Shapes.h" />
     <ClInclude Include="MathLib\SpatialPartition.h" />
+    <ClInclude Include="Physics\BoundingRegion.h" />
     <ClInclude Include="Physics\Environment.h" />
+    <ClInclude Include="Physics\ParticleSimulation.h" />
     <ClInclude Include="Physics\RigidBody.h" />
     <ClInclude Include="SceneFolder\ActorMovement.h" />
     <ClInclude Include="SceneFolder\Mesh.h" />
@@ -197,6 +201,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Shaders\container.jpg" />
+    <Image Include="Shaders\snowflake.jpg" />
     <Image Include="Shaders\wall.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

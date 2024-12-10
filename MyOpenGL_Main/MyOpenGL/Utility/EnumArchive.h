@@ -1,12 +1,12 @@
 #pragma once
 
-enum Extrude
+enum class Extrude
 {
     //For extrude
     Increase, Decrease,
 };
 
-enum Mouse
+enum class Mouse
 {
     //Mouse buttons
     RightMouseButton,
@@ -14,7 +14,7 @@ enum Mouse
     LeftMouseButton
 };
 
-enum Direction
+enum class Direction
 {
     //Directions
     Forward, Backwards,
@@ -23,7 +23,7 @@ enum Direction
     IncreaseSpeed, NormalSpeed,
 };
 
-enum CameraState
+enum class CameraState
 {
     //Other buttons
     CameraFreeMovement_1,
@@ -31,7 +31,7 @@ enum CameraState
     CameraStatic_FollowPlayer_3
 };
 
-enum GLDrawType
+enum class GLDrawType
 {
     Triangle,
     Line_Strip,
@@ -40,30 +40,45 @@ enum GLDrawType
     PolygonMode
 };
 
-enum MeshShape
+enum class MeshShape
 {
    Cube,
    Sphere,
    Pyramid
 };
 
-enum TextureType
+enum class TextureType
 {
     Wall = 0,
-    Container = 1
+    Container = 1,
+    SnowFlake = 2
 };
 
-enum LightType
+enum class LightType
 {
     Default = 0,
     Slope = 1
 };
 
-enum CollisionTypes
+enum class CollisionType
 {
     AABB,
     AABBInverse,
-    TrackPlayer,
-    ProjectileHit,
-    AABBConvex
+    BallBall,
+    BallBallInverse
+
+};
+
+enum class BoundTypes
+{
+    AABB = 0,
+    Sphere = 1
+};
+
+enum class ParticleType
+{
+    None,
+    Snow,
+    Rain,
+    Vortex
 };

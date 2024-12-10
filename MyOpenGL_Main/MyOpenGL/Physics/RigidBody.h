@@ -15,7 +15,8 @@ public:
 	glm::vec3 velocity;
 	glm::vec3 acceleration;
 	float friction = 0.0f;
-
+	glm::vec3 gravity = { 0.f,-9.81f,0.f };
+	
 	RigidBody(float mass = 1.0f, const glm::vec3& pos = glm::vec3(0.0f), const glm::vec3& velocity = glm::vec3(0.0f), const glm::vec3& acceleration = glm::vec3(0.0f));
 	void Update(float dt, const glm::vec3& minBound, const glm::vec3& maxBound);
 	void Update(float dt);
@@ -39,9 +40,13 @@ public:
 	//Domain constraint
 	void ConstraintPosition(const glm::vec3& minBound, const glm::vec3& maxBound);
 
+	//Acceleration vector
 	void Roll(const glm::vec3& baryCoords);
 
 	void SetLocalPosition(const glm::vec3& _pos);
 	glm::vec3 GetLocalPosition() const;
+
+	//Change parameter values
+	void SetMass(float _mass);
 };
 

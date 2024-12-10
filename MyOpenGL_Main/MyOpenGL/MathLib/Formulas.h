@@ -508,6 +508,7 @@ struct MathLib
         return newNormals;
     }
 
+
     //Hash maps
     template<typename T1, typename T2>
     struct PairHash
@@ -562,4 +563,6 @@ struct MathLib
         }
         return fric;
     }
+
+    
 };

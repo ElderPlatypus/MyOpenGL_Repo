@@ -2,7 +2,7 @@
 
 ///Constructor and Destructor
 Mesh::Mesh(const std::string& type, const std::vector<Vertex>& vertices,
-           const std::vector<Index>& indices, const bool& useTex,const GLDrawType& GLdrawType) 
+           const std::vector<Index>& indices, const bool& useTex,const GLDrawType& GLdrawType)
            : mVertices(vertices), mIndices(indices), mType(type), drawType(GLdrawType)
 {
     configureMesh();
@@ -56,13 +56,13 @@ void Mesh::drawActor(const std::shared_ptr<Shader>& shader) const
         glBindVertexArray(mVAO);
         switch (drawType)
         {
-        case Triangle: 
+        case GLDrawType::Triangle:
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0);  break;
-        case Line_Strip:
+        case GLDrawType::Line_Strip:
             glDrawElements(GL_LINE_STRIP, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); break;
-        case Points:
+        case GLDrawType::Points:
             glDrawElements(GL_POINTS, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); break;
-        case Triangle_Fan: 
+        case GLDrawType::Triangle_Fan:
             glDrawElements(GL_TRIANGLE_FAN, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); break;
         default:
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mIndices.size()), GL_UNSIGNED_INT, 0); break;
@@ -96,7 +96,7 @@ void Mesh::TexConfig(const bool& useTexture, const TextureType& texType)
     mTexType = texType;
     mShader->use();
     mShader->setBool("useTex", useTexture);
-    mShader->setInt("texType", mTexType);
+    mShader->setInt("texType", (int)mTexType);
 }
 
 void Mesh::SetShaderDefaults(bool useLight) const 
@@ -173,10 +173,10 @@ void Mesh::LightConfig(const bool& useLight, const LightType& lightType)
         //Selecting light type
         switch (lightType)
         {
-        case Default: 
+        case LightType::Default: 
             mShader->setVec3("objectColor", mObjectColor);
             break;
-        case Slope: 
+        case LightType::Slope:
         {
             CalculateSlopeColour();
             mShader->setVec3("objectColor", slopeColour);
