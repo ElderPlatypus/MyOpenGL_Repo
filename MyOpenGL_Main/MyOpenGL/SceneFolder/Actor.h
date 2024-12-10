@@ -33,21 +33,20 @@ class Actor : public Mesh
 {
 private:
     std::shared_ptr<Mesh> mMesh; 
-
+    CollisionType collisionType{};
 
 public:
     ///Constructor & Destructor
     //---------------------------------Members------------------------------------------------
     std::string mName;
     //---------------------------------Methods------------------------------------------------
-    Actor(const std::shared_ptr<Mesh>& mesh, const std::string &name);
-
+    Actor() = default;
+    Actor(const std::shared_ptr<Mesh>& mesh, const std::string& name);
+    Actor(const std::shared_ptr<Mesh>& mesh, const std::string& name, CollisionType type);
     Actor(const std::shared_ptr<Actor>&) = delete;
     Actor& operator = (const std::shared_ptr<Actor>) = delete;
     Actor(const std::shared_ptr<Actor>&&) = delete;
     Actor& operator = (const std::shared_ptr<Actor>&&) = delete;
-
-    Actor() = default; 
     ~Actor();
 
 
@@ -70,18 +69,16 @@ public:
 
     ///Physics
     //---------------------------------Methods------------------------------------------------
-    std::shared_ptr<RigidBody> rigidB = std::make_shared<RigidBody>();
+    std::shared_ptr<RigidBody> rigidB;
     bool mEnablePhysics = false; 
-    glm::vec3 mVelocity = { 0.f,0.f,0.f };
-    glm::vec3 mAcceleration = { 0.f,0.f,0.f };
     float mMaxSpeed = 20.f;
-    void UpdateVelocity(float dt);
     void EnablePhysics(const bool& enablePhysics);
 
     ///Collision
     //---------------------------------Members------------------------------------------------ 
     inline static int Health = 100;
     bool die = false;
+    CollisionType getCollisionType() const;
 
     ///Barycentric Coordinates
     //---------------------------------Members------------------------------------------------
@@ -191,10 +188,10 @@ public:
     const bool GetLightBool() const { return mMesh->mUseLight; } 
     const LightType GetLightType() const { return mMesh->mlightType; }  
     //---------------------------------Methods Setters------------------------------------------------ 
-    const float SetAmbientStrengt(const float& ambientStrength) { mMesh->mAmbientStrength = ambientStrength; }
-    const glm::vec3 SetLightColor(const glm::vec3 lightColour) { mMesh->mLightColor = lightColour; }
-    const glm::vec3 SetLightPos(const glm::vec3 lightPos) { mMesh->mLightPos = lightPos; }
-    const glm::vec3 SetObjectColor(const glm::vec3 objectColour) { mMesh->mObjectColor = objectColour; }
+    void SetAmbientStrengt(const float& ambientStrength) { mMesh->mAmbientStrength = ambientStrength; }
+    void SetLightColor(const glm::vec3& lightColour) { mMesh->mLightColor = lightColour; }
+    void SetLightPos(const glm::vec3& lightPos) { mMesh->mLightPos = lightPos; }
+    void SetObjectColor(const glm::vec3& objectColour) { mMesh->mObjectColor = objectColour; }
 
 
 };

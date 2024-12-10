@@ -1,12 +1,38 @@
 #include "Actor.h"
 
 ///Acor constructor/destructor
-Actor::Actor(const std::shared_ptr<Mesh>& mesh, const std::string& name): mMesh(mesh), mName(name)
+Actor::Actor(const std::shared_ptr<Mesh>& mesh, const std::string& name)
+    : mMesh(mesh), mName(name), rigidB(std::make_shared<RigidBody>()) 
 {
     mId++;
     mEnablePhysics = false;
-    rigidB->pos = mMesh->GetLocalPosition(); 
-    rigidB->acceleration = Environment::gravitationalAcceleraton; 
+
+    if (mMesh) 
+    {
+        rigidB->pos = mMesh->GetLocalPosition();
+    }
+    else 
+    {
+        rigidB->pos = glm::vec3(0.0f);
+    }
+    rigidB->acceleration = Environment::gravitationalAcceleraton;
+}
+
+Actor::Actor(const std::shared_ptr<Mesh>& mesh, const std::string& name, CollisionType type)
+    : mMesh(mesh), mName(name), rigidB(std::make_shared<RigidBody>()), collisionType(type)
+{
+    mId++;
+    mEnablePhysics = false;
+
+    if (mMesh)
+    {
+        rigidB->pos = mMesh->GetLocalPosition();
+    }
+    else
+    {
+        rigidB->pos = glm::vec3(0.0f);
+    }
+    rigidB->acceleration = Environment::gravitationalAcceleraton;
 }
 
 Actor::~Actor()
@@ -14,7 +40,6 @@ Actor::~Actor()
     if (!mMesh) return;  
 
     mMesh->~Mesh();
-    mMesh = nullptr; 
 }
 
 void Actor::ExtrudeMesh(Extrude _increase_or_decrease, const float& _extrude) const
@@ -25,7 +50,7 @@ void Actor::ExtrudeMesh(Extrude _increase_or_decrease, const float& _extrude) co
     }
     switch (_increase_or_decrease)
     {
-    case Increase:
+    case Extrude::Increase:
         {
          for (auto& getVert : mMesh->mVertices)
          {
@@ -38,7 +63,7 @@ void Actor::ExtrudeMesh(Extrude _increase_or_decrease, const float& _extrude) co
 
          break;
         }
-    case Decrease: 
+    case Extrude::Decrease:
        {
         for (auto& getVert: mMesh->mVertices)
         {
@@ -50,20 +75,6 @@ void Actor::ExtrudeMesh(Extrude _increase_or_decrease, const float& _extrude) co
     }
 }
 
-void Actor::UpdateVelocity(float dt)
-{
-    //Updating the velocity 
-    mVelocity += mAcceleration * dt;
-
-    //If the velocity exceeds the maximum speed, it is normalized: (unity vector) with
-    //size of 1 and the multiplied with the max speed until criteria is not true.
-    if (glm::length(mVelocity) > mMaxSpeed)
-    {
-        mVelocity = glm::normalize(mVelocity) * mMaxSpeed;
-    }
-
-    mAcceleration = glm::vec3(0.f);
-}
 
 void Actor::EnablePhysics(const bool& enablePhysics)
 {
@@ -78,6 +89,11 @@ void Actor::EnablePhysics(const bool& enablePhysics)
         //std::cout << "[LOG]:Actor Physics Updated Successfully \n";
     }
     //std::cout << "\n";
+}
+
+CollisionType Actor::getCollisionType() const
+{
+    return collisionType;
 }
 
 
@@ -120,28 +136,28 @@ void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& ca
         switch (direction)
         {
             //Forward & Backwards
-        case Forward:
+        case Direction::Forward: 
             movement += mMovementSpeed * dt * front; break;
-        case Backwards:
+        case Direction::Backwards:
             movement -= mMovementSpeed * dt * front; break;
 
             //Left & Right
-        case Left:
+        case Direction::Left:
             movement -= mMovementSpeed * dt * right; break;
-        case Right:
+        case Direction::Right:
             movement += mMovementSpeed * dt * right; break;
 
             //Up & Down
-        case Up:
+        case Direction::Up:
             movement += mMovementSpeed * dt * up; break;
-        case Down:
+        case Direction::Down:
             movement -= mMovementSpeed * dt * up; break;
 
             //Increase Speed
-        case IncreaseSpeed:
+        case Direction::IncreaseSpeed:
             mMovementSpeed = 50.0f;
             break;
-        case NormalSpeed:
+        case Direction::NormalSpeed:
             mMovementSpeed = 15.0f;
             break;
 
@@ -165,28 +181,28 @@ void Actor::ActorMovement(Direction direction, const std::shared_ptr<Camera>& ca
         switch (direction)
         {
             //Forward & Backwards
-        case Forward: 
+        case Direction::Forward: 
             movement += mMovementSpeed * dt * front; break;  
-        case Backwards:
+        case Direction::Backwards:
             movement -= mMovementSpeed * dt * front; break;
 
             //Left & Right
-        case Left:
+        case Direction::Left:
             movement -= mMovementSpeed * dt * right; break;
-        case Right:                                   
+        case Direction::Right:
             movement += mMovementSpeed * dt * right; break; 
 
             //Up & Down
-        case Up:
+        case Direction::Up:
             movement += mMovementSpeed * dt * up; break;
-        case Down:
+        case Direction::Down:
             movement -= mMovementSpeed * dt * up; break;
 
             //Increase Speed
-        case IncreaseSpeed:
+        case Direction::IncreaseSpeed:
             mMovementSpeed = camera->GetAccelerationSpeed() * 1.5f;
             break;
-        case NormalSpeed:
+        case Direction::NormalSpeed:
             mMovementSpeed = mMovementSpeed; 
             break;
 
@@ -212,17 +228,17 @@ void Actor::CameraStateControll(CameraState state, const std::shared_ptr<Camera>
 {
     switch (state)
     {
-      case CameraFreeMovement_1:
+    case CameraState::CameraFreeMovement_1:
             DetachCamera(); 
             camera->mUseCameraMovement = true; 
             break;
 
-      case CameraStatic_CharacterMovement_2:
+      case CameraState::CameraStatic_CharacterMovement_2:
             DetachCamera();
             camera->mUseCameraMovement = false; 
             break;
 
-      case CameraStatic_FollowPlayer_3:  
+      case CameraState::CameraStatic_FollowPlayer_3:
           if (mAttachToActor)
           {
               AttachCamera();
@@ -276,11 +292,11 @@ void Actor::AI_Path(float dt)
 ///Camera Support
 bool Actor::Shoot(Mouse shoot, float dt) const
 {
-    if (!isPlayer || !shoot)  
+    if (!isPlayer || !(bool)shoot)  
     {
         return false;
     }
-    if (shoot)
+    if ((bool)shoot)
     {
         std::cout << "shoot\n";
         isShooting = true;
@@ -301,7 +317,6 @@ void Actor::UpdateActors(float dt)
         if (mEnablePhysics)
         {
             mMesh->SetLocalPosition(rigidB->pos); 
-            UpdateVelocity(dt); 
             rigidB->Update(dt);
             mMesh->mCenter = GetLocalPosition();
         }

@@ -17,7 +17,7 @@ void RigidBody::Update(float dt)
 	velocity += acceleration * dt - friction; 
 	pos += velocity * dt + 0.5f * acceleration * (dt*dt); 
 
-	velocity *= 0.98f; 
+	//velocity *= 0.99f;  
 }
 
 void RigidBody::ApplyForce(glm::vec3 force)
@@ -84,9 +84,13 @@ void RigidBody::ConstraintPosition(const glm::vec3& minBound, const glm::vec3& m
 	}
 }
 
-void RigidBody::Roll(const glm::vec3& baryCoords)
+void RigidBody::Roll(const glm::vec3& surfaceCoords)
 {
-	 acceleration =  9.81f * glm::vec3(baryCoords.x * baryCoords.y, (baryCoords.y * baryCoords.y) - 1, baryCoords.z * baryCoords.y); 
+	// Normalize the surface normal
+	glm::vec3 normalizedSurface = glm::normalize(surfaceCoords);
+
+	// Calculate rolling acceleration: projection of gravity onto the surface
+	acceleration = gravity - glm::dot(gravity, normalizedSurface) * normalizedSurface;
 }
 
 void RigidBody::SetLocalPosition(const glm::vec3& _pos)
@@ -97,5 +101,10 @@ void RigidBody::SetLocalPosition(const glm::vec3& _pos)
 glm::vec3 RigidBody::GetLocalPosition() const
 {
 	return pos;
+}
+
+void RigidBody::SetMass(float _mass)
+{
+	mass = _mass;
 }
 

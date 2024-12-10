@@ -26,10 +26,7 @@ public:
 	{
 		//std::cout<< "[LOG]:ComponentInterface Created \n";
 	};
-	virtual ~IComponent()
-	{
-		//std::cout << "[LOG]:ComponentInterface Destroyed \n";
-	};
+	virtual ~IComponent() = default;
 };
 
 template<typename T>
@@ -40,52 +37,51 @@ public:
 	{
 		std::cout << "[LOG]:ComponentArchive Type: " <<  typeid(T).name() << "\n";
 	}
-	/*~ComponentArchive() override
-	{
-		std::cout << "[LOG]:ComponentArchive Destroyed \n";
-	}*/
 
 private:
 	std::unordered_map<std::string, std::vector<std::shared_ptr<T>>> m_componentArchive; 
 
 public:
-	void AddComponent(const std::string& _entityType, const std::shared_ptr<T>& _component)   
+	//Add component
+	void AddComponent(const std::string& _componentType, const std::shared_ptr<T>& _component)   
 	{
-		if (_entityType.empty() || !_component)      
+		if (_componentType.empty() || !_component)
 		{
 			throw std::runtime_error("[LOG]:Component not found or id doesnt exists.");  
 		}   
-		m_componentArchive[_entityType].emplace_back(_component); 
+		m_componentArchive[_componentType].emplace_back(_component); 
 	}
 
-	std::shared_ptr<T> GetComponent(const std::string& _entityType) 
+	//Get component single
+	std::shared_ptr<T> GetComponent(const std::string& _entityType, const std::shared_ptr<T> _component) 
 	{
-		try
+		//
+		auto content = m_componentArchive.find(_entityType);
+
+		if(content != m_componentArchive.end() || !content->second.empty) 
 		{
-			return m_componentArchive[_entityType]->front();  
+			return content->second; 
 		}
-		catch (const std::exception& e) {
-			// Catch any exception thrown during the execution
-			// of divide function
-			std::cerr << "Exception caught: " << e.what() << std::endl;
-			return nullptr;
-		}
+		return nullptr;
 	}
 
+	//Flag if component exists
 	bool HasComponent(const std::string& _entityType) 
 	{
 		return m_componentArchive.find(_entityType) != m_componentArchive.end(); 
 	}
 
-	void RemoveComponent(const std::shared_ptr<std::string>& _entityType)
+	//Remove component
+	void RemoveComponent(const std::string& _entityType)
 	{
 		if (!HasComponent(_entityType))
 		{
-			throw std::runtime_error("[ERROR]:Component not found for the given entity ID.");
+			throw std::runtime_error("[ERROR]:Component type not found.");
 		}
 		m_componentArchive->erase(_entityType);  
 	}
 
+	//Get all components
 	std::unordered_map<std::string, std::vector<std::shared_ptr<T>>> GetAllComponents() const 
 	{
 		return m_componentArchive;
@@ -98,21 +94,18 @@ struct TransformComponent : public IComponent
 {
 	void displayComponent() override
 	{
-		std::cout << "TransformComponent";
+		std::cout << "[LOG]:TransformComponent";
 	}
-	std::vector<float> X;
-	std::vector<float> Y;
-	std::vector<float> Z;
 	std::vector<glm::vec3> m_pos; 
-	glm::quat m_Rotation = { 0,0,0,0 };
-	int _Size = 0;
+	std::vector<glm::quat> m_Rotation;
+	std::vector<int> scale;
 };
 
 struct HealthComponent : public IComponent
 {
 	void displayComponent() override
 	{
-		std::cout << "HealthComponent";
+		std::cout << "[LOG]:HealthComponent";
 	}
 	std::vector<int> health;
 };
@@ -121,7 +114,7 @@ struct DamageComponent : public IComponent
 {
 	void displayComponent() override
 	{
-		std::cout << "DamageComponent";
+		std::cout << "[LOG]:DamageComponent";
 	}
 	std::vector<int> damage;
 };
@@ -130,8 +123,19 @@ struct PhysicsComponent : public IComponent
 {
 	void displayComponent() override
 	{
-		std::cout << "[LOG:]PhysicsComponent Created";
+		std::cout << "[LOG]:PhysicsComponent Created";
 	}
+	std::vector<bool> m_EnablePhysics;
 };
+
+struct SceneGraphComponent : public IComponent
+{
+	void displayComponent() override
+	{
+		std::cout << "[LOG]:SceneGraphComponent Created";
+	}
+	std::unordered_map<std::string, std::shared_ptr<Actor>> uActorMap;
+};
+
 
 

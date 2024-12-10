@@ -82,8 +82,29 @@ std::shared_ptr<T> CubeShape(float size)
         // Bottom face
         20, 21, 22, 20, 22, 23
     };
-    return std::make_shared<T>("Cube", vertices, indices, true, Triangle);
+    return std::make_shared<T>("Cube", vertices, indices, true, GLDrawType::Triangle);
 };
+
+
+template <typename T>
+std::shared_ptr<T> FlatPlaneXZShape(float size)
+{
+    std::vector<Vertex> vertices = {
+    { { -size, 0.f, -size}, {0.0f,  0.0f,  1.0f}, {0.0f, 0.0f} }, // Bottom-left    
+    { {  size, 0.f, -size}, {0.0f,  0.0f,  1.0f}, {1.0f, 0.0f} }, // Bottom-right  
+    { {  size, 0.f,  size}, {0.0f,  0.0f,  1.0f}, {1.0f, 1.0f} }, // Top-right 
+    { { -size, 0.f,  size}, {0.0f,  0.0f,  1.0f}, {0.0f, 1.0f} }, // Top-left
+    };
+
+    std::vector<Index> indices = {
+        // Front face
+        0, 1, 2, 0, 2, 3
+    };
+
+
+    return std::make_shared<T>("Square", vertices, indices, true, GLDrawType::Triangle);
+};
+
 
 template <typename T>
 std::shared_ptr<T> TriangleShape(float size)
@@ -101,7 +122,7 @@ std::shared_ptr<T> TriangleShape(float size)
         0,1,2
     };
 
-    return std::make_shared<T>("2DTriangle", vertices, indices, true, Triangle);
+    return std::make_shared<T>("2DTriangle", vertices, indices, true, GLDrawType::Triangle);
 };
 
 template <typename T>
@@ -154,7 +175,7 @@ std::shared_ptr<T> PyramidShape(float size)
         13,14,15
     };
 
-    return std::make_shared<T>("Pyramid", vertices, indices, true, Triangle);
+    return std::make_shared<T>("Pyramid", vertices, indices, true, GLDrawType::Triangle);
 
 };
 
@@ -226,7 +247,7 @@ std::shared_ptr<T> SphereShape(const int& stackCount, const int& sectorCount, co
             }
         }
     }
-    return std::make_shared<T>("Sphere", vertices, indices, true, Triangle);
+    return std::make_shared<T>("Sphere", vertices, indices, true, GLDrawType::Triangle);
 }
 
 template <typename T>
@@ -249,7 +270,7 @@ std::shared_ptr<T> CircleShape(const glm::vec3& origin, const float& radius, con
         vertices.emplace_back(x + (radius * glm::cos(i * diam / num_segment)), 0.f, z + (radius * glm::sin(i * diam / num_segment))); 
         indices.emplace_back(i);
     }
-    return std::make_shared<T>("Circle", vertices, indices, true, Triangle_Fan); 
+    return std::make_shared<T>("Circle", vertices, indices, true, GLDrawType::Triangle_Fan);  
 }
 
 
@@ -300,7 +321,7 @@ std::shared_ptr<T> BSplineSurfaceShape(const int& resU, const int& resV, const i
             indices.push_back(bottomRight);
         }
     }
-    return std::make_shared<T>("BSplineSurface", vertices, indices, true, Triangle);
+    return std::make_shared<T>("BSplineSurface", vertices, indices, true, GLDrawType::Triangle);
 }
 
 template <typename T>
@@ -353,7 +374,7 @@ std::shared_ptr<T> InterpolationCurve3PointsShape(const glm::vec2& p1, const glm
         indices.emplace_back(i);
     }
 
-    return std::make_shared<T>("InterpolationCurve", vertices, indices, true, Line_Strip); 
+    return std::make_shared<T>("InterpolationCurve", vertices, indices, true, GLDrawType::Line_Strip);
 }
 
 template <typename T>
@@ -415,7 +436,7 @@ std::shared_ptr<T> PlaneXZShape(const float& xMin, const float& zMin, const floa
         //std::cout << "[LOG]:Normal Values X:" << testing[index].x << " Y:" << testing[index].y << " Z:" << testing[index].z <<"\n";    
     }
     std::cout << "[LOG]:Finished Loading\n\n";  
-    return std::make_shared<T>("PlaneXZ", vertices, indices, true, Triangle);
+    return std::make_shared<T>("PlaneXZ", vertices, indices, true, GLDrawType::Triangle);
 }
 
 template <typename T>
@@ -460,7 +481,7 @@ std::shared_ptr<T> PlaneXYShape(const float& xMin, const float& yMin, const floa
         }
     }
 
-    return std::make_shared<T>("PlaneXY", vertices, indices, true, Triangle);
+    return std::make_shared<T>("PlaneXY", vertices, indices, true, GLDrawType::Triangle);
 
 }
 
@@ -591,7 +612,7 @@ std::shared_ptr<T> TriangualtionGridFromLas(const char* _fileDirectory, const fl
         //std::cout << "[LOG]:Normal Values X:" << normals[index].x << " Y:" << normals[index].y << " Z:" << normals[index].z <<"\n";
     } 
 
-    return std::make_shared<T>("TriangualtionGrid", newVertices, newIndices, true, Triangle);     
+    return std::make_shared<T>("TriangualtionGrid", newVertices, newIndices, true, GLDrawType::Triangle);
 }
 
 template <typename T>
@@ -659,7 +680,7 @@ template <typename T>
 std::shared_ptr<T> PointCloudFromLas(const char* _fileDirectory, float _scaleFactor)
 {
     auto data = MathLib::LoadLAS_Data(_fileDirectory, _scaleFactor);
-    return std::make_shared<T>("PointCloud", data.first, data.second, false, Points);  
+    return std::make_shared<T>("PointCloud", data.first, data.second, false, GLDrawType::Points);
 }
 
 

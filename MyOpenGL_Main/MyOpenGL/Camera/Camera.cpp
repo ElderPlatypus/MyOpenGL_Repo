@@ -105,13 +105,13 @@ void Camera::CameraMovement(Direction direction, float dt)
     switch (direction)
     {
     	//Forward and Backwards
-	    case Forward: mAcceleration.z += GetAccelerationSpeed(); break;
-        case Backwards:mAcceleration.z -= GetAccelerationSpeed(); break;;
-        case Right:mAcceleration.x += GetAccelerationSpeed(); break;
-        case Left:mAcceleration.x -= GetAccelerationSpeed(); break;
-        case Up:mAcceleration.y += GetAccelerationSpeed(); break;
-        case Down:mAcceleration.y -= GetAccelerationSpeed(); break;
-        case IncreaseSpeed: mAcceleration *= 3.0f, mMaxMovementSpeed = 70.f; break;
+	    case Direction::Forward: mAcceleration.z += GetAccelerationSpeed(); break;
+        case Direction::Backwards:mAcceleration.z -= GetAccelerationSpeed(); break;;
+        case Direction::Right:mAcceleration.x += GetAccelerationSpeed(); break;
+        case Direction::Left:mAcceleration.x -= GetAccelerationSpeed(); break;
+        case Direction::Up:mAcceleration.y += GetAccelerationSpeed(); break;
+        case Direction::Down:mAcceleration.y -= GetAccelerationSpeed(); break;
+        case Direction::IncreaseSpeed: mAcceleration *= 3.0f, mMaxMovementSpeed = 70.f; break;
 
         default: mAcceleration = glm::vec3(0.f, 0.f, 0.f), mMaxMovementSpeed = 50.f;
     }

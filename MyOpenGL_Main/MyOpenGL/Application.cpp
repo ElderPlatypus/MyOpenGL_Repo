@@ -285,21 +285,21 @@ void Application::UpdateActorMovement(float dt)
         if (mScene->uActorMap.find("Player")->second->isPlayer)
         {
             //Movement Keys
-            if (mKeyState[GLFW_KEY_W]) mScene->uActorMap.find("Player")->second->ActorMovement(Forward, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_A]) mScene->uActorMap.find("Player")->second->ActorMovement(Left, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_S]) mScene->uActorMap.find("Player")->second->ActorMovement(Backwards, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_D]) mScene->uActorMap.find("Player")->second->ActorMovement(Right, mScene->mSceneCamera, dt);
-            if (mKeyState[GLFW_KEY_SPACE]) mScene->uActorMap.find("Player")->second->ActorMovement(Up, mScene->mSceneCamera, dt); 
-            if (mKeyState[GLFW_KEY_LEFT_ALT]) mScene->uActorMap.find("Player")->second->ActorMovement(Down, mScene->mSceneCamera, dt); 
+            if (mKeyState[GLFW_KEY_W]) mScene->uActorMap.find("Player")->second->ActorMovement(Direction::Forward, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_A]) mScene->uActorMap.find("Player")->second->ActorMovement(Direction::Left, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_S]) mScene->uActorMap.find("Player")->second->ActorMovement(Direction::Backwards, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_D]) mScene->uActorMap.find("Player")->second->ActorMovement(Direction::Right, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_SPACE]) mScene->uActorMap.find("Player")->second->ActorMovement(Direction::Up, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_LEFT_ALT]) mScene->uActorMap.find("Player")->second->ActorMovement(Direction::Down, mScene->mSceneCamera, dt);
 
             //Increase Speed
-            if (mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->uActorMap.find("Player")->second->ActorMovement(IncreaseSpeed, mScene->mSceneCamera, dt);
-            if (!mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->uActorMap.find("Player")->second->ActorMovement(NormalSpeed, mScene->mSceneCamera, dt);
+            if (mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->uActorMap.find("Player")->second->ActorMovement(Direction::IncreaseSpeed, mScene->mSceneCamera, dt);
+            if (!mKeyState[GLFW_KEY_LEFT_SHIFT]) mScene->uActorMap.find("Player")->second->ActorMovement(Direction::NormalSpeed, mScene->mSceneCamera, dt);
         }
 
         if (mScene->uActorMap.find("Player")->second->isPlayer)
         {
-            if(mButtonState[GLFW_MOUSE_BUTTON_LEFT]) mScene->uActorMap.find("Player")->second->Shoot(LeftMouseButton,dt);  
+            if(mButtonState[GLFW_MOUSE_BUTTON_LEFT]) mScene->uActorMap.find("Player")->second->Shoot(Mouse::LeftMouseButton,dt);  
         }
 
 
@@ -309,9 +309,9 @@ void Application::UpdateCameraPlacement(float dt)
 { 
     if (mScene->uActorMap.find("Player")->second->isPlayer)
     {
-        if (mKeyState[GLFW_KEY_1]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraFreeMovement_1, mScene->mSceneCamera, dt);
-        if (mKeyState[GLFW_KEY_2]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
-        if (mKeyState[GLFW_KEY_3]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt);
+        if (mKeyState[GLFW_KEY_1]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraState::CameraFreeMovement_1, mScene->mSceneCamera, dt);
+        if (mKeyState[GLFW_KEY_2]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraState::CameraStatic_CharacterMovement_2, mScene->mSceneCamera, dt);
+        if (mKeyState[GLFW_KEY_3]) mScene->uActorMap.find("Player")->second->CameraStateControll(CameraState::CameraStatic_FollowPlayer_3, mScene->mSceneCamera, dt);
     
     }
 }
