@@ -139,7 +139,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\Lenovo\Documents\Spilltech2024_H\MyOpenGL_Repo\MyOpenGL_Main\MyOpenGL\Dependency\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;laszip64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;laszip64.lib;lua54.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
@@ -164,6 +164,11 @@
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="Camera\Camera.h" />
+    <ClInclude Include="Dependency\includes\LUA\lauxlib.h" />
+    <ClInclude Include="Dependency\includes\LUA\lua.h" />
+    <ClInclude Include="Dependency\includes\LUA\lua.hpp" />
+    <ClInclude Include="Dependency\includes\LUA\luaconf.h" />
+    <ClInclude Include="Dependency\includes\LUA\lualib.h" />
     <ClInclude Include="Dependency\includes\stb\stb_image.h" />
     <ClInclude Include="ECS\Components.h" />
     <ClInclude Include="ECS\Systems.h" />
@@ -173,6 +178,7 @@
     <ClInclude Include="includes\glm\mat4x3.hpp" />
     <ClInclude Include="includes\KHR\khrplatform.h" />
     <ClInclude Include="MathLib\Formulas.h" />
+    <ClInclude Include="LUA\Lua.h" />
     <ClInclude Include="MathLib\Shapes.h" />
     <ClInclude Include="MathLib\SpatialPartition.h" />
     <ClInclude Include="Physics\BoundingRegion.h" />
@@ -196,6 +202,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="LUA\Scripts\script.lua" />
     <None Include="Shaders\FragmentShader.fs" />
     <None Include="Shaders\VertexShader.vs" />
   </ItemGroup>

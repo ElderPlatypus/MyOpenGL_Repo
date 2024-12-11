@@ -564,5 +564,14 @@ struct MathLib
         return fric;
     }
 
-    
+    //Ransom Generators
+    static glm::vec3 CreateRandomVec3(const float& distribMin, const float& distribMax)
+    {
+        std::random_device rd;
+        std::mt19937 eng(rd());
+        std::uniform_real_distribution<float> random(distribMin, distribMax); 
+        glm::vec3 randVec(random(eng), random(eng), random(eng));
+        return randVec;
+    }
+
 };

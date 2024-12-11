@@ -166,7 +166,7 @@ public:
 	//---------------------------------Members------------------------------------------
 	float mAmbientStrength = 1.0f;
 	float mSpecularStrength = 0.5f;
-	glm::vec3 mLightColor{ 1.0f, 1.0f, 1.0f };
+	glm::vec3 mLightColor{ 0.5f, 0.5f, 0.5f };
 	glm::vec3 mLightPos{ 0.f,100.f,0.f };
 	glm::vec3 mObjectColor{ 1.f, 0.f, 0.0f };
 	bool mUseLight = false;
