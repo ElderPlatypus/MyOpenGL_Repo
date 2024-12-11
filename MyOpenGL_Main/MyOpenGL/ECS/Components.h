@@ -15,17 +15,13 @@
 #include <iostream>
 #include <unordered_map>
 #include <memory>
-#include <stdexcept>
 #include <vector>
  
 ///Components
 class IComponent
 {
 public:
-	virtual void displayComponent()
-	{
-		//std::cout<< "[LOG]:ComponentInterface Created \n";
-	};
+	virtual void displayComponent() = 0;
 	virtual ~IComponent() = default;
 };
 
@@ -37,9 +33,8 @@ public:
 	{
 		std::cout << "[LOG]:ComponentArchive Type: " <<  typeid(T).name() << "\n";
 	}
-
 private:
-	std::unordered_map<std::string, std::vector<std::shared_ptr<T>>> m_componentArchive; 
+	std::unordered_map<std::string, std::shared_ptr<T>> m_componentArchive; 
 
 public:
 	//Add component
@@ -49,16 +44,16 @@ public:
 		{
 			throw std::runtime_error("[LOG]:Component not found or id doesnt exists.");  
 		}   
-		m_componentArchive[_componentType].emplace_back(_component); 
+		m_componentArchive[_componentType] = _component; 
 	}
 
 	//Get component single
-	std::shared_ptr<T> GetComponent(const std::string& _entityType, const std::shared_ptr<T> _component) 
+	std::shared_ptr<T> GetComponent(const std::string& _entityType) 
 	{
 		//
 		auto content = m_componentArchive.find(_entityType);
 
-		if(content != m_componentArchive.end() || !content->second.empty) 
+		if(content != m_componentArchive.end()) 
 		{
 			return content->second; 
 		}
@@ -82,7 +77,7 @@ public:
 	}
 
 	//Get all components
-	std::unordered_map<std::string, std::vector<std::shared_ptr<T>>> GetAllComponents() const 
+	const auto& GetAllComponents() const 
 	{
 		return m_componentArchive;
 	}
@@ -92,49 +87,53 @@ public:
 //TypeComponents
 struct TransformComponent : public IComponent
 {
-	void displayComponent() override
-	{
-		std::cout << "[LOG]:TransformComponent";
-	}
-	std::vector<glm::vec3> m_pos; 
+	std::vector<glm::vec3> m_pos;
 	std::vector<glm::quat> m_Rotation;
 	std::vector<int> scale;
+
+	void displayComponent() override
+	{
+		std::cout << "[LOG]:TransformComponent\n";
+	}
 };
 
 struct HealthComponent : public IComponent
 {
+	std::vector<int> health;
 	void displayComponent() override
 	{
-		std::cout << "[LOG]:HealthComponent";
+		std::cout << "[LOG]:HealthComponent\n";
 	}
-	std::vector<int> health;
 };
 
 struct DamageComponent : public IComponent
 {
+	std::vector<int> damage;
 	void displayComponent() override
 	{
-		std::cout << "[LOG]:DamageComponent";
+		std::cout << "[LOG]:DamageComponent\n";
 	}
-	std::vector<int> damage;
 };
 
 struct PhysicsComponent : public IComponent
 {
+	std::vector<bool> m_EnablePhysics;
 	void displayComponent() override
 	{
-		std::cout << "[LOG]:PhysicsComponent Created";
+		std::cout << "[LOG]:PhysicsComponent Created\n";
 	}
-	std::vector<bool> m_EnablePhysics;
 };
 
 struct SceneGraphComponent : public IComponent
 {
+	std::unordered_map<std::string, std::shared_ptr<Actor>> uActorMap;
+	std::unordered_map<std::string, std::shared_ptr<Actor>> uBoundsMap;
+	std::unordered_map<std::string, std::shared_ptr<Spawner>> uSpawnerMap;
+		 
 	void displayComponent() override
 	{
-		std::cout << "[LOG]:SceneGraphComponent Created";
+		std::cout << "[LOG]:SceneGraphComponent Created\n";
 	}
-	std::unordered_map<std::string, std::shared_ptr<Actor>> uActorMap;
 };
 
 

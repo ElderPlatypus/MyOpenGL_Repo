@@ -32,7 +32,7 @@ struct Collision
 	}
 
 	template<typename Actor, typename BoundingRegionActor>
-	static bool AABBInverse(const std::shared_ptr<Actor>& a, const std::shared_ptr<BoundingRegionActor>& b)
+	static bool AABBInverse(const std::shared_ptr<Actor>& a, const std::shared_ptr<BoundingRegionActor>& b) 
 	{
 		// Ensure both actors are valid before proceeding
 		if (!a || !b) return false;
@@ -51,7 +51,7 @@ struct Collision
 		// Flag to indicate if Actor a is outside the bounds of Actor b
 		bool outOfBound = false;
 
-		// Generate random velocity perturbation for realism (used when resolving collisions)
+		// Generate random velocity perturbation for realism 
 		std::random_device rd;
 		std::mt19937 eng(rd());
 		std::uniform_real_distribution<float> random(-0.5f, 0.5f);
@@ -76,13 +76,14 @@ struct Collision
 		// Check for overlap on the Y-axis
 		if (overlap.y > 0)
 		{
-			// Stop vertical movement by setting Y-axis velocity to zero
-			a->rigidB->velocity.y = 0;
+			// Reverse velocity on the X-axis and add a random perturbation
+			a->rigidB->velocity.y *= -1;
+			a->rigidB->velocity += randVec;
 
 			// Reposition Actor a within the legal bounds of Actor b on the Y-axis
 			a->rigidB->SetLocalPosition(glm::vec3(
 				a->rigidB->GetLocalPosition().x,
-				b->GetCenter().y - bExtent.y + aExtent.y,
+				b->GetCenter().y + glm::sign(centerDiff.y) * (bExtent.y - aExtent.y),
 				a->rigidB->GetLocalPosition().z));
 
 			outOfBound = true;
@@ -106,7 +107,6 @@ struct Collision
 
 		return outOfBound; // Return whether Actor a is out of bounds and required repositioning
 	}
-
 
 	template<typename Actor, typename Actor1>
 	static bool BallBall(const std::shared_ptr<Actor>& a, const std::shared_ptr<Actor1>& b)
@@ -145,7 +145,7 @@ struct Collision
 			if (impactSpeed < 0)
 			{
 				// Impulse is proportional to the impact speed and the collision normal
-				glm::vec3 impulse = collisionNormal * impactSpeed * 2.0f;
+				glm::vec3 impulse = collisionNormal * impactSpeed;
 
 				// Apply the impulse to both actors' velocities to simulate the collision response
 				a->rigidB->velocity -= impulse; // Actor 'a' slows down
@@ -172,7 +172,7 @@ struct Collision
 		// Compute the distance between the centers of the two spheres
 		float distance = glm::length(centerDiff);
 
-		// Retrieve the radii of the two spheres
+		// Retrieve the radius of the two spheres
 		float radiusA = a->GetExtent().x; // Radius of the smaller sphere (Actor a)
 		float radiusB = b->GetExtent().x; // Radius of the larger bounding sphere (Actor b)
 
@@ -206,10 +206,8 @@ struct Collision
 				glm::vec3 impulse = collisionNormal * impactSpeed * 2.0f;
 				a->rigidB->velocity -= impulse;
 			}
-
 			return true; // Collision occurred
 		}
-
 		return false; // No collision detected
 	}
 

@@ -3,6 +3,7 @@
 ParticleSimulation::ParticleSimulation(int _particleNumber, MeshShape _shape, ParticleType _pTypes)
 	: particleNumber(_particleNumber), shape(_shape), pt(_pTypes)
 {
+	spawners.reserve(_particleNumber);
 	spawners.emplace_back(std::make_shared<Spawner>(particleNumber, 1.0f, shape));
 	spawners.back()->EnablePhysics_all(true);
 }
@@ -130,7 +131,9 @@ void ParticleSimulation::UpdateSnowPartices(float dt)
 				//Reseting position on collision
 				glm::vec3 startPosition = glm::vec3(glm::vec3(random(eng), origin, random(eng)));
 				particle->rigidB->SetLocalPosition(startPosition);
-				//particle->rigidB->velocity = glm::vec3(0.0f);
+
+				//Changed code
+				particle->rigidB->velocity.y = 0;
 			}
 			for (const auto& [name,object] : objects)
 			{
@@ -212,7 +215,7 @@ void ParticleSimulation::UpdateRainParticles(float dt)
 		for (const auto& particle : spawner->spawnVector)
 		{
 			//Apply fallingspeed
-			float fallSpeed = -0.3f;
+			float fallSpeed = -1.0f;
 			particle->rigidB->velocity.y += fallSpeed; 
 
 			//Computing new position based on snow effect and velocity
@@ -228,6 +231,7 @@ void ParticleSimulation::UpdateRainParticles(float dt)
 			if (Collision::AABBInverse<Actor, Actor>(particle, bound))
 			{
 				//Reseting position on collision
+				particle->rigidB->velocity.y = 0.0f;
 				glm::vec3 startPosition = glm::vec3(glm::vec3(random(eng), origin, random(eng)));
 				particle->rigidB->SetLocalPosition(startPosition);
 			}

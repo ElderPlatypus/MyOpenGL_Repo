@@ -24,13 +24,17 @@
 #include "../MathLib/Formulas.h"
 #include "../Utility/FileHandler.h"
 #include "../Physics/ParticleSimulation.h" 
+#include "../LUA/Lua.h"
+
+//// Link to lua library
+//#include "../Dependency/includes/LUA/lua.hpp"
 
 class Scene 
 {
 	std::string mName;
 
 public:
-	std::unordered_map<std::string,std::shared_ptr<Actor>> uActorMap;
+	std::unordered_map<std::string, std::shared_ptr<Actor>> uActorMap;
 	std::unordered_map<std::string, std::shared_ptr<Texture>> uTextureMap; 
 	std::unordered_map<std::string, std::shared_ptr<ParticleSimulation>> uParticleMap;
 	std::unordered_map<std::string, std::shared_ptr<Spawner>> uSpawnerMap;
@@ -80,6 +84,8 @@ public:
 	std::shared_ptr<ComponentArchive<PhysicsComponent>> physicsManager = std::make_shared<ComponentArchive<PhysicsComponent>>();
 	std::shared_ptr<ComponentArchive<HealthComponent>> healthManager = std::make_shared<ComponentArchive<HealthComponent>>();
 	std::shared_ptr<ComponentArchive<DamageComponent>> damageManager = std::make_shared<ComponentArchive<DamageComponent>>();
+
+	std::shared_ptr<SceneGraphSystem> graphSystem = std::make_shared<SceneGraphSystem>(sceneGraphManager);
 
 
 	std::vector<std::vector<std::string>> terrainData;

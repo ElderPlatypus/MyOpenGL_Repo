@@ -102,7 +102,7 @@ void Mesh::TexConfig(const bool& useTexture, const TextureType& texType)
 void Mesh::SetShaderDefaults(bool useLight) const 
 {
     mShader->setBool("useLight", useLight);
-    mShader->setVec3("lightColor", glm::vec3(0.0f, 0.0f, 1.0f));
+    mShader->setVec3("lightColor", glm::vec3(0.0f, 0.5f, 1.0f));
     mShader->setVec3("lightPos", glm::vec3(0.f, 100.f, 0.f));
     mShader->setVec3("objectColor", glm::vec3(1.f, 0.f, 0.0f));
     mShader->setFloat("ambientStrength", 5.f);
