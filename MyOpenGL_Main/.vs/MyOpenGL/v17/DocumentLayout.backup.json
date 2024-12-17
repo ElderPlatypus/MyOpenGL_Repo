@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\LUA\\Scripts\\script.lua||{3B902123-F8A7-4915-9F01-361F908088D0}",
-      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\LUA\\Scripts\\script.lua||{3B902123-F8A7-4915-9F01-361F908088D0}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\LUA\\Lua.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\LUA\\Lua.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\LUA\\Scripts\\script.lua||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|solutionrelative:MyOpenGL\\LUA\\Scripts\\script.lua||{3B902123-F8A7-4915-9F01-361F908088D0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{C00E2A29-F0FA-4428-9A24-FA14D57FD404}|MyOpenGL\\MyOpenGL.vcxproj|C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\ECS\\Systems.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
@@ -62,8 +62,7 @@
               "RelativeToolTip": "MyOpenGL\\ECS\\Systems.h",
               "ViewState": "AgIAAAMAAAAAAAAAAAAAABwAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-12-09T19:22:20.537Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-09T19:22:20.537Z"
             },
             {
               "$type": "Document",
@@ -75,8 +74,7 @@
               "RelativeToolTip": "MyOpenGL\\ECS\\Components.h",
               "ViewState": "AgIAACcAAAAAAAAAAAAuwH0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-12-09T19:22:19.945Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-09T19:22:19.945Z"
             },
             {
               "$type": "Document",
@@ -88,8 +86,7 @@
               "RelativeToolTip": "MyOpenGL\\SceneFolder\\Scene.h",
               "ViewState": "AgIAAA4AAAAAAAAAAAAAABoAAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-12-08T15:43:57.592Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-08T15:43:57.592Z"
             },
             {
               "$type": "Document",
@@ -101,12 +98,11 @@
               "RelativeToolTip": "MyOpenGL\\SceneFolder\\Spawner.h",
               "ViewState": "AgIAAAsAAAAAAAAAAAAAACUAAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-12-10T15:51:18.373Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-10T15:51:18.373Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Lua.h",
               "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\LUA\\Lua.h",
               "RelativeDocumentMoniker": "MyOpenGL\\LUA\\Lua.h",
@@ -133,8 +129,7 @@
               "RelativeToolTip": "MyOpenGL\\SceneFolder\\Scene.cpp",
               "ViewState": "AgIAAGMAAAAAAAAAAAAAAA4BAAAuAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-10-21T13:02:34.636Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-10-21T13:02:34.636Z"
             },
             {
               "$type": "Document",
@@ -146,12 +141,11 @@
               "RelativeToolTip": "MyOpenGL\\Physics\\Collision.h",
               "ViewState": "AgIAAAYAAAAAAAAAAAAAAA0BAAA+AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-12-10T01:22:34.608Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-10T01:22:34.608Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "script.lua",
               "DocumentMoniker": "C:\\Users\\Lenovo\\Documents\\Spilltech2024_H\\MyOpenGL_Repo\\MyOpenGL_Main\\MyOpenGL\\LUA\\Scripts\\script.lua",
               "RelativeDocumentMoniker": "MyOpenGL\\LUA\\Scripts\\script.lua",
@@ -172,8 +166,7 @@
               "RelativeToolTip": "MyOpenGL\\Physics\\ParticleSimulation.cpp",
               "ViewState": "AgIAAGYAAAAAAAAAAAAAAJgAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-12-08T17:09:59.022Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-08T17:09:59.022Z"
             },
             {
               "$type": "Document",
@@ -185,8 +178,7 @@
               "RelativeToolTip": "MyOpenGL\\SceneFolder\\Actor.cpp",
               "ViewState": "AgIAAHYAAAAAAAAAAAAwwDYBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-12-10T00:18:02.75Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-10T00:18:02.75Z"
             }
           ]
         }
